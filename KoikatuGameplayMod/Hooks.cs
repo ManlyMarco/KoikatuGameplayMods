@@ -3,8 +3,6 @@ using Harmony;
 using UnityEngine;
 using Random = System.Random;
 
-// ReSharper disable InconsistentNaming
-
 namespace KoikatuGameplayMod
 {
     internal static class Hooks
@@ -16,6 +14,41 @@ namespace KoikatuGameplayMod
             var i = HarmonyInstance.Create("marco-gameplaymod");
             i.PatchAll(typeof(Hooks));
         }
+
+        #region ForceAnal
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(HSprite), nameof(HSprite.OnInsertAnalNoVoiceClick), new Type[] { })]
+        public static void OnInsertAnalNoVoiceClickPre(HSprite __instance)
+        {
+            if (!Input.GetMouseButtonUp(0) || !__instance.IsSpriteAciotn())
+                return;
+
+            if (__instance.flags.isInsertOK)
+                return;
+
+            var heroine = __instance.flags.lstHeroine[0];
+
+            // Check if player can force raw 
+            // OUT_A is resting after popping the cork outdoors
+            if (__instance.flags.nowAnimStateName == "OUT_A" ||
+                __instance.flags.isDenialvoiceWait)
+            {
+                MakeGirlAngry(heroine);
+
+                ForceAllowRaw(__instance);
+                __instance.flags.isDenialvoiceWait = false;
+            }
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(HSprite), nameof(HSprite.OnInsertAnalNoVoiceClick), new Type[] { })]
+        public static void OnInsertAnalNoVoiceClickPost(HSprite __instance)
+        {
+            ResetForceAllowRaw(__instance);
+        }
+
+        #endregion
 
         #region ForceRaw
 
