@@ -18,6 +18,54 @@ namespace KoikatuGameplayMod
             i.PatchAll(typeof(Hooks));
         }
 
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(HSprite), "Start", new Type[] { })]
+        public static void HookToEndHButton(HSprite __instance)
+        {
+            var f = typeof(HSprite).GetField("btnEnd",
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+
+            var b = f.GetValue(__instance) as UnityEngine.UI.Button;
+
+            // Modify girl's lewdness after exiting h scene based on scene stats
+            b.OnClickAsObservable().Subscribe(unit =>
+            {
+                UpdateGirlLewdness(__instance);
+                UpdateGirlAnger(__instance);
+            });
+        }
+
+        #region GirlEroLevel
+
+        private static void UpdateGirlLewdness(HSprite __instance)
+        {
+            var flags = __instance.flags;
+            var count = flags.count;
+            var heroine = GetTargetHeroine(__instance);
+            if (heroine == null) return;
+
+            if (flags.GetOrgCount() == 0)
+            {
+                var massageTotal = (int)(count.selectAreas.Sum() / 4 + (+count.kiss + count.houshiOutside + count.houshiInside) * 10);
+                if (massageTotal <= 5)
+                    heroine.lewdness = Math.Max(0, heroine.lewdness - 30);
+                else
+                    heroine.lewdness = Math.Min(100, heroine.lewdness + massageTotal);
+            }
+            else if (count.aibuOrg > 0 && count.sonyuOrg + count.sonyuAnalOrg == 0)
+                heroine.lewdness = Math.Min(100, heroine.lewdness - (count.aibuOrg - 1) * 20);
+            else
+            {
+                int cumCount = count.sonyuCondomInside + count.sonyuInside + count.sonyuOutside + count.sonyuAnalCondomInside + count.sonyuAnalInside + count.sonyuAnalOutside;
+                if (cumCount > 0)
+                    heroine.lewdness = Math.Max(0, heroine.lewdness - cumCount * 20);
+
+                heroine.lewdness = Math.Max(0, heroine.lewdness - count.aibuOrg * 20);
+            }
+        }
+
+        #endregion
+
         #region FastTravelCost
 
         [HarmonyPostfix]
@@ -28,6 +76,8 @@ namespace KoikatuGameplayMod
                 BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
 
             var b = f.GetValue(__instance) as UnityEngine.UI.Button;
+
+            // Add a time penalty for using F3 fast travel
             b.OnClickAsObservable().Subscribe(unit =>
             {
                 if (__instance.result == MapSelectMenuScene.ResultType.EnterMapMove)
@@ -57,10 +107,14 @@ namespace KoikatuGameplayMod
 
             if (__instance.flags.isAnalInsertOK)
                 return;
-            
+
             // Check if player can circumvent the anal deny
             if (__instance.flags.count.sonyuAnalOrg >= 1)
             {
+                var heroine = GetTargetHeroine(__instance);
+
+                if (heroine != null && heroine.anger <= 80) heroine.anger = Math.Min(100, heroine.anger + 15);
+
                 ForceAllowInsert(__instance);
             }
         }
@@ -75,12 +129,14 @@ namespace KoikatuGameplayMod
             if (__instance.flags.isAnalInsertOK)
                 return;
 
-            var heroine = __instance.flags.lstHeroine[0];
+            var heroine = GetTargetHeroine(__instance);
+            if (heroine == null) return;
 
             // Check if player can circumvent the anal deny
             if (CanCircumventDeny(__instance) || __instance.flags.count.sonyuAnalOrg >= 1)
             {
                 MakeGirlAngry(heroine);
+                heroine.anger = Math.Min(100, heroine.anger + 15);
 
                 ForceAllowInsert(__instance);
                 __instance.flags.isDenialvoiceWait = false;
@@ -115,7 +171,7 @@ namespace KoikatuGameplayMod
             if (__instance.flags.isInsertOK)
                 return;
 
-            var heroine = __instance.flags.lstHeroine[0];
+            var heroine = GetTargetHeroine(__instance);
             var girlOrgasms = __instance.flags.count.sonyuOrg;
 
             // Check if player can circumvent the raw deny 
@@ -130,6 +186,11 @@ namespace KoikatuGameplayMod
             }
         }
 
+        private static SaveData.Heroine GetTargetHeroine(HSprite __instance)
+        {
+            return __instance.flags.lstHeroine.FirstOrDefault();
+        }
+
         [HarmonyPrefix]
         [HarmonyPatch(typeof(HSprite), nameof(HSprite.OnInsertClick), new Type[] { })]
         public static void OnInsertClickPre(HSprite __instance)
@@ -140,7 +201,8 @@ namespace KoikatuGameplayMod
             if (__instance.flags.isInsertOK)
                 return;
 
-            var heroine = __instance.flags.lstHeroine[0];
+            var heroine = GetTargetHeroine(__instance);
+            if (heroine == null) return;
             var girlOrgasms = __instance.flags.count.sonyuOrg;
 
             // Check if girl allows raw
@@ -174,8 +236,7 @@ namespace KoikatuGameplayMod
 
         private static void MakeGirlAngry(SaveData.Heroine heroine)
         {
-            heroine.anger = Math.Min(100, heroine.anger + 34);
-            heroine.isAnger = true;
+            heroine.anger = Math.Min(100, heroine.anger + 15);
             heroine.favor = Math.Max(0, heroine.favor - 10);
 
             heroine.chaCtrl.tearsLv = 1;
@@ -190,6 +251,23 @@ namespace KoikatuGameplayMod
             return string.Equals(__instance.flags.nowAnimStateName, "OUT_A", StringComparison.Ordinal) ||
                    string.Equals(__instance.flags.nowAnimStateName, "A_OUT_A", StringComparison.Ordinal) ||
                    __instance.flags.isDenialvoiceWait;
+        }
+
+        /// <summary>
+        /// Make girl angry if hero exploded inside raw
+        /// </summary>
+        private static void UpdateGirlAnger(HSprite __instance)
+        {
+            if (__instance.flags.isInsertOK) return;
+            var heroine = GetTargetHeroine(__instance);
+            if (heroine == null) return;
+            if (__instance.flags.count.sonyuInside > 0)
+            {
+                heroine.anger = Math.Min(100, heroine.anger + __instance.flags.count.sonyuInside * 33);
+                heroine.isAnger = true;
+            }
+            else if (heroine.anger >= 100)
+                heroine.isAnger = true;
         }
 
         #endregion
