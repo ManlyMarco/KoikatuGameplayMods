@@ -49,34 +49,56 @@ namespace KoikatuGameplayMod
         #region ForceAnal
 
         [HarmonyPrefix]
+        [HarmonyPatch(typeof(HSprite), nameof(HSprite.OnInsertAnalClick), new Type[] { })]
+        public static void OnInsertAnalClickPre(HSprite __instance)
+        {
+            if (!Input.GetMouseButtonUp(0) || !__instance.IsSpriteAciotn())
+                return;
+
+            if (__instance.flags.isAnalInsertOK)
+                return;
+            
+            // Check if player can circumvent the anal deny
+            if (__instance.flags.count.sonyuAnalOrg >= 1)
+            {
+                ForceAllowInsert(__instance);
+            }
+        }
+
+        [HarmonyPrefix]
         [HarmonyPatch(typeof(HSprite), nameof(HSprite.OnInsertAnalNoVoiceClick), new Type[] { })]
         public static void OnInsertAnalNoVoiceClickPre(HSprite __instance)
         {
             if (!Input.GetMouseButtonUp(0) || !__instance.IsSpriteAciotn())
                 return;
 
-            if (__instance.flags.isInsertOK)
+            if (__instance.flags.isAnalInsertOK)
                 return;
 
             var heroine = __instance.flags.lstHeroine[0];
 
             // Check if player can circumvent the anal deny
-            // OUT_A is resting after popping the cork outdoors
-            if (__instance.flags.nowAnimStateName == "OUT_A" ||
-                __instance.flags.isDenialvoiceWait)
+            if (CanCircumventDeny(__instance) || __instance.flags.count.sonyuAnalOrg >= 1)
             {
                 MakeGirlAngry(heroine);
 
-                ForceAllowRaw(__instance);
+                ForceAllowInsert(__instance);
                 __instance.flags.isDenialvoiceWait = false;
             }
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(HSprite), nameof(HSprite.OnInsertAnalClick), new Type[] { })]
+        public static void OnInsertAnalClickPost(HSprite __instance)
+        {
+            ResetForceAllowInsert(__instance);
         }
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(HSprite), nameof(HSprite.OnInsertAnalNoVoiceClick), new Type[] { })]
         public static void OnInsertAnalNoVoiceClickPost(HSprite __instance)
         {
-            ResetForceAllowRaw(__instance);
+            ResetForceAllowInsert(__instance);
         }
 
         #endregion
@@ -98,13 +120,12 @@ namespace KoikatuGameplayMod
 
             // Check if player can circumvent the raw deny 
             // OUT_A is resting after popping the cork outdoors
-            if (__instance.flags.nowAnimStateName == "OUT_A" ||
-                __instance.flags.isDenialvoiceWait ||
+            if (CanCircumventDeny(__instance) ||
                 girlOrgasms >= 3 + RandomGen.Next(0, 3) - heroine.lewdness / 66)
             {
                 MakeGirlAngry(heroine);
 
-                ForceAllowRaw(__instance);
+                ForceAllowInsert(__instance);
                 __instance.flags.isDenialvoiceWait = false;
             }
         }
@@ -124,29 +145,29 @@ namespace KoikatuGameplayMod
 
             // Check if girl allows raw
             if (girlOrgasms >= 4 + RandomGen.Next(0, 3) - heroine.lewdness / 45)
-                ForceAllowRaw(__instance);
+                ForceAllowInsert(__instance);
         }
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(HSprite), nameof(HSprite.OnInsertNoVoiceClick), new Type[] { })]
         public static void OnInsertNoVoiceClickPost(HSprite __instance)
         {
-            ResetForceAllowRaw(__instance);
+            ResetForceAllowInsert(__instance);
         }
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(HSprite), nameof(HSprite.OnInsertClick), new Type[] { })]
         public static void OnInsertClickPost(HSprite __instance)
         {
-            ResetForceAllowRaw(__instance);
+            ResetForceAllowInsert(__instance);
         }
 
-        private static void ForceAllowRaw(HSprite instance)
+        private static void ForceAllowInsert(HSprite instance)
         {
             instance.flags.isDebug = true;
         }
 
-        private static void ResetForceAllowRaw(HSprite __instance)
+        private static void ResetForceAllowInsert(HSprite __instance)
         {
             __instance.flags.isDebug = false;
         }
@@ -161,6 +182,14 @@ namespace KoikatuGameplayMod
             heroine.chaCtrl.ChangeEyesShaking(true);
             heroine.chaCtrl.ChangeLookEyesTarget(2);
             heroine.chaCtrl.ChangeTongueState(0);
+        }
+
+        private static bool CanCircumventDeny(HSprite __instance)
+        {
+            // OUT_A is resting after popping the cork outdoors
+            return string.Equals(__instance.flags.nowAnimStateName, "OUT_A", StringComparison.Ordinal) ||
+                   string.Equals(__instance.flags.nowAnimStateName, "A_OUT_A", StringComparison.Ordinal) ||
+                   __instance.flags.isDenialvoiceWait;
         }
 
         #endregion
