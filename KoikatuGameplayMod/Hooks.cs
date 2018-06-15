@@ -7,7 +7,7 @@ namespace KoikatuGameplayMod
 {
     internal static class Hooks
     {
-        private static readonly Random RandomGen = new Random();
+        public static readonly Random RandomGen = new Random();
 
         public static void ApplyHooks()
         {
