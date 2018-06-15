@@ -16,7 +16,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>bin\Debug\</OutputPath>
+    <OutputPath>..\..\..\..\Games\Koikatsu\BepInEx\</OutputPath>
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -32,15 +32,19 @@
   <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>..\..\..\..\Games\Koikatsu\Koikatu_Data\Managed\0Harmony.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
       <HintPath>..\..\..\..\Games\Koikatsu\Koikatu_Data\Managed\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="BepInEx">
       <HintPath>..\..\..\..\Games\Koikatsu\Koikatu_Data\Managed\BepInEx.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="ConfigurationManager">
       <HintPath>..\..\BepisPlugins\bin\BepInEx\ConfigurationManager.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -50,9 +54,11 @@
     <Reference Include="System.Xml" />
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\..\Games\Koikatsu\Koikatu_Data\Managed\UnityEngine.dll</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Hooks.cs" />
     <Compile Include="KoikatuGameplayMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
