@@ -2,6 +2,7 @@
 using System.Linq;
 using System.Reflection;
 using Harmony;
+using Manager;
 using UniRx;
 using UnityEngine;
 using Random = System.Random;
@@ -113,7 +114,7 @@ namespace KoikatuGameplayMod
             {
                 var heroine = GetTargetHeroine(__instance);
 
-                if (heroine != null && heroine.anger <= 80) heroine.anger = Math.Min(100, heroine.anger + 15);
+                if (heroine != null && heroine.anger <= 80) heroine.anger = Math.Min(100, heroine.anger + 20);
 
                 ForceAllowInsert(__instance);
             }
@@ -258,15 +259,31 @@ namespace KoikatuGameplayMod
         /// </summary>
         private static void UpdateGirlAnger(HSprite __instance)
         {
-            if (__instance.flags.isInsertOK) return;
             var heroine = GetTargetHeroine(__instance);
             if (heroine == null) return;
-            if (__instance.flags.count.sonyuInside > 0)
+
+            if (!__instance.flags.isInsertOK)
             {
-                heroine.anger = Math.Min(100, heroine.anger + __instance.flags.count.sonyuInside * 33);
-                heroine.isAnger = true;
+                if (__instance.flags.count.sonyuInside > 0)
+                {
+                    if(__instance.flags.GetMenstruation(heroine.MenstruationDay) == HFlag.MenstruationType.危険日)
+                    {
+                        // If it's dangerous always make her angry
+                        heroine.anger = Math.Min(100, heroine.anger + __instance.flags.count.sonyuInside * 45);
+                        heroine.isAnger = true;
+                    }
+                    else
+                    {
+                        heroine.anger = Math.Min(100, heroine.anger + __instance.flags.count.sonyuInside * 25);
+                    }
+                }
+                else if(__instance.flags.count.sonyuOutside > 0)
+                {
+                    heroine.anger = Math.Max(0, heroine.anger - __instance.flags.count.sonyuOutside * 10);
+                }
             }
-            else if (heroine.anger >= 100)
+
+            if (heroine.anger >= 100)
                 heroine.isAnger = true;
         }
 

@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
-using System.Reflection;
-using System.Text;
 using BepInEx;
 using Manager;
 using UnityEngine;
@@ -44,6 +41,11 @@ namespace KoikatuGameplayMod
                 LowerStat(ref _gameMgr.Player.intellect);
                 LowerStat(ref _gameMgr.Player.hentai);
                 LowerStat(ref _gameMgr.Player.physical);
+            }
+
+            foreach (var heroine in _gameMgr.HeroineList)
+            {
+                heroine.lewdness = Math.Max(0, heroine.lewdness - 50);
             }
         }
 
