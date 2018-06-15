@@ -15,14 +15,20 @@ namespace KoikatuGameplayMod
     [BepInDependency("marco-gameplaymod", BepInDependency.DependencyFlags.SoftDependency)]
     public class KoikatuGameplayMod : BaseUnityPlugin
     {
-        [DisplayName("Allow stats to decay")]
-        public ConfigWrapper<bool> StatDecay { get; }
+        [DisplayName("Allow player stats to slowly decay")]
+        public static ConfigWrapper<bool> StatDecay { get; set; }
+
+        [DisplayName("Fast travel (F3) time cost")]
+        [Description("Value is in seconds.\nOne period has 500 seconds.")]
+        [AcceptableValueRange(0, 100, false)]
+        public static ConfigWrapper<int> FastTravelTimePenalty { get; set; }
 
         private Game _gameMgr;
         private Scene _sceneMgr;
 
         public KoikatuGameplayMod()
         {
+            FastTravelTimePenalty = new ConfigWrapper<int>("FastTravelTimePenalty", this, 50);
             StatDecay = new ConfigWrapper<bool>("StatDecay", this, true);
 
             Hooks.ApplyHooks();
@@ -43,8 +49,8 @@ namespace KoikatuGameplayMod
 
         private void LowerStat(ref int stat)
         {
-            if (stat > 30)
-                stat = stat - (int)Math.Log10(_gameMgr.Player.intellect);
+            if (stat > 40)
+                stat = stat - (int)(Math.Log10(_gameMgr.Player.intellect) * 1.33);
 
             stat -= Hooks.RandomGen.Next(0, 3);
 

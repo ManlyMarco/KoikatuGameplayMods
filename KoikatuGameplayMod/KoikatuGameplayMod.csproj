@@ -38,6 +38,9 @@
       <HintPath>..\..\..\..\Games\Koikatsu\Koikatu_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Assembly-CSharp-firstpass">
+      <HintPath>..\..\..\..\Games\Koikatsu\Koikatu_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+    </Reference>
     <Reference Include="BepInEx">
       <HintPath>..\..\..\..\Games\Koikatsu\Koikatu_Data\Managed\BepInEx.dll</HintPath>
       <Private>False</Private>
@@ -55,6 +58,9 @@
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\..\Games\Koikatsu\Koikatu_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI">
+      <HintPath>..\..\..\..\Games\Koikatsu\Koikatu_Data\Managed\UnityEngine.UI.dll</HintPath>
     </Reference>
   </ItemGroup>
   <ItemGroup>

@@ -1,5 +1,8 @@
 ﻿using System;
+using System.Linq;
+using System.Reflection;
 using Harmony;
+using UniRx;
 using UnityEngine;
 using Random = System.Random;
 
@@ -15,6 +18,34 @@ namespace KoikatuGameplayMod
             i.PatchAll(typeof(Hooks));
         }
 
+        #region FastTravelCost
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(MapSelectMenuScene), "Start", new Type[] { })]
+        public static void MapSelectMenuSceneRegisterCallback(MapSelectMenuScene __instance)
+        {
+            var f = typeof(MapSelectMenuScene).GetField("enterButton",
+                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+
+            var b = f.GetValue(__instance) as UnityEngine.UI.Button;
+            b.OnClickAsObservable().Subscribe(unit =>
+            {
+                if (__instance.result == MapSelectMenuScene.ResultType.EnterMapMove)
+                {
+                    var cycle = UnityEngine.Object.FindObjectsOfType<ActionGame.Cycle>().FirstOrDefault();
+                    if (cycle != null)
+                    {
+                        var newVal = Math.Min(cycle.timer + KoikatuGameplayMod.FastTravelTimePenalty.Value, ActionGame.Cycle.TIME_LIMIT - 10);
+                        typeof(ActionGame.Cycle)
+                            .GetField("_timer", BindingFlags.Instance | BindingFlags.NonPublic)
+                            .SetValue(cycle, newVal);
+                    }
+                }
+            });
+        }
+
+        #endregion
+
         #region ForceAnal
 
         [HarmonyPrefix]
@@ -29,7 +60,7 @@ namespace KoikatuGameplayMod
 
             var heroine = __instance.flags.lstHeroine[0];
 
-            // Check if player can force raw 
+            // Check if player can circumvent the anal deny
             // OUT_A is resting after popping the cork outdoors
             if (__instance.flags.nowAnimStateName == "OUT_A" ||
                 __instance.flags.isDenialvoiceWait)
@@ -65,7 +96,7 @@ namespace KoikatuGameplayMod
             var heroine = __instance.flags.lstHeroine[0];
             var girlOrgasms = __instance.flags.count.sonyuOrg;
 
-            // Check if player can force raw 
+            // Check if player can circumvent the raw deny 
             // OUT_A is resting after popping the cork outdoors
             if (__instance.flags.nowAnimStateName == "OUT_A" ||
                 __instance.flags.isDenialvoiceWait ||
