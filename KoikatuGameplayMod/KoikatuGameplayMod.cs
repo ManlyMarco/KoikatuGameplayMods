@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
@@ -30,29 +31,14 @@ namespace KoikatuGameplayMod
         // Start as false to prevent firing after loading
         private bool _inNightMenu, _firstNightMenu = true;
 
-        private void Update()
-        {
-            if (!_gameMgr.saveData.isOpening && StatDecay.Value && !_sceneMgr.IsNowLoading)
-            {
-                if (_sceneMgr.NowSceneNames.Any(x => x.Equals("NightMenu", StringComparison.Ordinal)))
-                {
-                    if (!_inNightMenu && !_firstNightMenu)
-                        OnNightStarted();
-                    _inNightMenu = true;
-                    _firstNightMenu = false;
-                }
-                else
-                {
-                    _inNightMenu = false;
-                }
-            }
-        }
-
         private void OnNightStarted()
         {
-            LowerStat(ref _gameMgr.Player.intellect);
-            LowerStat(ref _gameMgr.Player.hentai);
-            LowerStat(ref _gameMgr.Player.physical);
+            if (StatDecay.Value)
+            {
+                LowerStat(ref _gameMgr.Player.intellect);
+                LowerStat(ref _gameMgr.Player.hentai);
+                LowerStat(ref _gameMgr.Player.physical);
+            }
         }
 
         private void LowerStat(ref int stat)
@@ -65,13 +51,43 @@ namespace KoikatuGameplayMod
             if (stat < 0) stat = 0;
         }
 
-        private void Start()
+        public void Start()
         {
             _gameMgr = Manager.Game.Instance;
             _sceneMgr = Manager.Scene.Instance;
+
+            StartCoroutine(SlowUpdate());
+        }
+
+        private IEnumerator SlowUpdate()
+        {
+            while (true)
+            {
+                yield return new WaitForSecondsRealtime(0.5f);
+
+                if (!_gameMgr.saveData.isOpening && !_sceneMgr.IsNowLoading)
+                {
+                    if (_sceneMgr.NowSceneNames.Any(x => x.Equals("NightMenu", StringComparison.Ordinal)))
+                    {
+                        if (!_inNightMenu && !_firstNightMenu)
+                            OnNightStarted();
+                        _inNightMenu = true;
+                        _firstNightMenu = false;
+                    }
+                    else
+                    {
+                        _inNightMenu = false;
+                    }
+                }
+            }
         }
 
         /*
+
+        private void Update()
+        {
+
+        }
         private void OnGUI()
         {
 
