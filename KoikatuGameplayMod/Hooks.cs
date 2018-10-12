@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Reflection;
 using Harmony;
-using Manager;
 using UniRx;
 using UnityEngine;
 using Random = System.Random;
@@ -32,7 +31,7 @@ namespace KoikatuGameplayMod
             b.OnClickAsObservable().Subscribe(unit =>
             {
                 UpdateGirlLewdness(__instance);
-                UpdateGirlAnger(__instance);
+                ApplyGirlAnger(__instance);
             });
         }
 
@@ -40,6 +39,8 @@ namespace KoikatuGameplayMod
 
         private static void UpdateGirlLewdness(HSprite __instance)
         {
+            if(!KoikatuGameplayMod.DecreaseLewd.Value) return;
+            
             var flags = __instance.flags;
             var count = flags.count;
             var heroine = GetTargetHeroine(__instance);
@@ -114,7 +115,7 @@ namespace KoikatuGameplayMod
             {
                 var heroine = GetTargetHeroine(__instance);
 
-                if (heroine != null && heroine.anger <= 80) heroine.anger = Math.Min(100, heroine.anger + 20);
+                MakeGirlAngry(heroine, 20, 10);
 
                 ForceAllowInsert(__instance);
             }
@@ -134,10 +135,10 @@ namespace KoikatuGameplayMod
             if (heroine == null) return;
 
             // Check if player can circumvent the anal deny
+            if (!KoikatuGameplayMod.ForceInsert.Value) return;
             if (CanCircumventDeny(__instance) || __instance.flags.count.sonyuAnalOrg >= 1)
             {
-                MakeGirlAngry(heroine);
-                heroine.anger = Math.Min(100, heroine.anger + 15);
+                MakeGirlAngry(heroine, 30, 15);
 
                 ForceAllowInsert(__instance);
                 __instance.flags.isDenialvoiceWait = false;
@@ -175,12 +176,12 @@ namespace KoikatuGameplayMod
             var heroine = GetTargetHeroine(__instance);
             var girlOrgasms = __instance.flags.count.sonyuOrg;
 
-            // Check if player can circumvent the raw deny 
-            // OUT_A is resting after popping the cork outdoors
+            // Check if player can circumvent the raw deny
+            if (!KoikatuGameplayMod.ForceInsert.Value) return;
             if (CanCircumventDeny(__instance) ||
                 girlOrgasms >= 3 + RandomGen.Next(0, 3) - heroine.lewdness / 66)
             {
-                MakeGirlAngry(heroine);
+                MakeGirlAngry(heroine, 20, 10);
 
                 ForceAllowInsert(__instance);
                 __instance.flags.isDenialvoiceWait = false;
@@ -235,15 +236,24 @@ namespace KoikatuGameplayMod
             __instance.flags.isDebug = false;
         }
 
-        private static void MakeGirlAngry(SaveData.Heroine heroine)
+        /// <summary>
+        /// ang 15 fav 10
+        /// </summary>
+        /// <param name="heroine"></param>
+        /// <param name="angerAmount"></param>
+        /// <param name="favorAmount"></param>
+        private static void MakeGirlAngry(SaveData.Heroine heroine, int angerAmount, int favorAmount)
         {
-            heroine.anger = Math.Min(100, heroine.anger + 15);
-            heroine.favor = Math.Max(0, heroine.favor - 10);
+            if (!KoikatuGameplayMod.ForceInsertAnger.Value) return;
 
-            heroine.chaCtrl.tearsLv = 1;
+            heroine.anger = Math.Min(100, heroine.anger + angerAmount);
+            heroine.favor = Math.Max(0, heroine.favor - favorAmount);
+
+            heroine.chaCtrl.tearsLv = 2;
             heroine.chaCtrl.ChangeEyesShaking(true);
             heroine.chaCtrl.ChangeLookEyesTarget(2);
             heroine.chaCtrl.ChangeTongueState(0);
+            heroine.chaCtrl.ChangeEyesOpenMax(1f);
         }
 
         private static bool CanCircumventDeny(HSprite __instance)
@@ -253,12 +263,11 @@ namespace KoikatuGameplayMod
                    string.Equals(__instance.flags.nowAnimStateName, "A_OUT_A", StringComparison.Ordinal) ||
                    __instance.flags.isDenialvoiceWait;
         }
-
-        /// <summary>
-        /// Make girl angry if hero exploded inside raw
-        /// </summary>
-        private static void UpdateGirlAnger(HSprite __instance)
+        
+        private static void ApplyGirlAnger(HSprite __instance)
         {
+            if(!KoikatuGameplayMod.ForceInsertAnger.Value) return;
+
             var heroine = GetTargetHeroine(__instance);
             if (heroine == null) return;
 
