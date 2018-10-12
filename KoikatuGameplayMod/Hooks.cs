@@ -266,7 +266,7 @@ namespace KoikatuGameplayMod
             {
                 if (__instance.flags.count.sonyuInside > 0)
                 {
-                    if(__instance.flags.GetMenstruation(heroine.MenstruationDay) == HFlag.MenstruationType.危険日)
+                    if(HFlag.GetMenstruation(heroine.MenstruationDay) == HFlag.MenstruationType.危険日)
                     {
                         // If it's dangerous always make her angry
                         heroine.anger = Math.Min(100, heroine.anger + __instance.flags.count.sonyuInside * 45);
