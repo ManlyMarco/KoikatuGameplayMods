@@ -8,8 +8,8 @@ using UnityEngine;
 
 namespace KoikatuGameplayMod
 {
-    [BepInPlugin("KoikatuGameplayMod", "Koikatu Gameplay Tweaks and Improvements", "1.0")]
-    [BepInDependency("marco-gameplaymod", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInProcess("Koikatu")]
+    [BepInPlugin("KoikatuGameplayMod", "Koikatu Gameplay Tweaks and Improvements", "1.1")]
     public class KoikatuGameplayMod : BaseUnityPlugin
     {
         [DisplayName("Allow player stats to slowly decay")]
