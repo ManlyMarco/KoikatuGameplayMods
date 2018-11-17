@@ -13,3 +13,6 @@ Works under BepInEx with Harmony. Needs latest BepisPlugins - universal Configur
 
 ## Download
 Check releases or build from source. Tested on VS 2017.
+
+-----
+You can support development of my plugins through my Patreon page: https://www.patreon.com/ManlyMarco
