@@ -9,7 +9,7 @@ using UnityEngine;
 namespace KoikatuGameplayMod
 {
     [BepInProcess("Koikatu")]
-    [BepInPlugin("marco-gameplaymod", "Koikatu Gameplay Tweaks and Improvements", "1.1")]
+    [BepInPlugin("marco-gameplaymod", "Koikatu Gameplay Tweaks and Improvements", "1.2")]
     public class KoikatuGameplayMod : BaseUnityPlugin
     {
         private const string HScene = "H Scene tweaks";
@@ -119,16 +119,5 @@ namespace KoikatuGameplayMod
                 }
             }
         }
-
-        /*
-
-        private void Update()
-        {
-
-        }
-        private void OnGUI()
-        {
-
-        }*/
     }
 }

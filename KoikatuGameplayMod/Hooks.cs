@@ -170,7 +170,7 @@ namespace KoikatuGameplayMod
             if (!Input.GetMouseButtonUp(0) || !__instance.IsSpriteAciotn())
                 return;
 
-            if (__instance.flags.isInsertOK)
+            if (__instance.flags.isInsertOK[GetTargetHeroineId(__instance)])
                 return;
 
             var heroine = GetTargetHeroine(__instance);
@@ -190,7 +190,12 @@ namespace KoikatuGameplayMod
 
         private static SaveData.Heroine GetTargetHeroine(HSprite __instance)
         {
-            return __instance.flags.lstHeroine.FirstOrDefault();
+            return __instance.flags.lstHeroine[GetTargetHeroineId(__instance)];
+        }
+
+        private static int GetTargetHeroineId(HSprite __instance)
+        {
+            return (__instance.flags.mode >= HFlag.EMode.houshi3P) ? (__instance.flags.nowAnimationInfo.id % 2) : 0;
         }
 
         [HarmonyPrefix]
@@ -200,7 +205,7 @@ namespace KoikatuGameplayMod
             if (!Input.GetMouseButtonUp(0) || !__instance.IsSpriteAciotn())
                 return;
 
-            if (__instance.flags.isInsertOK)
+            if (__instance.flags.isInsertOK[GetTargetHeroineId(__instance)])
                 return;
 
             var heroine = GetTargetHeroine(__instance);
@@ -271,7 +276,7 @@ namespace KoikatuGameplayMod
             var heroine = GetTargetHeroine(__instance);
             if (heroine == null) return;
 
-            if (!__instance.flags.isInsertOK)
+            if (!__instance.flags.isInsertOK[GetTargetHeroineId(__instance)])
             {
                 if (__instance.flags.count.sonyuInside > 0)
                 {
