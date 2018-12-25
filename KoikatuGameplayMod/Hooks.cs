@@ -1,22 +1,67 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Reflection.Emit;
+using ActionGame;
+using Config;
 using Harmony;
 using UniRx;
 using UnityEngine;
+using UnityEngine.UI;
 using Random = System.Random;
 
 namespace KoikatuGameplayMod
 {
     internal static class Hooks
     {
+        private const int UnlockedMaxCharacters = 99;
         public static readonly Random RandomGen = new Random();
 
         public static void ApplyHooks()
         {
             var i = HarmonyInstance.Create("marco-gameplaymod");
             i.PatchAll(typeof(Hooks));
+
+            var t = typeof(ActionScene).GetNestedType("<NPCLoadAll>c__IteratorD", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            var m = t.GetMethod("MoveNext");
+            i.Patch(m, null, null, new HarmonyMethod(typeof(Hooks), nameof(NPCLoadAllUnlock)));
         }
+
+        #region Chara limit unlock
+
+        public static IEnumerable<CodeInstruction> NPCLoadAllUnlock(IEnumerable<CodeInstruction> instructions)
+        {
+            foreach (var instruction in instructions)
+            {
+                if (instruction.opcode == OpCodes.Ldc_I4_S)
+                {
+                    if (((sbyte)0x26).Equals(instruction.operand))
+                        instruction.operand = UnlockedMaxCharacters;
+                }
+                yield return instruction;
+            }
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(ClassRoomList), "Start")]
+        public static void ClassRoomListUnlock(ClassRoomList __instance)
+        {
+            var f = typeof(ClassRoomList).GetField("sldAttendanceNum", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            var sld = (Slider)f.GetValue(__instance);
+            sld.maxValue = UnlockedMaxCharacters;
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(EtceteraSetting), "Init")]
+        public static void EtceteraSettingUnlock(EtceteraSetting __instance)
+        {
+            var f = typeof(EtceteraSetting).GetField("maxCharaNumSlider", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            var sld = (Slider)f.GetValue(__instance);
+            sld.maxValue = UnlockedMaxCharacters;
+        }
+
+        #endregion
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(HSprite), "Start", new Type[] { })]
@@ -39,8 +84,8 @@ namespace KoikatuGameplayMod
 
         private static void UpdateGirlLewdness(HSprite __instance)
         {
-            if(!KoikatuGameplayMod.DecreaseLewd.Value) return;
-            
+            if (!KoikatuGameplayMod.DecreaseLewd.Value) return;
+
             var flags = __instance.flags;
             var count = flags.count;
             var heroine = GetTargetHeroine(__instance);
@@ -268,10 +313,10 @@ namespace KoikatuGameplayMod
                    string.Equals(__instance.flags.nowAnimStateName, "A_OUT_A", StringComparison.Ordinal) ||
                    __instance.flags.isDenialvoiceWait;
         }
-        
+
         private static void ApplyGirlAnger(HSprite __instance)
         {
-            if(!KoikatuGameplayMod.ForceInsertAnger.Value) return;
+            if (!KoikatuGameplayMod.ForceInsertAnger.Value) return;
 
             var heroine = GetTargetHeroine(__instance);
             if (heroine == null) return;
@@ -280,7 +325,7 @@ namespace KoikatuGameplayMod
             {
                 if (__instance.flags.count.sonyuInside > 0)
                 {
-                    if(HFlag.GetMenstruation(heroine.MenstruationDay) == HFlag.MenstruationType.危険日)
+                    if (HFlag.GetMenstruation(heroine.MenstruationDay) == HFlag.MenstruationType.危険日)
                     {
                         // If it's dangerous always make her angry
                         heroine.anger = Math.Min(100, heroine.anger + __instance.flags.count.sonyuInside * 45);
@@ -291,7 +336,7 @@ namespace KoikatuGameplayMod
                         heroine.anger = Math.Min(100, heroine.anger + __instance.flags.count.sonyuInside * 25);
                     }
                 }
-                else if(__instance.flags.count.sonyuOutside > 0)
+                else if (__instance.flags.count.sonyuOutside > 0)
                 {
                     heroine.anger = Math.Max(0, heroine.anger - __instance.flags.count.sonyuOutside * 10);
                 }
