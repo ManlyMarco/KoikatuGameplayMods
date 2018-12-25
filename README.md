@@ -11,6 +11,8 @@ Mod that tweaks and (hopefully) improves Koikatu gameplay.
 
 **Warning:** Setting the character limit above 38 requires a large amount of RAM and will extend loading times. To load 99 characters the game will need approximately 10GB of free RAM (depending on the characters used).
 
+![preview](https://user-images.githubusercontent.com/39247311/50426454-0c860a00-088e-11e9-85d0-493db814cc48.png)
+
 ## Requirements
 Works under BepInEx with Harmony. Needs latest BepisPlugins - universal ConfigurationManager is used for mod settings.
 
