@@ -55,7 +55,6 @@ namespace KoikatuGameplayMod
             DecreaseLewd = new ConfigWrapper<bool>("DecreaseLewd", this, true);
             CountNamaInsert = new ConfigWrapper<bool>("countNamaInsert", this, true);
 
-
             FastTravelTimePenalty = new ConfigWrapper<int>("FastTravelTimePenalty", this, 50);
             StatDecay = new ConfigWrapper<bool>("StatDecay", this, true);
             LewdDecay = new ConfigWrapper<bool>("LewdDecay", this, false);
