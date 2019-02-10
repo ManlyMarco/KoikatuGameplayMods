@@ -43,6 +43,10 @@
       <HintPath>..\..\..\..\Games\Koikatsu\BepInEx\core\BepInEx.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="ConfigurationManager">
+      <HintPath>..\..\BepisPlugins\bin\BepInEx\ConfigurationManager.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="UnityEngine">
       <HintPath>..\..\..\..\Games\Koikatsu\Koikatu_Data\Managed\UnityEngine.dll</HintPath>
