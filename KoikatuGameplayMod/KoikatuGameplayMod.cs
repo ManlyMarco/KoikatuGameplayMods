@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections;
 using System.ComponentModel;
-using System.Linq;
 using BepInEx;
 using Manager;
 using UnityEngine;
@@ -9,9 +8,10 @@ using UnityEngine;
 namespace KoikatuGameplayMod
 {
     [BepInProcess("Koikatu")]
-    [BepInPlugin("marco-gameplaymod", "Koikatu Gameplay Tweaks and Improvements", "1.2")]
+    [BepInPlugin("marco-gameplaymod", "Koikatu Gameplay Tweaks and Improvements", Version)]
     public class KoikatuGameplayMod : BaseUnityPlugin
     {
+        internal const string Version = "1.2";
         private const string HScene = "H Scene tweaks";
 
         [Category(HScene)]

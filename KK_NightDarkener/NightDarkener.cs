@@ -8,7 +8,7 @@ using UnityEngine.SceneManagement;
 namespace KK_NightDarkener
 {
     [BepInProcess("Koikatu")]
-    [BepInPlugin(GUID, "KK Night Darkener", Version)]
+    [BepInPlugin(GUID, "Night Darkener", Version)]
     public class NightDarkener : BaseUnityPlugin
     {
         public const string GUID = "Marco.NightDarkener";
