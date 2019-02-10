@@ -18,3 +18,10 @@ Works under BepInEx with Harmony. Needs latest BepisPlugins - universal Configur
 
 ## Download
 Check [releases](https://github.com/ManlyMarco/Koikatu-Gameplay-Mod/releases) or build from source. Tested on VS 2017.
+
+# KK_NightDarkener v1.0 
+Mod that darkens the night scenes to something slightly more realistic. Configurable, can go down to horror levels of darkness.
+
+Needs BepInEx and BepisPlugins, to install copy the dll to your BepInEx directory.
+
+Inspired by PHmod44_KK_Dark_Map_Ver mod, thanks to HCM06 for bringing it up.
