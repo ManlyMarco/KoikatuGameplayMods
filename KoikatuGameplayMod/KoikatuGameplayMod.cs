@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.ComponentModel;
+using System.Linq;
 using BepInEx;
 using Manager;
 using UnityEngine;
@@ -34,7 +35,7 @@ namespace KoikatuGameplayMod
         [DisplayName("Player's stats slowly decay overnight")]
         public static ConfigWrapper<bool> StatDecay { get; set; }
 
-        [DisplayName("Girls' lewdness decays overnight")]
+        [DisplayName("Girls' lewdness decays overnight. Will make lesbian and masturbation scenes less common.")]
         public static ConfigWrapper<bool> LewdDecay { get; set; }
 
         [DisplayName("Fast travel (F3) time cost")]
@@ -47,9 +48,9 @@ namespace KoikatuGameplayMod
 
         public KoikatuGameplayMod()
         {
-            ForceInsert = new ConfigWrapper<bool>("ForceInsertAnger", this, true);
+            ForceInsert = new ConfigWrapper<bool>("ForceInsert", this, true);
             ForceInsertAnger = new ConfigWrapper<bool>("ForceInsertAnger", this, true);
-            DecreaseLewd = new ConfigWrapper<bool>("DecreaseLewd", this, true);
+            DecreaseLewd = new ConfigWrapper<bool>("DecreaseLewd", this, false);
 
             FastTravelTimePenalty = new ConfigWrapper<int>("FastTravelTimePenalty", this, 50);
             StatDecay = new ConfigWrapper<bool>("StatDecay", this, true);
@@ -81,11 +82,8 @@ namespace KoikatuGameplayMod
 
         private void LowerStat(ref int stat)
         {
-            if (stat > 40)
-                stat = stat - (int)(Math.Log10(_gameMgr.Player.intellect) * 1.33);
-
-            stat -= Hooks.RandomGen.Next(0, 3);
-
+            stat -= Hooks.RandomGen.Next(0, 2);
+            
             if (stat < 0) stat = 0;
         }
 
@@ -102,7 +100,7 @@ namespace KoikatuGameplayMod
             while (true)
             {
                 yield return new WaitForSecondsRealtime(0.5f);
-                
+
                 if (!_gameMgr.saveData.isOpening && !_sceneMgr.IsNowLoading)
                 {
                     if (_sceneMgr.NowSceneNames.Any(x => x.Equals("NightMenu", StringComparison.Ordinal)))
