@@ -4,13 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{9A51CFCB-A18A-428A-843A-FE7CF2EEF523}</ProjectGuid>
+    <ProjectGuid>{EA097539-121F-4DCB-ACAE-B4BE2076BABE}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>KoikatuGameplayMod</RootNamespace>
-    <AssemblyName>KoikatuGameplayMod</AssemblyName>
+    <RootNamespace>KK_NightDarkener</RootNamespace>
+    <AssemblyName>KK_NightDarkener</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -30,43 +31,32 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Hooks.cs" />
-    <Compile Include="KoikatuGameplayMod.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <Reference Include="0Harmony">
       <HintPath>..\..\..\..\Games\Koikatsu\BepInEx\core\0Harmony.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp">
-      <HintPath>..\..\lib\Assembly-CSharp.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
-    <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Games\Koikatsu\Koikatu_Data\Managed\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>..\..\..\..\Games\Koikatsu\Koikatu_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="BepInEx">
       <HintPath>..\..\..\..\Games\Koikatsu\BepInEx\core\BepInEx.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="ConfigurationManager, Version=1.0.6855.1664, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
+    <Reference Include="ConfigurationManager">
       <HintPath>..\..\BepisPlugins\bin\BepInEx\ConfigurationManager.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
+    <Reference Include="System.Core" />
     <Reference Include="UnityEngine">
-      <HintPath>..\..\lib\UnityEngine.dll</HintPath>
+      <HintPath>..\..\..\..\Games\Koikatsu\Koikatu_Data\Managed\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\Games\Koikatsu\Koikatu_Data\Managed\UnityEngine.UI.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="NightDarkener.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

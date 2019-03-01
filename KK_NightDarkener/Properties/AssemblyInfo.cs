@@ -4,12 +4,12 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("KoikatuGameplayMod")]
+[assembly: AssemblyTitle("KK_NightDarkener")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("MarC0")]
-[assembly: AssemblyProduct("KoikatuGameplayMod")]
-[assembly: AssemblyCopyright("Copyright ©  2018")]
+[assembly: AssemblyCompany("ManlyMarco")]
+[assembly: AssemblyProduct("KK_NightDarkener")]
+[assembly: AssemblyCopyright("Copyright ©  2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
@@ -19,7 +19,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("9a51cfcb-a18a-428a-843a-fe7cf2eef523")]
+[assembly: Guid("ea097539-121f-4dcb-acae-b4be2076babe")]
 
 // Version information for an assembly consists of the following four values:
 //
@@ -32,4 +32,4 @@ using System.Runtime.InteropServices;
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion(KoikatuGameplayMod.KoikatuGameplayMod.Version)]
+[assembly: AssemblyFileVersion(KK_NightDarkener.NightDarkener.Version)]

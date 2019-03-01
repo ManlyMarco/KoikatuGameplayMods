@@ -9,9 +9,10 @@ using UnityEngine;
 namespace KoikatuGameplayMod
 {
     [BepInProcess("Koikatu")]
-    [BepInPlugin("marco-gameplaymod", "Koikatu Gameplay Tweaks and Improvements", "1.2")]
+    [BepInPlugin("marco-gameplaymod", "Koikatu Gameplay Tweaks and Improvements", Version)]
     public class KoikatuGameplayMod : BaseUnityPlugin
     {
+        internal const string Version = "1.2";
         private const string HScene = "H Scene tweaks";
 
         [Category(HScene)]
@@ -34,7 +35,7 @@ namespace KoikatuGameplayMod
         [DisplayName("Player's stats slowly decay overnight")]
         public static ConfigWrapper<bool> StatDecay { get; set; }
 
-        [DisplayName("Girls' lewdness decays overnight")]
+        [DisplayName("Girls' lewdness decays overnight. Will make lesbian and masturbation scenes less common.")]
         public static ConfigWrapper<bool> LewdDecay { get; set; }
         
         [DisplayName("!Reset Nama Insert")]
@@ -45,19 +46,27 @@ namespace KoikatuGameplayMod
         [AcceptableValueRange(0, 100, false)]
         public static ConfigWrapper<int> FastTravelTimePenalty { get; set; }
 
+        [DisplayName("Adjust preferred breast size question")]
+        [Description("Lowers the breast size needed for 'Average' and 'Large' breast options when a girl asks you what size you prefer.\n\n" +
+                     "Changes take effect after game restart.")]
+        [AcceptableValueRange(0, 100, false)]
+        public static ConfigWrapper<bool> AdjustBreastSizeQuestion { get; set; }
+
         private Game _gameMgr;
         private Scene _sceneMgr;
 
         public KoikatuGameplayMod()
         {
-            ForceInsert = new ConfigWrapper<bool>("ForceInsertAnger", this, true);
+            ForceInsert = new ConfigWrapper<bool>("ForceInsert", this, true);
             ForceInsertAnger = new ConfigWrapper<bool>("ForceInsertAnger", this, true);
-            DecreaseLewd = new ConfigWrapper<bool>("DecreaseLewd", this, true);
+            DecreaseLewd = new ConfigWrapper<bool>("DecreaseLewd", this, false);
+            
             CountNamaInsert = new ConfigWrapper<bool>("countNamaInsert", this, true);
 
             FastTravelTimePenalty = new ConfigWrapper<int>("FastTravelTimePenalty", this, 50);
             StatDecay = new ConfigWrapper<bool>("StatDecay", this, true);
             LewdDecay = new ConfigWrapper<bool>("LewdDecay", this, false);
+            AdjustBreastSizeQuestion = new ConfigWrapper<bool>("AdjustBreastSizeQuestion", this, true);
 
             Hooks.ApplyHooks();
         }
@@ -94,11 +103,8 @@ namespace KoikatuGameplayMod
 
         private void LowerStat(ref int stat)
         {
-            if (stat > 40)
-                stat = stat - (int)(Math.Log10(_gameMgr.Player.intellect) * 1.33);
-
-            stat -= Hooks.RandomGen.Next(0, 3);
-
+            stat -= Hooks.RandomGen.Next(0, 2);
+            
             if (stat < 0) stat = 0;
         }
 
@@ -115,7 +121,7 @@ namespace KoikatuGameplayMod
             while (true)
             {
                 yield return new WaitForSecondsRealtime(0.5f);
-                
+
                 if (!_gameMgr.saveData.isOpening && !_sceneMgr.IsNowLoading)
                 {
                     if (_sceneMgr.NowSceneNames.Any(x => x.Equals("NightMenu", StringComparison.Ordinal)))
