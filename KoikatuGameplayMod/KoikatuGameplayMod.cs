@@ -37,9 +37,11 @@ namespace KoikatuGameplayMod
 
         [DisplayName("Girls' lewdness decays overnight. Will make lesbian and masturbation scenes less common.")]
         public static ConfigWrapper<bool> LewdDecay { get; set; }
-        
-        [DisplayName("!Reset Nama Insert")]
-        public static ConfigWrapper<bool> CountNamaInsert { get; set; }
+
+        [DisplayName("Reset raw insert count at night")]
+        [Description("If enabled, next day girl will refuse raw insert on dangerous day until you do it a few times.\n" +
+                     "If disabled the default game logic is used (girl won't refuse if you did raw 5 times or more in total.)")]
+        public static ConfigWrapper<bool> ResetRawInsertCount { get; set; }
 
         [DisplayName("Fast travel (F3) time cost")]
         [Description("Value is in seconds.\nOne period has 500 seconds.")]
@@ -60,8 +62,8 @@ namespace KoikatuGameplayMod
             ForceInsert = new ConfigWrapper<bool>("ForceInsert", this, true);
             ForceInsertAnger = new ConfigWrapper<bool>("ForceInsertAnger", this, true);
             DecreaseLewd = new ConfigWrapper<bool>("DecreaseLewd", this, false);
-            
-            CountNamaInsert = new ConfigWrapper<bool>("countNamaInsert", this, true);
+
+            ResetRawInsertCount = new ConfigWrapper<bool>("countNamaInsert", this, true);
 
             FastTravelTimePenalty = new ConfigWrapper<int>("FastTravelTimePenalty", this, 50);
             StatDecay = new ConfigWrapper<bool>("StatDecay", this, true);
@@ -78,6 +80,13 @@ namespace KoikatuGameplayMod
         {
             if (StatDecay.Value)
             {
+                void LowerStat(ref int stat)
+                {
+                    stat -= Hooks.RandomGen.Next(0, 2);
+
+                    if (stat < 0) stat = 0;
+                }
+
                 LowerStat(ref _gameMgr.Player.intellect);
                 LowerStat(ref _gameMgr.Player.hentai);
                 LowerStat(ref _gameMgr.Player.physical);
@@ -86,28 +95,20 @@ namespace KoikatuGameplayMod
             if (LewdDecay.Value)
             {
                 foreach (var heroine in _gameMgr.HeroineList)
-                {
                     heroine.lewdness = Math.Max(0, heroine.lewdness - 50);
-                }
             }
-            
-            if (CountNamaInsert.Value)
+
+            if (ResetRawInsertCount.Value)
             {
                 foreach (var heroine in _gameMgr.HeroineList)
-                if (heroine.countNamaInsert >= 5)
                 {
-                    heroine.countNamaInsert = Math.Max(4, heroine.countNamaInsert - 50);
+                    // Lovers stop asking for condom at 3 or more, friends at 5 or more
+                    if (heroine.countNamaInsert >= 5)
+                        heroine.countNamaInsert = 2;
                 }
             }
         }
-
-        private void LowerStat(ref int stat)
-        {
-            stat -= Hooks.RandomGen.Next(0, 2);
-            
-            if (stat < 0) stat = 0;
-        }
-
+        
         public void Start()
         {
             _gameMgr = Game.Instance;
