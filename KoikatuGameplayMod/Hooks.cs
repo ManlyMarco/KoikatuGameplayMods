@@ -4,6 +4,7 @@ using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using ActionGame;
+using ADV.Commands.Game;
 using Config;
 using Harmony;
 using UniRx;
@@ -26,6 +27,27 @@ namespace KoikatuGameplayMod
             var t = typeof(ActionScene).GetNestedType("<NPCLoadAll>c__IteratorD", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
             var m = t.GetMethod("MoveNext");
             i.Patch(m, null, null, new HarmonyMethod(typeof(Hooks), nameof(NPCLoadAllUnlock)));
+        }
+        
+        [HarmonyTranspiler]
+        [HarmonyPatch(typeof(CharaPersonal), "GetBustSize", new[] { typeof(ChaFileControl) })]
+        public static IEnumerable<CodeInstruction> GetBustSizeTranspiler(IEnumerable<CodeInstruction> instr)
+        {
+            foreach (var instruction in instr)
+            {
+                if(KoikatuGameplayMod.AdjustBreastSizeQuestion.Value)
+                {
+                    if (instruction.operand is float f && Equals(f, 0.4f))
+                    {
+                        instruction.operand = 0.3f;
+                    }
+                    else if (instruction.operand is float f2 && Equals(f2, 0.7f))
+                    {
+                        instruction.operand = 0.55f;
+                    }
+                }
+                yield return instruction;
+            }
         }
 
         #region ExitFirstH

@@ -43,6 +43,12 @@ namespace KoikatuGameplayMod
         [AcceptableValueRange(0, 100, false)]
         public static ConfigWrapper<int> FastTravelTimePenalty { get; set; }
 
+        [DisplayName("Adjust preferred breast size question")]
+        [Description("Lowers the breast size needed for 'Average' and 'Large' breast options when a girl asks you what size you prefer.\n\n" +
+                     "Changes take effect after game restart.")]
+        [AcceptableValueRange(0, 100, false)]
+        public static ConfigWrapper<bool> AdjustBreastSizeQuestion { get; set; }
+
         private Game _gameMgr;
         private Scene _sceneMgr;
 
@@ -55,6 +61,7 @@ namespace KoikatuGameplayMod
             FastTravelTimePenalty = new ConfigWrapper<int>("FastTravelTimePenalty", this, 50);
             StatDecay = new ConfigWrapper<bool>("StatDecay", this, true);
             LewdDecay = new ConfigWrapper<bool>("LewdDecay", this, false);
+            AdjustBreastSizeQuestion = new ConfigWrapper<bool>("AdjustBreastSizeQuestion", this, true);
 
             Hooks.ApplyHooks();
         }
