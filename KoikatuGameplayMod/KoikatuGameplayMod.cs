@@ -37,6 +37,9 @@ namespace KoikatuGameplayMod
 
         [DisplayName("Girls' lewdness decays overnight. Will make lesbian and masturbation scenes less common.")]
         public static ConfigWrapper<bool> LewdDecay { get; set; }
+        
+        [DisplayName("!Reset Nama Insert")]
+        public static ConfigWrapper<bool> CountNamaInsert { get; set; }
 
         [DisplayName("Fast travel (F3) time cost")]
         [Description("Value is in seconds.\nOne period has 500 seconds.")]
@@ -57,6 +60,8 @@ namespace KoikatuGameplayMod
             ForceInsert = new ConfigWrapper<bool>("ForceInsert", this, true);
             ForceInsertAnger = new ConfigWrapper<bool>("ForceInsertAnger", this, true);
             DecreaseLewd = new ConfigWrapper<bool>("DecreaseLewd", this, false);
+            
+            CountNamaInsert = new ConfigWrapper<bool>("countNamaInsert", this, true);
 
             FastTravelTimePenalty = new ConfigWrapper<int>("FastTravelTimePenalty", this, 50);
             StatDecay = new ConfigWrapper<bool>("StatDecay", this, true);
@@ -83,6 +88,15 @@ namespace KoikatuGameplayMod
                 foreach (var heroine in _gameMgr.HeroineList)
                 {
                     heroine.lewdness = Math.Max(0, heroine.lewdness - 50);
+                }
+            }
+            
+            if (CountNamaInsert.Value)
+            {
+                foreach (var heroine in _gameMgr.HeroineList)
+                if (heroine.countNamaInsert >= 5)
+                {
+                    heroine.countNamaInsert = Math.Max(4, heroine.countNamaInsert - 50);
                 }
             }
         }
