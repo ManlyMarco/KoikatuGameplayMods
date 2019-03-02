@@ -38,10 +38,10 @@ namespace KoikatuGameplayMod
         [DisplayName("Girls' lewdness decays overnight. Will make lesbian and masturbation scenes less common.")]
         public static ConfigWrapper<bool> LewdDecay { get; set; }
 
-        [DisplayName("Reset raw insert count at night")]
-        [Description("If enabled, next day girl will refuse raw insert on dangerous day until you do it a few times.\n" +
-                     "If disabled the default game logic is used (girl won't refuse if you did raw 5 times or more in total.)")]
-        public static ConfigWrapper<bool> ResetRawInsertCount { get; set; }
+        [DisplayName("Make experienced girls ask for condom")]
+        [Description("If enabled, sometimes a girl will refuse raw insert on dangerous day until the second insert (once per day).\n" +
+                     "If disabled the default game logic is used (girl will never refuse if you did raw 5 times or more in total.)")]
+        public static ConfigWrapper<bool> ResetNoCondom { get; set; }
 
         [DisplayName("Fast travel (F3) time cost")]
         [Description("Value is in seconds.\nOne period has 500 seconds.")]
@@ -59,16 +59,16 @@ namespace KoikatuGameplayMod
 
         public KoikatuGameplayMod()
         {
-            ForceInsert = new ConfigWrapper<bool>("ForceInsert", this, true);
-            ForceInsertAnger = new ConfigWrapper<bool>("ForceInsertAnger", this, true);
-            DecreaseLewd = new ConfigWrapper<bool>("DecreaseLewd", this, false);
+            ForceInsert = new ConfigWrapper<bool>(nameof(ForceInsert), this, true);
+            ForceInsertAnger = new ConfigWrapper<bool>(nameof(ForceInsertAnger), this, true);
+            DecreaseLewd = new ConfigWrapper<bool>(nameof(DecreaseLewd), this, false);
 
-            ResetRawInsertCount = new ConfigWrapper<bool>("countNamaInsert", this, true);
+            ResetNoCondom = new ConfigWrapper<bool>(nameof(ResetNoCondom), this, true);
 
-            FastTravelTimePenalty = new ConfigWrapper<int>("FastTravelTimePenalty", this, 50);
-            StatDecay = new ConfigWrapper<bool>("StatDecay", this, true);
-            LewdDecay = new ConfigWrapper<bool>("LewdDecay", this, false);
-            AdjustBreastSizeQuestion = new ConfigWrapper<bool>("AdjustBreastSizeQuestion", this, true);
+            FastTravelTimePenalty = new ConfigWrapper<int>(nameof(FastTravelTimePenalty), this, 50);
+            StatDecay = new ConfigWrapper<bool>(nameof(StatDecay), this, true);
+            LewdDecay = new ConfigWrapper<bool>(nameof(LewdDecay), this, false);
+            AdjustBreastSizeQuestion = new ConfigWrapper<bool>(nameof(AdjustBreastSizeQuestion), this, true);
 
             Hooks.ApplyHooks();
         }
@@ -98,17 +98,21 @@ namespace KoikatuGameplayMod
                     heroine.lewdness = Math.Max(0, heroine.lewdness - 50);
             }
 
-            if (ResetRawInsertCount.Value)
+            if (ResetNoCondom.Value)
             {
                 foreach (var heroine in _gameMgr.HeroineList)
                 {
+                    if (heroine.parameter.attribute.bitch) continue;
+
                     // Lovers stop asking for condom at 3 or more, friends at 5 or more
-                    if (heroine.countNamaInsert >= 5)
-                        heroine.countNamaInsert = 2;
+                    if (heroine.isGirlfriend)
+                        heroine.countNamaInsert = Mathf.Min(heroine.countNamaInsert, 2);
+                    else
+                        heroine.countNamaInsert = Mathf.Min(heroine.countNamaInsert, 4);
                 }
             }
         }
-        
+
         public void Start()
         {
             _gameMgr = Game.Instance;
