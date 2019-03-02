@@ -12,7 +12,7 @@ namespace KoikatuGameplayMod
     [BepInPlugin("marco-gameplaymod", "Koikatu Gameplay Tweaks and Improvements", Version)]
     public class KoikatuGameplayMod : BaseUnityPlugin
     {
-        internal const string Version = "1.2";
+        internal const string Version = "1.3";
         private const string HScene = "H Scene tweaks";
 
         [Category(HScene)]
