@@ -3,6 +3,7 @@ Mod that tweaks and (hopefully) improves Koikatu gameplay.
 
 ## Some of the features
 - Character limit at school is raised from the stock 38 to 99.
+- Virgin H scenes can now be quit early. The girl stays a virgin in that case.
 - It's possible to force raw even when denied. Can cause anger.
 - Lewdness drops or raises depending on what happened in the H scene.
 - Everyone's levdness drops naturally, needs to be built back up.
