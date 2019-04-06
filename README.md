@@ -26,3 +26,5 @@ Mod that darkens the night scenes to something slightly more realistic. Configur
 Needs BepInEx and BepisPlugins, to install copy the dll to your BepInEx directory.
 
 Inspired by PHmod44_KK_Dark_Map_Ver mod, thanks to HCM06 for bringing it up.
+
+![Preview](https://user-images.githubusercontent.com/39247311/55674510-07395200-58b6-11e9-8b85-d15f8fab54fa.png)
