@@ -3,6 +3,7 @@ Mod that tweaks and (hopefully) improves Koikatu gameplay.
 
 ## Some of the features
 - Character limit at school is raised from the stock 38 to 99.
+- Virgin H scenes can now be quit early. The girl stays a virgin in that case.
 - It's possible to force raw even when denied. Can cause anger.
 - Lewdness drops or raises depending on what happened in the H scene.
 - Everyone's levdness drops naturally, needs to be built back up.
@@ -25,3 +26,5 @@ Mod that darkens the night scenes to something slightly more realistic. Configur
 Needs BepInEx and BepisPlugins, to install copy the dll to your BepInEx directory.
 
 Inspired by PHmod44_KK_Dark_Map_Ver mod, thanks to HCM06 for bringing it up.
+
+![Preview](https://user-images.githubusercontent.com/39247311/55674510-07395200-58b6-11e9-8b85-d15f8fab54fa.png)
