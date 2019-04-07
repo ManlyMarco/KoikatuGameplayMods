@@ -3,16 +3,19 @@ using System.Collections;
 using System.ComponentModel;
 using System.Linq;
 using BepInEx;
+using Harmony;
 using Manager;
 using UnityEngine;
 
 namespace KoikatuGameplayMod
 {
     [BepInProcess("Koikatu")]
-    [BepInPlugin("marco-gameplaymod", "Koikatu Gameplay Tweaks and Improvements", Version)]
+    [BepInPlugin(GUID, "Koikatu Gameplay Tweaks and Improvements", Version)]
     public class KoikatuGameplayMod : BaseUnityPlugin
     {
+        public const string GUID = "marco-gameplaymod";
         internal const string Version = "1.3";
+
         private const string HScene = "H Scene tweaks";
 
         [Category(HScene)]
@@ -31,6 +34,12 @@ namespace KoikatuGameplayMod
         [Category(HScene)]
         [DisplayName("Decrease girl's lewdness after H")]
         public static ConfigWrapper<bool> DecreaseLewd { get; set; }
+
+        [Category(HScene)]
+        [DisplayName("Disable vaginal insert for traps/men")]
+        [Description("Only works if you use UncensorSelector to give a female card a penis but no vagina in maker.\n\n" +
+                     "Changes take effect after game restart.")]
+        public static ConfigWrapper<bool> DisableTrapVagInsert { get; set; }
 
         [DisplayName("Player's stats slowly decay overnight")]
         public static ConfigWrapper<bool> StatDecay { get; set; }
@@ -59,18 +68,22 @@ namespace KoikatuGameplayMod
 
         public KoikatuGameplayMod()
         {
-            ForceInsert = new ConfigWrapper<bool>(nameof(ForceInsert), this, true);
-            ForceInsertAnger = new ConfigWrapper<bool>(nameof(ForceInsertAnger), this, true);
-            DecreaseLewd = new ConfigWrapper<bool>(nameof(DecreaseLewd), this, false);
+            ForceInsert = new ConfigWrapper<bool>("ForceInsert", this, true);
+            ForceInsertAnger = new ConfigWrapper<bool>("ForceInsertAnger", this, true);
+            DecreaseLewd = new ConfigWrapper<bool>("DecreaseLewd", this, false);
+            DisableTrapVagInsert = new ConfigWrapper<bool>("DisableTrapVagInsert", this, true);
 
-            ResetNoCondom = new ConfigWrapper<bool>(nameof(ResetNoCondom), this, true);
+            ResetNoCondom = new ConfigWrapper<bool>("ResetNoCondom", this, true);
 
-            FastTravelTimePenalty = new ConfigWrapper<int>(nameof(FastTravelTimePenalty), this, 50);
-            StatDecay = new ConfigWrapper<bool>(nameof(StatDecay), this, true);
-            LewdDecay = new ConfigWrapper<bool>(nameof(LewdDecay), this, false);
-            AdjustBreastSizeQuestion = new ConfigWrapper<bool>(nameof(AdjustBreastSizeQuestion), this, true);
+            FastTravelTimePenalty = new ConfigWrapper<int>("FastTravelTimePenalty", this, 50);
+            StatDecay = new ConfigWrapper<bool>("StatDecay", this, true);
+            LewdDecay = new ConfigWrapper<bool>("LewdDecay", this, false);
+            AdjustBreastSizeQuestion = new ConfigWrapper<bool>("AdjustBreastSizeQuestion", this, true);
 
-            Hooks.ApplyHooks();
+            var i = HarmonyInstance.Create(GUID);
+            Hooks.ApplyHooks(i);
+            if (DisableTrapVagInsert.Value)
+                TrapNoVagInsertHooks.ApplyHooks(i);
         }
 
         // Start as false to prevent firing after loading

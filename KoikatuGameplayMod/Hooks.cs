@@ -14,28 +14,28 @@ using Random = System.Random;
 
 namespace KoikatuGameplayMod
 {
+
     internal static class Hooks
     {
         private const int UnlockedMaxCharacters = 99;
         public static readonly Random RandomGen = new Random();
 
-        public static void ApplyHooks()
+        public static void ApplyHooks(HarmonyInstance instance)
         {
-            var i = HarmonyInstance.Create("marco-gameplaymod");
-            i.PatchAll(typeof(Hooks));
+            instance.PatchAll(typeof(Hooks));
 
             var t = typeof(ActionScene).GetNestedType("<NPCLoadAll>c__IteratorD", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
             var m = t.GetMethod("MoveNext");
-            i.Patch(m, null, null, new HarmonyMethod(typeof(Hooks), nameof(NPCLoadAllUnlock)));
+            instance.Patch(m, null, null, new HarmonyMethod(typeof(Hooks), nameof(NPCLoadAllUnlock)));
         }
-        
+
         [HarmonyTranspiler]
         [HarmonyPatch(typeof(CharaPersonal), "GetBustSize", new[] { typeof(ChaFileControl) })]
         public static IEnumerable<CodeInstruction> GetBustSizeTranspiler(IEnumerable<CodeInstruction> instr)
         {
             foreach (var instruction in instr)
             {
-                if(KoikatuGameplayMod.AdjustBreastSizeQuestion.Value)
+                if (KoikatuGameplayMod.AdjustBreastSizeQuestion.Value)
                 {
                     if (instruction.operand is float f && Equals(f, 0.4f))
                     {
@@ -168,7 +168,7 @@ namespace KoikatuGameplayMod
 
             var flags = __instance.flags;
             var count = flags.count;
-            var heroine = GetTargetHeroine(__instance);
+            var heroine = Utilities.GetTargetHeroine(__instance);
             if (heroine == null) return;
 
             if (flags.GetOrgCount() == 0)
@@ -238,11 +238,11 @@ namespace KoikatuGameplayMod
             // Check if player can circumvent the anal deny
             if (__instance.flags.count.sonyuAnalOrg >= 1)
             {
-                var heroine = GetTargetHeroine(__instance);
+                var heroine = Utilities.GetTargetHeroine(__instance);
 
                 MakeGirlAngry(heroine, 20, 10);
 
-                ForceAllowInsert(__instance);
+                Utilities.ForceAllowInsert(__instance);
             }
         }
 
@@ -256,7 +256,7 @@ namespace KoikatuGameplayMod
             if (__instance.flags.isAnalInsertOK)
                 return;
 
-            var heroine = GetTargetHeroine(__instance);
+            var heroine = Utilities.GetTargetHeroine(__instance);
             if (heroine == null) return;
 
             // Check if player can circumvent the anal deny
@@ -265,7 +265,7 @@ namespace KoikatuGameplayMod
             {
                 MakeGirlAngry(heroine, 30, 15);
 
-                ForceAllowInsert(__instance);
+                Utilities.ForceAllowInsert(__instance);
                 __instance.flags.isDenialvoiceWait = false;
             }
         }
@@ -274,14 +274,14 @@ namespace KoikatuGameplayMod
         [HarmonyPatch(typeof(HSprite), nameof(HSprite.OnInsertAnalClick), new Type[] { })]
         public static void OnInsertAnalClickPost(HSprite __instance)
         {
-            ResetForceAllowInsert(__instance);
+            Utilities.ResetForceAllowInsert(__instance);
         }
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(HSprite), nameof(HSprite.OnInsertAnalNoVoiceClick), new Type[] { })]
         public static void OnInsertAnalNoVoiceClickPost(HSprite __instance)
         {
-            ResetForceAllowInsert(__instance);
+            Utilities.ResetForceAllowInsert(__instance);
         }
 
         #endregion
@@ -295,10 +295,10 @@ namespace KoikatuGameplayMod
             if (!Input.GetMouseButtonUp(0) || !__instance.IsSpriteAciotn())
                 return;
 
-            if (__instance.flags.isInsertOK[GetTargetHeroineId(__instance)])
+            if (__instance.flags.isInsertOK[Utilities.GetTargetHeroineId(__instance)])
                 return;
 
-            var heroine = GetTargetHeroine(__instance);
+            var heroine = Utilities.GetTargetHeroine(__instance);
             var girlOrgasms = __instance.flags.count.sonyuOrg;
 
             // Check if player can circumvent the raw deny
@@ -308,19 +308,9 @@ namespace KoikatuGameplayMod
             {
                 MakeGirlAngry(heroine, 20, 10);
 
-                ForceAllowInsert(__instance);
+                Utilities.ForceAllowInsert(__instance);
                 __instance.flags.isDenialvoiceWait = false;
             }
-        }
-
-        private static SaveData.Heroine GetTargetHeroine(HSprite __instance)
-        {
-            return __instance.flags.lstHeroine[GetTargetHeroineId(__instance)];
-        }
-
-        private static int GetTargetHeroineId(HSprite __instance)
-        {
-            return (__instance.flags.mode >= HFlag.EMode.houshi3P) ? (__instance.flags.nowAnimationInfo.id % 2) : 0;
         }
 
         [HarmonyPrefix]
@@ -330,40 +320,30 @@ namespace KoikatuGameplayMod
             if (!Input.GetMouseButtonUp(0) || !__instance.IsSpriteAciotn())
                 return;
 
-            if (__instance.flags.isInsertOK[GetTargetHeroineId(__instance)])
+            if (__instance.flags.isInsertOK[Utilities.GetTargetHeroineId(__instance)])
                 return;
 
-            var heroine = GetTargetHeroine(__instance);
+            var heroine = Utilities.GetTargetHeroine(__instance);
             if (heroine == null) return;
             var girlOrgasms = __instance.flags.count.sonyuOrg;
 
             // Check if girl allows raw
             if (girlOrgasms >= 4 + RandomGen.Next(0, 3) - heroine.lewdness / 45)
-                ForceAllowInsert(__instance);
+                Utilities.ForceAllowInsert(__instance);
         }
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(HSprite), nameof(HSprite.OnInsertNoVoiceClick), new Type[] { })]
         public static void OnInsertNoVoiceClickPost(HSprite __instance)
         {
-            ResetForceAllowInsert(__instance);
+            Utilities.ResetForceAllowInsert(__instance);
         }
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(HSprite), nameof(HSprite.OnInsertClick), new Type[] { })]
         public static void OnInsertClickPost(HSprite __instance)
         {
-            ResetForceAllowInsert(__instance);
-        }
-
-        private static void ForceAllowInsert(HSprite instance)
-        {
-            instance.flags.isDebug = true;
-        }
-
-        private static void ResetForceAllowInsert(HSprite __instance)
-        {
-            __instance.flags.isDebug = false;
+            Utilities.ResetForceAllowInsert(__instance);
         }
 
         /// <summary>
@@ -398,10 +378,10 @@ namespace KoikatuGameplayMod
         {
             if (!KoikatuGameplayMod.ForceInsertAnger.Value) return;
 
-            var heroine = GetTargetHeroine(__instance);
+            var heroine = Utilities.GetTargetHeroine(__instance);
             if (heroine == null) return;
 
-            if (!__instance.flags.isInsertOK[GetTargetHeroineId(__instance)])
+            if (!__instance.flags.isInsertOK[Utilities.GetTargetHeroineId(__instance)])
             {
                 if (__instance.flags.count.sonyuInside > 0)
                 {
