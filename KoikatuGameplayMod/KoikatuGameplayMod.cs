@@ -82,18 +82,19 @@ namespace KoikatuGameplayMod
 
             var i = HarmonyInstance.Create(GUID);
             Utilities.ApplyHooks(i);
-            Utilities.HSceneEndClicked += UpdateGirlLewdness;
-
-            ClassCharaLimitUnlockHooks.ApplyHooks(i);
-            ExitFirstHHooks.ApplyHooks(i);
-            FastTravelCostHooks.ApplyHooks(i);
+            
+            // H Scene functions
             ForceInsertHooks.ApplyHooks(i);
-
+            ExitFirstHHooks.ApplyHooks(i);
             if (DisableTrapVagInsert.Value)
                 TrapNoVagInsertHooks.ApplyHooks(i);
 
+            // Main game functions
+            ClassCharaLimitUnlockHooks.ApplyHooks(i);
+            FastTravelCostHooks.ApplyHooks(i);
             if (AdjustBreastSizeQuestion.Value)
                 BustSizeQuestionHooks.ApplyHooks(i);
+            Utilities.HSceneEndClicked += UpdateGirlLewdness;
         }
 
         // Start as false to prevent firing after loading
