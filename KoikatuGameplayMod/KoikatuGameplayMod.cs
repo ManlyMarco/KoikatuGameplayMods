@@ -36,7 +36,8 @@ namespace KoikatuGameplayMod
 
         [Category(HScene)]
         [DisplayName("Disable vaginal insert for traps/men")]
-        [Description("Only works if you use UncensorSelector to give a female card a penis but no vagina in maker.\n\n" +
+        [Description("Only works if you use UncensorSelector to give a female card a penis but no vagina in maker. " +
+                     "Some positions don't have the anal option so you won't be able to insert at all in them.\n\n" +
                      "Changes take effect after game restart.")]
         public static ConfigWrapper<bool> DisableTrapVagInsert { get; set; }
 
