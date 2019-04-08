@@ -13,7 +13,7 @@ namespace KoikatuGameplayMod
     public class KoikatuGameplayMod : BaseUnityPlugin
     {
         public const string GUID = "marco-gameplaymod";
-        internal const string Version = "1.3";
+        internal const string Version = "1.4";
 
         private const string HScene = "H Scene tweaks";
 
