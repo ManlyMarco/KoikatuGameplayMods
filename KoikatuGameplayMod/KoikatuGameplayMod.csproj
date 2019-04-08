@@ -30,7 +30,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Hooks.cs" />
+    <Compile Include="BustSizeQuestionHooks.cs" />
+    <Compile Include="ClassCharaLimitUnlockHooks.cs" />
+    <Compile Include="ExitFirstHHooks.cs" />
+    <Compile Include="FastTravelCostHooks.cs" />
+    <Compile Include="ForceInsertHooks.cs" />
     <Compile Include="KoikatuGameplayMod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="TrapNoVagInsertHooks.cs" />

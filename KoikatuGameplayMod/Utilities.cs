@@ -1,7 +1,29 @@
-﻿namespace KoikatuGameplayMod
+﻿using System;
+using System.Reflection;
+using Harmony;
+using UniRx;
+
+namespace KoikatuGameplayMod
 {
     internal static class Utilities
     {
+        public static void ApplyHooks(HarmonyInstance instance)
+        {
+            instance.PatchAll(typeof(Utilities));
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(HSprite), "Start", new Type[] { })]
+        public static void HookToEndHButton(HSprite __instance)
+        {
+            var f = typeof(HSprite).GetField("btnEnd", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            if (f == null) throw new ArgumentException("Could not find field btnEnd in HSprite");
+            var b = f.GetValue(__instance) as UnityEngine.UI.Button;
+            b.OnClickAsObservable().Subscribe(unit => HSceneEndClicked?.Invoke(__instance));
+        }
+
+        public static event Action<HSprite> HSceneEndClicked;
+
         public static SaveData.Heroine GetTargetHeroine(HFlag __instance)
         {
             return __instance.lstHeroine[GetTargetHeroineId(__instance)];

@@ -81,9 +81,19 @@ namespace KoikatuGameplayMod
             AdjustBreastSizeQuestion = new ConfigWrapper<bool>("AdjustBreastSizeQuestion", this, true);
 
             var i = HarmonyInstance.Create(GUID);
-            Hooks.ApplyHooks(i);
+            Utilities.ApplyHooks(i);
+            Utilities.HSceneEndClicked += UpdateGirlLewdness;
+
+            ClassCharaLimitUnlockHooks.ApplyHooks(i);
+            ExitFirstHHooks.ApplyHooks(i);
+            FastTravelCostHooks.ApplyHooks(i);
+            ForceInsertHooks.ApplyHooks(i);
+
             if (DisableTrapVagInsert.Value)
                 TrapNoVagInsertHooks.ApplyHooks(i);
+
+            if (AdjustBreastSizeQuestion.Value)
+                BustSizeQuestionHooks.ApplyHooks(i);
         }
 
         // Start as false to prevent firing after loading
@@ -95,7 +105,7 @@ namespace KoikatuGameplayMod
             {
                 void LowerStat(ref int stat)
                 {
-                    stat -= Hooks.RandomGen.Next(0, 2);
+                    stat -= UnityEngine.Random.Range(0, 2);
 
                     if (stat < 0) stat = 0;
                 }
@@ -154,6 +164,35 @@ namespace KoikatuGameplayMod
                         _inNightMenu = false;
                     }
                 }
+            }
+        }
+
+        private static void UpdateGirlLewdness(HSprite __instance)
+        {
+            if (!DecreaseLewd.Value) return;
+
+            var flags = __instance.flags;
+            var count = flags.count;
+            var heroine = Utilities.GetTargetHeroine(__instance);
+            if (heroine == null) return;
+
+            if (flags.GetOrgCount() == 0)
+            {
+                var massageTotal = (int)(count.selectAreas.Sum() / 4 + (+count.kiss + count.houshiOutside + count.houshiInside) * 10);
+                if (massageTotal <= 5)
+                    heroine.lewdness = Math.Max(0, heroine.lewdness - 30);
+                else
+                    heroine.lewdness = Math.Min(100, heroine.lewdness + massageTotal);
+            }
+            else if (count.aibuOrg > 0 && count.sonyuOrg + count.sonyuAnalOrg == 0)
+                heroine.lewdness = Math.Min(100, heroine.lewdness - (count.aibuOrg - 1) * 20);
+            else
+            {
+                int cumCount = count.sonyuCondomInside + count.sonyuInside + count.sonyuOutside + count.sonyuAnalCondomInside + count.sonyuAnalInside + count.sonyuAnalOutside;
+                if (cumCount > 0)
+                    heroine.lewdness = Math.Max(0, heroine.lewdness - cumCount * 20);
+
+                heroine.lewdness = Math.Max(0, heroine.lewdness - count.aibuOrg * 20);
             }
         }
     }
