@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.ComponentModel;
 using System.Linq;
 using BepInEx;
@@ -82,7 +81,7 @@ namespace KoikatuGameplayMod
 
             var i = HarmonyInstance.Create(GUID);
             Utilities.ApplyHooks(i);
-            
+
             // H Scene functions
             ForceInsertHooks.ApplyHooks(i);
             ExitFirstHHooks.ApplyHooks(i);
@@ -142,39 +141,34 @@ namespace KoikatuGameplayMod
             _gameMgr = Game.Instance;
             _sceneMgr = Scene.Instance;
 
-            StartCoroutine(SlowUpdate());
+            InvokeRepeating(nameof(SlowUpdate), 2f, 0.5f);
         }
 
-        private IEnumerator SlowUpdate()
+        private void SlowUpdate()
         {
-            while (true)
+            if (!_gameMgr.saveData.isOpening && !_sceneMgr.IsNowLoading)
             {
-                yield return new WaitForSecondsRealtime(0.5f);
-
-                if (!_gameMgr.saveData.isOpening && !_sceneMgr.IsNowLoading)
+                if (_sceneMgr.NowSceneNames.Any(x => x.Equals("NightMenu", StringComparison.Ordinal)))
                 {
-                    if (_sceneMgr.NowSceneNames.Any(x => x.Equals("NightMenu", StringComparison.Ordinal)))
-                    {
-                        if (!_inNightMenu && !_firstNightMenu)
-                            OnNightStarted();
-                        _inNightMenu = true;
-                        _firstNightMenu = false;
-                    }
-                    else
-                    {
-                        _inNightMenu = false;
-                    }
+                    if (!_inNightMenu && !_firstNightMenu)
+                        OnNightStarted();
+                    _inNightMenu = true;
+                    _firstNightMenu = false;
+                }
+                else
+                {
+                    _inNightMenu = false;
                 }
             }
         }
 
-        private static void UpdateGirlLewdness(HSprite __instance)
+        private static void UpdateGirlLewdness(HSprite hSprite)
         {
             if (!DecreaseLewd.Value) return;
 
-            var flags = __instance.flags;
+            var flags = hSprite.flags;
             var count = flags.count;
-            var heroine = Utilities.GetTargetHeroine(__instance);
+            var heroine = Utilities.GetTargetHeroine(hSprite);
             if (heroine == null) return;
 
             if (flags.GetOrgCount() == 0)
