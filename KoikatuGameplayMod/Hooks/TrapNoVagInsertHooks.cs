@@ -1,5 +1,6 @@
 ﻿using ExtensibleSaveFormat;
 using Harmony;
+using UnityEngine;
 
 namespace KoikatuGameplayMod
 {
@@ -28,7 +29,37 @@ namespace KoikatuGameplayMod
             if (isTrap)
                 __instance.flags.isAnalInsertOK = true;
         }
-        
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuAnalInside))]
+        public static void AddSonyuAnalInsidePre(HFlag __instance)
+        {
+            OnAnalCum(__instance);
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuAnalCondomInside))]
+        public static void AddSonyuAnalCondomInsidePre(HFlag __instance)
+        {
+            OnAnalCum(__instance);
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuAnalOutside))]
+        public static void AddSonyuAnalOutsidePre(HFlag __instance)
+        {
+            OnAnalCum(__instance);
+        }
+
+        private static void OnAnalCum(HFlag hFlag)
+        {
+            if (IsATrap(Utilities.GetTargetHeroine(hFlag)))
+            {
+                // If it's a trap, disable the first h guide after coming inside the back hole (wouldn't disappear otherwise)
+                Object.FindObjectOfType<HSprite>()?.objFirstHHelpBase?.SetActive(false);
+            }
+        }
+
         private static bool IsATrap(SaveData.Heroine heroine)
         {
             const string selectorGuid = "com.deathweasel.bepinex.uncensorselector";
