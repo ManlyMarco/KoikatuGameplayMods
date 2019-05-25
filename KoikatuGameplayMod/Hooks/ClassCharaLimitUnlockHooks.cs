@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
 using ActionGame;
@@ -16,7 +17,7 @@ namespace KoikatuGameplayMod
         {
             instance.PatchAll(typeof(ClassCharaLimitUnlockHooks));
 
-            var t = typeof(ActionScene).GetNestedType("<NPCLoadAll>c__IteratorD", BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
+            var t = typeof(ActionScene).GetNestedTypes(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Single(x=>x.Name.StartsWith("<NPCLoadAll>c__Iterator"));
             var m = t.GetMethod("MoveNext");
             instance.Patch(m, null, null, new HarmonyMethod(typeof(ClassCharaLimitUnlockHooks), nameof(NPCLoadAllUnlock)));
         }

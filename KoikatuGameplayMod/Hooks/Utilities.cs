@@ -35,12 +35,12 @@ namespace KoikatuGameplayMod
 
         public static int GetTargetHeroineId(HFlag __instance)
         {
-            return (__instance.mode >= HFlag.EMode.houshi3P) ? (__instance.nowAnimationInfo.id % 2) : 0;
+            return (__instance.mode == HFlag.EMode.houshi3P || __instance.mode == HFlag.EMode.sonyu3P) ? (__instance.nowAnimationInfo.id % 2) : 0;
         }
 
         public static int GetTargetHeroineId(HSprite __instance)
         {
-            return (__instance.flags.mode >= HFlag.EMode.houshi3P) ? (__instance.flags.nowAnimationInfo.id % 2) : 0;
+            return (__instance.flags.mode >= HFlag.EMode.houshi3P || __instance.flags.mode >= HFlag.EMode.sonyu3P) ? (__instance.flags.nowAnimationInfo.id % 2) : 0;
         }
 
         public static void ForceAllowInsert(HSprite instance)
