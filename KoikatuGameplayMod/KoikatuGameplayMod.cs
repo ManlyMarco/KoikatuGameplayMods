@@ -8,12 +8,11 @@ using UnityEngine;
 
 namespace KoikatuGameplayMod
 {
-    [BepInProcess("Koikatu")]
     [BepInPlugin(GUID, "Koikatu Gameplay Tweaks and Improvements", Version)]
     public class KoikatuGameplayMod : BaseUnityPlugin
     {
         public const string GUID = "marco-gameplaymod";
-        internal const string Version = "1.4.1";
+        internal const string Version = "1.4.2";
 
         private const string HScene = "H Scene tweaks";
 
@@ -80,6 +79,9 @@ namespace KoikatuGameplayMod
             LewdDecay = new ConfigWrapper<bool>("LewdDecay", this, false);
             AdjustBreastSizeQuestion = new ConfigWrapper<bool>("AdjustBreastSizeQuestion", this, true);
 
+            if (Application.productName == "CharaStudio")
+                return;
+
             var i = HarmonyInstance.Create(GUID);
             Utilities.ApplyHooks(i);
 
@@ -139,6 +141,13 @@ namespace KoikatuGameplayMod
 
         public void Start()
         {
+            if (Application.productName == "CharaStudio")
+            {
+                BepInEx.Bootstrap.Chainloader.Plugins.Remove(this);
+                Destroy(this);
+                return;
+            }
+
             _gameMgr = Game.Instance;
             _sceneMgr = Scene.Instance;
 

@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Linq;
 using BepInEx;
 using Harmony;
@@ -8,12 +7,11 @@ using UnityEngine.SceneManagement;
 
 namespace KK_NightDarkener
 {
-    [BepInProcess("Koikatu")]
     [BepInPlugin(GUID, "Night Darkener", Version)]
     public class NightDarkener : BaseUnityPlugin
     {
         public const string GUID = "Marco.NightDarkener";
-        internal const string Version = "1.1";
+        internal const string Version = "1.1.1";
         
         [DisplayName("Enable dark fog at night")]
         [Description("Horror game effect.\nChanges take effect next time you load a night map.")]
@@ -61,6 +59,13 @@ namespace KK_NightDarkener
 
         private void Start()
         {
+            if (Application.productName == "CharaStudio")
+            {
+                BepInEx.Bootstrap.Chainloader.Plugins.Remove(this);
+                Destroy(this);
+                return;
+            }
+
             UseFog = new ConfigWrapper<bool>("UseFog", this);
             Exposure = new ConfigWrapper<float>("NightExposure", this, 0.3f);
 
