@@ -59,7 +59,6 @@ namespace KoikatuGameplayMod
         [DisplayName("Adjust preferred breast size question")]
         [Description("Lowers the breast size needed for 'Average' and 'Large' breast options when a girl asks you what size you prefer.\n\n" +
                      "Changes take effect after game restart.")]
-        [AcceptableValueRange(0, 100, false)]
         public static ConfigWrapper<bool> AdjustBreastSizeQuestion { get; set; }
 
         private Game _gameMgr;
