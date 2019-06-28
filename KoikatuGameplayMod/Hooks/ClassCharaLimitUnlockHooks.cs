@@ -16,10 +16,15 @@ namespace KoikatuGameplayMod
         public static void ApplyHooks(HarmonyInstance instance)
         {
             instance.PatchAll(typeof(ClassCharaLimitUnlockHooks));
+            var transpiler = new HarmonyMethod(typeof(ClassCharaLimitUnlockHooks), nameof(NPCLoadAllUnlock));
+            PatchNPCLoadAll(instance, transpiler);
+        }
 
-            var t = typeof(ActionScene).GetNestedTypes(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Single(x=>x.Name.StartsWith("<NPCLoadAll>c__Iterator"));
+        private static void PatchNPCLoadAll(HarmonyInstance instance, HarmonyMethod transpiler)
+        {
+            var t = typeof(ActionScene).GetNestedTypes(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Single(x => x.Name.StartsWith("<NPCLoadAll>c__Iterator"));
             var m = t.GetMethod("MoveNext");
-            instance.Patch(m, null, null, new HarmonyMethod(typeof(ClassCharaLimitUnlockHooks), nameof(NPCLoadAllUnlock)));
+            instance.Patch(m, null, null, transpiler);
         }
 
         [HarmonyPostfix]
