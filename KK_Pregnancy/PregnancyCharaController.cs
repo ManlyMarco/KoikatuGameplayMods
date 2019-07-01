@@ -2,12 +2,13 @@
 using KKABMX.Core;
 using KKAPI;
 using KKAPI.Chara;
+using KKAPI.MainGame;
 using UnityEngine;
 using Logger = BepInEx.Logger;
 
 namespace KK_Pregnancy
 {
-    public class PregnancyController : CharaCustomFunctionController
+    public class PregnancyCharaController : CharaCustomFunctionController
     {
         private PregnancyBoneEffect _boneEffect;
         private float _fertility;
@@ -55,15 +56,28 @@ namespace KK_Pregnancy
             return Week > 0;
         }
 
+        public bool CanGetDangerousDays()
+        {
+            return Week <= 1;
+        }
+
         public void SaveData()
         {
             SetExtendedData(PregnancyPlugin.WriteData(Week, GameplayEnabled, Fertility));
         }
 
-        public void ReadSavedData()
+        public void ReadData()
         {
             var data = GetExtendedData();
             PregnancyPlugin.ParseData(data, out _week, out _gameplayEnabled, out _fertility);
+
+            if (!CanGetDangerousDays())
+            {
+                // Force the girl to always be on the safe day, happens every day after day of conception
+                var heroine = ChaControl.GetHeroine();
+                if (heroine != null)
+                    HFlag.SetMenstruation(heroine, HFlag.MenstruationType.安全日);
+            }
         }
 
         /// <summary>
@@ -88,7 +102,7 @@ namespace KK_Pregnancy
         {
             if (maintainState) return;
 
-            ReadSavedData();
+            ReadData();
 
             if (_boneEffect == null)
                 _boneEffect = new PregnancyBoneEffect(this);

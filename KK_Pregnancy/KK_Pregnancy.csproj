@@ -58,7 +58,7 @@
     </Reference>
     <Reference Include="KKABMX">
       <HintPath>..\..\..\KKEC\KKABMX\bin\KKABMX.dll</HintPath>
-      <Private>False</Private>
+      <Private>True</Private>
     </Reference>
     <Reference Include="KKAPI">
       <HintPath>..\..\..\KKEC\KKAPI\bin\KKAPI.dll</HintPath>
@@ -73,8 +73,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="PregnancyBoneEffect.cs" />
-    <Compile Include="PregnancyController.cs" />
-    <Compile Include="PregnancyManager.cs" />
+    <Compile Include="PregnancyCharaController.cs" />
+    <Compile Include="PregnancyGameController.cs" />
     <Compile Include="PregnancyPlugin.cs" />
     <Compile Include="PregnancyPlugin.Hooks.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

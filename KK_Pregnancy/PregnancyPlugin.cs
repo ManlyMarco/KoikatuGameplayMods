@@ -4,6 +4,7 @@ using ExtensibleSaveFormat;
 using KKABMX.Core;
 using KKAPI;
 using KKAPI.Chara;
+using KKAPI.MainGame;
 using KKAPI.Maker;
 using KKAPI.Maker.UI;
 using UniRx;
@@ -46,7 +47,7 @@ namespace KK_Pregnancy
         [AcceptableValueList(new object[] { 1, 2, 4, 10 })]
         public static ConfigWrapper<int> PregnancyProgressionSpeed { get; private set; }
 
-        private void Awake()
+        private void Start()
         {
             Hooks.InitHooks();
 
@@ -55,23 +56,28 @@ namespace KK_Pregnancy
 
             MakerAPI.MakerBaseLoaded += MakerAPI_MakerBaseLoaded;
 
-            CharacterApi.RegisterExtraBehaviour<PregnancyController>(GUID);
+            CharacterApi.RegisterExtraBehaviour<PregnancyCharaController>(GUID);
+            GameAPI.RegisterExtraBehaviour<PregnancyGameController>(GUID);
 
             // todo add when slider is implemented
             //StudioAPI.CreateCurrentStateCategory(new CurrentStateCategory("Pregnancy", new CurrentStateCategorySubItemBase[]{new CurrentStateCategorySlider()}));
         }
 
-        private static PregnancyController GetController()
+        private static PregnancyCharaController GetController()
         {
-            return MakerAPI.GetCharacterControl().GetComponent<PregnancyController>();
+            return MakerAPI.GetCharacterControl().GetComponent<PregnancyCharaController>();
         }
 
         private void MakerAPI_MakerBaseLoaded(object sender, RegisterCustomControlsEvent e)
         {
+            if (MakerAPI.GetMakerSex() == 0) return;
+
             var cat = MakerConstants.Parameter.Character;
 
             _gameplayToggle = e.AddControl(new MakerToggle(cat, "Enable pregnancy progression", true, this));
             _gameplayToggle.ValueChanged.Subscribe(val => GetController().GameplayEnabled = val);
+
+            e.AddControl(new MakerText("If off, the character can't get pregnant and current pregnancy will stop progressing.", cat, this) { TextColor = Color.gray });
 
             _fertilityToggle = e.AddControl(new MakerSlider(cat, "Fertility", 0f, 1f, DefaultFertility, this));
             _fertilityToggle.ValueChanged.Subscribe(val => GetController().Fertility = val);
@@ -82,17 +88,16 @@ namespace KK_Pregnancy
             _weeksSlider.ValueToString = f => Mathf.RoundToInt(f).ToString();
             _weeksSlider.ValueChanged.Subscribe(val => GetController().Week = Mathf.RoundToInt(val));
 
-            e.AddControl(new MakerText("If the character is pregnant when added to the game, the pregnancy will continue from this " +
-                                       "point, unless \"Enable pregnancy progression\" is turned off.", cat, this) { TextColor = Color.gray });
+            e.AddControl(new MakerText("If the character is pregnant when added to the game, the pregnancy will continue from this point.", cat, this) { TextColor = Color.gray });
         }
 
-        internal static void UpdateInterface(PregnancyController controller)
+        internal static void UpdateInterface(PregnancyCharaController controller)
         {
-            if (MakerAPI.InsideMaker)
+            if (MakerAPI.InsideMaker && _gameplayToggle != null)
             {
-                if (_gameplayToggle != null) _gameplayToggle.Value = controller.GameplayEnabled;
-                if (_fertilityToggle != null) _fertilityToggle.Value = controller.Fertility;
-                if (_weeksSlider != null) _weeksSlider.Value = controller.Week;
+                _gameplayToggle.Value = controller.GameplayEnabled;
+                _fertilityToggle.Value = controller.Fertility;
+                _weeksSlider.Value = controller.Week;
             }
         }
 

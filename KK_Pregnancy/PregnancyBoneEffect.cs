@@ -8,32 +8,32 @@ namespace KK_Pregnancy
 {
     public class PregnancyBoneEffect : BoneEffect
     {
-        private readonly PregnancyController _controller;
+        private readonly PregnancyCharaController _controller;
 
         private readonly Dictionary<string, BoneModifierData> _pregnancyFullValues = new Dictionary<string, BoneModifierData>
         {
             // Belly
-            {"cf_s_spine01", new BoneModifierData(new Vector3(1.45f, 1.4f, 1.8f), -4f)},
-            {"cf_s_waist01", new BoneModifierData(new Vector3(1.2f, 1.28f, 1.6f), -3.5f)},
+            {"cf_s_spine01", new BoneModifierData(new Vector3(1.7f, 1.5f, 2f), -4.1f)},
+            {"cf_s_waist01", new BoneModifierData(new Vector3(1.22f, 1.5f, 1.7f), -3.6f)},
             // Skirt Front
-            {"cf_d_sk_00_00", new BoneModifierData(new Vector3(1.35f, 1f, 1f), 1.95f)},
+            {"cf_d_sk_00_00", new BoneModifierData(new Vector3(1.35f, 1f, 1f), 1.85f)},
             // Skirt Front sides
-            {"cf_d_sk_07_00", new BoneModifierData(new Vector3(2f, 1f, 1f), 1.5f)},
-            {"cf_d_sk_01_00", new BoneModifierData(new Vector3(2f, 1f, 1f), 1.5f)},
+            {"cf_d_sk_07_00", new BoneModifierData(new Vector3(1.5f, 1f, 1f), 1.45f)},
+            {"cf_d_sk_01_00", new BoneModifierData(new Vector3(1.5f, 1f, 1f), 1.45f)},
             // Skirt Back
             {"cf_d_sk_04_00", new BoneModifierData(new Vector3(1f, 1f, 1f), 1.1f)},
             // Breasts
             {"cf_d_bust01_L", new BoneModifierData(new Vector3(1.15f, 1.15f, 1.15f), 1f)},
             {"cf_d_bust01_R", new BoneModifierData(new Vector3(1.15f, 1.15f, 1.15f), 1f)},
             // Areolas
-            {"cf_s_bnip01_L", new BoneModifierData(new Vector3(1.2f, 1.2f, 1f), 1f)},
-            {"cf_s_bnip01_R", new BoneModifierData(new Vector3(1.2f, 1.2f, 1f), 1f)},
+            {"cf_s_bnip01_L", new BoneModifierData(new Vector3(1.1f, 1.1f, 1f), 1f)},
+            {"cf_s_bnip01_R", new BoneModifierData(new Vector3(1.1f, 1.1f, 1f), 1f)},
             // Nipples
             {"cf_d_bnip01_L", new BoneModifierData(new Vector3(1.2f, 1.2f, 1.2f), 1f)},
             {"cf_d_bnip01_R", new BoneModifierData(new Vector3(1.2f, 1.2f, 1.2f), 1f)}
         };
 
-        public PregnancyBoneEffect(PregnancyController controller)
+        public PregnancyBoneEffect(PregnancyCharaController controller)
         {
             _controller = controller;
         }
