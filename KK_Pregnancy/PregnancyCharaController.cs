@@ -3,6 +3,7 @@ using KKABMX.Core;
 using KKAPI;
 using KKAPI.Chara;
 using KKAPI.MainGame;
+using KKAPI.Maker;
 using UnityEngine;
 using Logger = BepInEx.Logger;
 
@@ -36,8 +37,8 @@ namespace KK_Pregnancy
 
         /// <summary>
         /// If 0 or negative, the character is not pregnant.
-        /// If between 0 and <see cref="PregnancyPlugin.LeaveSchoolWeek"/> the character is pregnant and the belly is proportionately sized.
-        /// If equal or above <see cref="PregnancyPlugin.LeaveSchoolWeek"/> the character is on a maternal leave until <see cref="PregnancyPlugin.ReturnToSchoolWeek"/>.
+        /// If between 0 and <see cref="PregnancyDataUtils.LeaveSchoolWeek"/> the character is pregnant and the belly is proportionately sized.
+        /// If equal or above <see cref="PregnancyDataUtils.LeaveSchoolWeek"/> the character is on a maternal leave until <see cref="PregnancyDataUtils.ReturnToSchoolWeek"/>.
         /// </summary>
         public int Week
         {
@@ -48,7 +49,7 @@ namespace KK_Pregnancy
         public float GetBellySizePercent()
         {
             // Don't show any effect at week 1 since it begins right after winning a child lottery
-            return Mathf.Clamp01((Week - 1f) / (PregnancyPlugin.LeaveSchoolWeek - 1f));
+            return Mathf.Clamp01((Week - 1f) / (PregnancyDataUtils.LeaveSchoolWeek - 1f));
         }
 
         public bool IsDuringPregnancy()
@@ -63,13 +64,13 @@ namespace KK_Pregnancy
 
         public void SaveData()
         {
-            SetExtendedData(PregnancyPlugin.WriteData(Week, GameplayEnabled, Fertility));
+            SetExtendedData(PregnancyDataUtils.WriteData(Week, GameplayEnabled, Fertility));
         }
 
         public void ReadData()
         {
             var data = GetExtendedData();
-            PregnancyPlugin.ParseData(data, out _week, out _gameplayEnabled, out _fertility);
+            PregnancyDataUtils.ParseData(data, out _week, out _gameplayEnabled, out _fertility);
 
             if (!CanGetDangerousDays())
             {
@@ -98,9 +99,9 @@ namespace KK_Pregnancy
             SaveData();
         }
 
-        protected override void OnReload(GameMode currentGameMode, bool maintainState)
+        protected override void OnReload(GameMode currentGameMode)
         {
-            if (maintainState) return;
+            if (MakerAPI.GetCharacterLoadFlags()?.Parameters == false) return;
 
             ReadData();
 
@@ -109,7 +110,7 @@ namespace KK_Pregnancy
 
             GetComponent<BoneController>().AddBoneEffect(_boneEffect);
 
-            PregnancyPlugin.UpdateInterface(this);
+            PregnancyGui.UpdateInterface(this);
         }
     }
 }

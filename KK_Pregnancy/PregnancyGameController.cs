@@ -24,7 +24,7 @@ namespace KK_Pregnancy
                     BepInEx.Logger.Log(LogLevel.Debug, "Preg - process heroine " + heroine.charFile.parameter.fullname);
 
                     foreach (var chaFile in heroine.GetRelatedChaFiles())
-                        AddPregnancyWeek(heroine, chaFile);
+                        AddPregnancyWeek(chaFile);
                 }
             }
 
@@ -35,45 +35,43 @@ namespace KK_Pregnancy
             }
         }
 
-        private static void AddPregnancyWeek(SaveData.Heroine heroine, ChaFileControl chaFile)
+        private static void AddPregnancyWeek(ChaFileControl chaFile)
         {
             var data = ExtendedSave.GetExtendedDataById(chaFile, PregnancyPlugin.GUID);
             if (data == null) return;
 
             BepInEx.Logger.Log(LogLevel.Debug, "Preg - data found");
-            PregnancyPlugin.ParseData(data, out var week, out var gameplayEnabled, out var lowFertility);
+            PregnancyDataUtils.ParseData(data, out var week, out var gameplayEnabled, out var lowFertility);
             // Advance the week of pregnancy. If week is 0 the character is not pregnant
             if (gameplayEnabled && week > 0)
             {
                 BepInEx.Logger.Log(LogLevel.Debug, "Preg - update preg week start " + chaFile.parameter.fullname);
-                if (week < PregnancyPlugin.LeaveSchoolWeek)
+                if (week < PregnancyDataUtils.LeaveSchoolWeek)
                 {
                     BepInEx.Logger.Log(LogLevel.Debug, "Preg - week < PregnancyPlugin.LeaveSchoolWeek");
                     // Advance through in-school at full configured speed
                     var weekChange = PregnancyPlugin.PregnancyProgressionSpeed.Value;
-                    week = Mathf.Min(PregnancyPlugin.LeaveSchoolWeek, week + weekChange);
+                    week = Mathf.Min(PregnancyDataUtils.LeaveSchoolWeek, week + weekChange);
 
                     BepInEx.Logger.Log(LogLevel.Debug, "Preg - update preg week start " + chaFile.parameter.fullname);
                 }
-                else if (week < PregnancyPlugin.ReturnToSchoolWeek)
+                else if (week < PregnancyDataUtils.ReturnToSchoolWeek)
                 {
                     BepInEx.Logger.Log(LogLevel.Debug, "Preg - week < PregnancyPlugin.ReturnToSchoolWeek");
                     // Make sure at least one week is spent out of school
-                    var weekChange = Mathf.Min(PregnancyPlugin.ReturnToSchoolWeek - PregnancyPlugin.LeaveSchoolWeek - 1, PregnancyPlugin.PregnancyProgressionSpeed.Value);
+                    var weekChange = Mathf.Min(PregnancyDataUtils.ReturnToSchoolWeek - PregnancyDataUtils.LeaveSchoolWeek - 1, PregnancyPlugin.PregnancyProgressionSpeed.Value);
                     week = week + weekChange;
                 }
 
-                if (week >= PregnancyPlugin.ReturnToSchoolWeek)
+                if (week >= PregnancyDataUtils.ReturnToSchoolWeek)
                     week = 0;
 
                 BepInEx.Logger.Log(LogLevel.Debug, "Preg - end week " + week);
-                ExtendedSave.SetExtendedDataById(chaFile, PregnancyPlugin.GUID, PregnancyPlugin.WriteData(week, true, lowFertility));
+                ExtendedSave.SetExtendedDataById(chaFile, PregnancyPlugin.GUID, PregnancyDataUtils.WriteData(week, true, lowFertility));
             }
         }
 
-        /// <summary>
-        /// Figure out if conception happened
-        /// </summary>
+        // Figure out if conception happened at end of h scene
         protected override void OnEndH(HSceneProc proc, bool freeH)
         {
             BepInEx.Logger.Log(LogLevel.Debug, "Preg - OnEndH with " + proc.flags.lstHeroine.First(x => x != null).charFile.parameter.fullname);

@@ -4,8 +4,8 @@ using System.Reflection;
 using System.Reflection.Emit;
 using ExtensibleSaveFormat;
 using Harmony;
+using KKAPI.MainGame;
 using Manager;
-using UniRx;
 
 namespace KK_Pregnancy
 {
@@ -13,14 +13,16 @@ namespace KK_Pregnancy
     {
         private static class Hooks
         {
-            public static void InitHooks()
+            public static void InitHooks(HarmonyInstance harmonyInstance)
             {
-                var hi = HarmonyInstance.Create(GUID);
-                hi.PatchAll(typeof(Hooks));
+                harmonyInstance.PatchAll(typeof(Hooks));
 
-                PatchNPCLoadAll(hi, new HarmonyMethod(typeof(Hooks), nameof(NPCLoadAllTpl)));
+                PatchNPCLoadAll(harmonyInstance, new HarmonyMethod(typeof(Hooks), nameof(NPCLoadAllTpl)));
             }
 
+            /// <summary>
+            /// Needed for preventing characters from going to school when on leave after pregnancy
+            /// </summary>
             public static IEnumerable<CodeInstruction> NPCLoadAllTpl(IEnumerable<CodeInstruction> instructions)
             {
                 var target = AccessTools.Property(typeof(Game), nameof(Game.HeroineList)).GetGetMethod();
@@ -39,15 +41,20 @@ namespace KK_Pregnancy
 
             private static bool CanGetSpawned(SaveData.Heroine heroine)
             {
-                var data = ExtendedSave.GetExtendedDataById(heroine.charFile, GUID);
-                if (data == null)
-                    return true;
+                var isOnLeave = heroine.GetRelatedChaFiles()
+                    .Any(c =>
+                    {
+                        var data = ExtendedSave.GetExtendedDataById(heroine.charFile, GUID);
 
-                ParseData(data, out var week, out var gameplayEnabled, out var _);
-                if (gameplayEnabled && week >= LeaveSchoolWeek)
-                    return false;
+                        if (data == null) return false;
 
-                return true;
+                        PregnancyDataUtils.ParseData(data, out var week, out var gameplayEnabled, out var _);
+                        if (gameplayEnabled && week >= PregnancyDataUtils.LeaveSchoolWeek)
+                            return true;
+
+                        return false;
+                    });
+                return !isOnLeave;
             }
 
             private static List<SaveData.Heroine> GetFilteredHeroines(List<SaveData.Heroine> originalList)

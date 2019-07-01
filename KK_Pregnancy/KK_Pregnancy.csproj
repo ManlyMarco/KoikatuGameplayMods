@@ -58,7 +58,7 @@
     </Reference>
     <Reference Include="KKABMX">
       <HintPath>..\..\..\KKEC\KKABMX\bin\KKABMX.dll</HintPath>
-      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="KKAPI">
       <HintPath>..\..\..\KKEC\KKAPI\bin\KKAPI.dll</HintPath>
@@ -70,14 +70,36 @@
       <HintPath>..\lib\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\..\Games\Koikatsu\Koikatu_Data\Managed\UnityEngine.UI.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="PregnancyBoneEffect.cs" />
     <Compile Include="PregnancyCharaController.cs" />
+    <Compile Include="PregnancyDataUtils.cs" />
     <Compile Include="PregnancyGameController.cs" />
+    <Compile Include="PregnancyGui.cs" />
+    <Compile Include="PregnancyGui.HeartIcons.cs" />
     <Compile Include="PregnancyPlugin.cs" />
     <Compile Include="PregnancyPlugin.Hooks.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Properties\Resource.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resource.resx</DependentUpon>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Properties\Resource.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <SubType>Designer</SubType>
+      <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Resources\preg_icon.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
