@@ -1,5 +1,7 @@
-﻿using ExtensibleSaveFormat;
+﻿using System.Linq;
+using ExtensibleSaveFormat;
 using Harmony;
+using KKAPI.MainGame;
 using UnityEngine;
 
 namespace KoikatuGameplayMod
@@ -62,9 +64,13 @@ namespace KoikatuGameplayMod
 
         private static bool IsATrap(SaveData.Heroine heroine)
         {
-            const string selectorGuid = "com.deathweasel.bepinex.uncensorselector";
+            return heroine.GetRelatedChaFiles().Any(IsATrap);
+        }
 
-            var data = ExtendedSave.GetExtendedDataById(heroine.charFile, selectorGuid);
+        private static bool IsATrap(ChaFileControl chaFile)
+        {
+            const string selectorGuid = "com.deathweasel.bepinex.uncensorselector";
+            var data = ExtendedSave.GetExtendedDataById(chaFile, selectorGuid);
 
             if (data == null)
                 return false;
