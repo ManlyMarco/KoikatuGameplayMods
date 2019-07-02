@@ -3,12 +3,15 @@ using System.ComponentModel;
 using System.Linq;
 using BepInEx;
 using Harmony;
+using KKAPI;
+using KKAPI.Studio;
 using Manager;
 using UnityEngine;
 
 namespace KoikatuGameplayMod
 {
     [BepInPlugin(GUID, "Koikatu Gameplay Tweaks and Improvements", Version)]
+    [BepInDependency(KoikatuAPI.GUID)]
     public class KoikatuGameplayMod : BaseUnityPlugin
     {
         public const string GUID = "marco-gameplaymod";
@@ -64,8 +67,14 @@ namespace KoikatuGameplayMod
         private Game _gameMgr;
         private Scene _sceneMgr;
 
-        public KoikatuGameplayMod()
+        private void Start()
         {
+            if (!KoikatuAPI.CheckRequiredPlugin(this, KoikatuAPI.GUID, new Version(KoikatuAPI.VersionConst)) || StudioAPI.InsideStudio)
+            {
+                enabled = false;
+                return;
+            }
+
             ForceInsert = new ConfigWrapper<bool>("ForceInsert", this, true);
             ForceInsertAnger = new ConfigWrapper<bool>("ForceInsertAnger", this, true);
             DecreaseLewd = new ConfigWrapper<bool>("DecreaseLewd", this, false);
@@ -78,11 +87,9 @@ namespace KoikatuGameplayMod
             LewdDecay = new ConfigWrapper<bool>("LewdDecay", this, false);
             AdjustBreastSizeQuestion = new ConfigWrapper<bool>("AdjustBreastSizeQuestion", this, true);
 
-            if (Application.productName == "CharaStudio")
-                return;
-
             var i = HarmonyInstance.Create(GUID);
             Utilities.ApplyHooks(i);
+            Utilities.HSceneEndClicked += UpdateGirlLewdness;
 
             // H Scene functions
             ForceInsertHooks.ApplyHooks(i);
@@ -95,7 +102,12 @@ namespace KoikatuGameplayMod
             FastTravelCostHooks.ApplyHooks(i);
             if (AdjustBreastSizeQuestion.Value)
                 BustSizeQuestionHooks.ApplyHooks(i);
-            Utilities.HSceneEndClicked += UpdateGirlLewdness;
+            
+            _gameMgr = Game.Instance;
+            _sceneMgr = Scene.Instance;
+
+            // todo replace with scene load?
+            InvokeRepeating(nameof(SlowUpdate), 2f, 0.5f);
         }
 
         // Start as false to prevent firing after loading
@@ -138,21 +150,6 @@ namespace KoikatuGameplayMod
             }
         }
 
-        public void Start()
-        {
-            if (Application.productName == "CharaStudio")
-            {
-                BepInEx.Bootstrap.Chainloader.Plugins.Remove(this);
-                Destroy(this);
-                return;
-            }
-
-            _gameMgr = Game.Instance;
-            _sceneMgr = Scene.Instance;
-
-            InvokeRepeating(nameof(SlowUpdate), 2f, 0.5f);
-        }
-
         private void SlowUpdate()
         {
             if (!_gameMgr.saveData.isOpening && !_sceneMgr.IsNowLoading)
@@ -189,7 +186,9 @@ namespace KoikatuGameplayMod
                     heroine.lewdness = Math.Min(100, heroine.lewdness + massageTotal);
             }
             else if (count.aibuOrg > 0 && count.sonyuOrg + count.sonyuAnalOrg == 0)
+            {
                 heroine.lewdness = Math.Min(100, heroine.lewdness - (count.aibuOrg - 1) * 20);
+            }
             else
             {
                 int cumCount = count.sonyuCondomInside + count.sonyuInside + count.sonyuOutside + count.sonyuAnalCondomInside + count.sonyuAnalInside + count.sonyuAnalOutside;

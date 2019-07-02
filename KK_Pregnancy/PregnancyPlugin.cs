@@ -1,4 +1,5 @@
-﻿using System.ComponentModel;
+﻿using System;
+using System.ComponentModel;
 using BepInEx;
 using Harmony;
 using KKABMX.Core;
@@ -29,6 +30,9 @@ namespace KK_Pregnancy
 
         private void Start()
         {
+            if(!KoikatuAPI.CheckRequiredPlugin(this, KoikatuAPI.GUID, new Version(KoikatuAPI.VersionConst))) return;
+            if(!KoikatuAPI.CheckRequiredPlugin(this, KKABMX_Core.GUID, new Version("3.2.1"))) return;
+
             PregnancyProgressionSpeed = new ConfigWrapper<int>(nameof(PregnancyProgressionSpeed), this, 4);
             ConceptionEnabled = new ConfigWrapper<bool>(nameof(ConceptionEnabled), this, true);
 
