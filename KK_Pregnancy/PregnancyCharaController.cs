@@ -1,11 +1,9 @@
-﻿using BepInEx.Logging;
-using KKABMX.Core;
+﻿using KKABMX.Core;
 using KKAPI;
 using KKAPI.Chara;
 using KKAPI.MainGame;
 using KKAPI.Maker;
 using UnityEngine;
-using Logger = BepInEx.Logger;
 
 namespace KK_Pregnancy
 {
@@ -78,19 +76,6 @@ namespace KK_Pregnancy
                 var heroine = ChaControl.GetHeroine();
                 if (heroine != null)
                     HFlag.SetMenstruation(heroine, HFlag.MenstruationType.安全日);
-            }
-        }
-
-        /// <summary>
-        /// Start pregnancy if it's not already ongoing, also saves the status to ext data
-        /// </summary>
-        public void StartPregnancy()
-        {
-            if (!IsDuringPregnancy())
-            {
-                Logger.Log(LogLevel.Debug, "Preg - pregnancy started on " + ChaFileControl.parameter.fullname);
-                Week = 1;
-                SaveData();
             }
         }
 

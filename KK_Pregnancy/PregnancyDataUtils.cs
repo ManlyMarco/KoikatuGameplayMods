@@ -40,12 +40,18 @@ namespace KK_Pregnancy
 
         public static PluginData WriteData(int week, bool gameplayEnabled, float fertility)
         {
-            if (week <= 0 && gameplayEnabled && !Mathf.Approximately(fertility, DefaultFertility)) return null;
+            if (week <= 0 && gameplayEnabled && Mathf.Approximately(fertility, DefaultFertility)) return null;
 
-            var data = new PluginData();
-            data.data["Week"] = week;
-            data.data["GameplayEnabled"] = gameplayEnabled;
-            data.data["Fertility"] = fertility;
+            var data = new PluginData
+            {
+                version = 1,
+                data =
+                {
+                    ["Week"] = week,
+                    ["GameplayEnabled"] = gameplayEnabled,
+                    ["Fertility"] = fertility
+                }
+            };
             return data;
         }
 
