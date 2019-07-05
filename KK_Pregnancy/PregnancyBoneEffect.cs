@@ -14,7 +14,7 @@ namespace KK_Pregnancy
         private readonly Dictionary<string, BoneModifierData> _pregnancyFullValues = new Dictionary<string, BoneModifierData>
         {
             // Belly
-            {"cf_s_spine01", new BoneModifierData(new Vector3(1.62f, 1.5f, 1.9f), -6.15f)},
+            {"cf_s_spine01", new BoneModifierData(new Vector3(1.62f, 1.5f, 1.9f), -2.46F)},
             {"cf_s_waist01", new BoneModifierData(new Vector3(1.13f, 1.55f, 1.7f), -3.6f)},
             {"cf_s_waist02", new BoneModifierData(new Vector3(1.17f, 1f, 1f), 1f)},
             // Skirt Front
