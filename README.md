@@ -30,6 +30,8 @@ Because the pregnant effect is made by manipulating bones, there are some limita
 3. To install copy the dll to your BepInEx directory.
 4. Check if there are no warnings on game startup, Pregnancy options should appear in plugin settings (not in studio).
 
+![preview](https://user-images.githubusercontent.com/39247311/60744379-f8764000-9f75-11e9-886b-be5e74448258.png)
+
 # KK_NightDarkener
 Plugin that darkens the night scenes to something slightly more realistic. Configurable, can go down to horror levels of darkness.
 
