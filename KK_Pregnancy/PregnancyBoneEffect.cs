@@ -10,27 +10,45 @@ namespace KK_Pregnancy
     {
         private readonly PregnancyCharaController _controller;
 
+        // todo use flat len offsets whenever they get implemented
         private readonly Dictionary<string, BoneModifierData> _pregnancyFullValues = new Dictionary<string, BoneModifierData>
         {
             // Belly
-            {"cf_s_spine01", new BoneModifierData(new Vector3(1.7f, 1.5f, 2f), -4.1f)},
-            {"cf_s_waist01", new BoneModifierData(new Vector3(1.22f, 1.5f, 1.7f), -3.6f)},
+            {"cf_s_spine01", new BoneModifierData(new Vector3(1.62f, 1.5f, 1.9f), -6.15f)},
+            {"cf_s_waist01", new BoneModifierData(new Vector3(1.13f, 1.55f, 1.7f), -3.6f)},
+            {"cf_s_waist02", new BoneModifierData(new Vector3(1.17f, 1f, 1f), 1f)},
             // Skirt Front
-            {"cf_d_sk_00_00", new BoneModifierData(new Vector3(1.35f, 1f, 1f), 1.85f)},
+            {"cf_d_sk_00_00", new BoneModifierData(new Vector3(1.35f, 1f, 1f), 2.15F)},
             // Skirt Front sides
-            {"cf_d_sk_07_00", new BoneModifierData(new Vector3(1.5f, 1f, 1f), 1.45f)},
-            {"cf_d_sk_01_00", new BoneModifierData(new Vector3(1.5f, 1f, 1f), 1.45f)},
+            {"cf_d_sk_07_00", new BoneModifierData(new Vector3(1.5f, 1f, 1f), 1.65F)},
+            {"cf_d_sk_01_00", new BoneModifierData(new Vector3(1.5f, 1f, 1f), 1.65F)},
             // Skirt Back
             {"cf_d_sk_04_00", new BoneModifierData(new Vector3(1f, 1f, 1f), 1.1f)},
+            // Skirt Back sides
+            {"cf_d_sk_05_00", new BoneModifierData(new Vector3(1f, 1f, 1f), 1.12F)},
+            {"cf_d_sk_03_00", new BoneModifierData(new Vector3(1f, 1f, 1f), 1.12F)},
             // Breasts
             {"cf_d_bust01_L", new BoneModifierData(new Vector3(1.15f, 1.15f, 1.15f), 1f)},
             {"cf_d_bust01_R", new BoneModifierData(new Vector3(1.15f, 1.15f, 1.15f), 1f)},
-            // Areolas
-            {"cf_s_bnip01_L", new BoneModifierData(new Vector3(1.1f, 1.1f, 1f), 1f)},
-            {"cf_s_bnip01_R", new BoneModifierData(new Vector3(1.1f, 1.1f, 1f), 1f)},
-            // Nipples
-            {"cf_d_bnip01_L", new BoneModifierData(new Vector3(1.2f, 1.2f, 1.2f), 1f)},
-            {"cf_d_bnip01_R", new BoneModifierData(new Vector3(1.2f, 1.2f, 1.2f), 1f)}
+            // Nipples because yes
+            {"cf_d_bnip01_L", new BoneModifierData(new Vector3(1.1f, 1.1f, 1.1f), 1f)},
+            {"cf_d_bnip01_R", new BoneModifierData(new Vector3(1.1f, 1.1f, 1.1f), 1f)},
+            // More butt
+            {"cf_s_siri_L", new BoneModifierData(new Vector3(1.03f, 1f, 1.1f), 1f)},
+            {"cf_s_siri_R", new BoneModifierData(new Vector3(1.03f, 1f, 1.1f), 1f)},
+            // Stronger legs
+            {"cf_s_thigh00_L", new BoneModifierData(new Vector3(1.02f, 1f, 1.03f), 1f)},
+            {"cf_s_thigh00_R", new BoneModifierData(new Vector3(1.02f, 1f, 1.03f), 1f)},
+            {"cf_s_thigh01_L", new BoneModifierData(new Vector3(1.02f, 1f, 1.02f), 1f)},
+            {"cf_s_thigh01_R", new BoneModifierData(new Vector3(1.02f, 1f, 1.02f), 1f)},
+            {"cf_s_thigh02_L", new BoneModifierData(new Vector3(1.02f, 1f, 1.02f), 1f)},
+            {"cf_s_thigh02_R", new BoneModifierData(new Vector3(1.02f, 1f, 1.02f), 1f)},
+            {"cf_s_thigh03_L", new BoneModifierData(new Vector3(1.02f, 1f, 1.02f), 1f)},
+            {"cf_s_thigh03_R", new BoneModifierData(new Vector3(1.02f, 1f, 1.02f), 1f)},
+            {"cf_s_leg01_L", new BoneModifierData(new Vector3(1.02f, 1f, 1.02f), 1f)},
+            {"cf_s_leg01_R", new BoneModifierData(new Vector3(1.02f, 1f, 1.02f), 1f)},
+            {"cf_s_leg02_L", new BoneModifierData(new Vector3(1.03f, 1f, 1.02f), 1f)},
+            {"cf_s_leg02_R", new BoneModifierData(new Vector3(1.03f, 1f, 1.02f), 1f)},
         };
 
         public PregnancyBoneEffect(PregnancyCharaController controller)
