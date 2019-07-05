@@ -46,11 +46,11 @@ namespace KK_Pregnancy
 
                 var winThreshold = Mathf.RoundToInt(controller.Fertility * 100);
                 var childLottery = Random.Range(1, 100);
-                Logger.Log(LogLevel.Debug, $"Preg - OnEndH calc pregnancy chance {childLottery} to {winThreshold}");
+                //Logger.Log(LogLevel.Debug, $"Preg - OnEndH calc pregnancy chance {childLottery} to {winThreshold}");
                 var wonAChild = winThreshold >= childLottery;
                 if (wonAChild)
                 {
-                    Logger.Log(LogLevel.Debug, "Preg - child lottery won, pregnancy will start");
+                    //Logger.Log(LogLevel.Debug, "Preg - child lottery won, pregnancy will start");
                     _startedPregnancies.Add(heroine);
                 }
             }
@@ -110,7 +110,7 @@ namespace KK_Pregnancy
             // If week is 0 the character is not pregnant
             if (gameplayEnabled && week <= 0)
             {
-                Logger.Log(LogLevel.Debug, "Preg - starting pregnancy on " + chaFile.parameter.fullname + ", new week is " + 1);
+                //Logger.Log(LogLevel.Debug, "Preg - starting pregnancy on " + chaFile.parameter.fullname + ", new week is " + 1);
 
                 ExtendedSave.SetExtendedDataById(chaFile, PregnancyPlugin.GUID, PregnancyDataUtils.SerializeData(1, true, fertility));
             }
@@ -141,7 +141,7 @@ namespace KK_Pregnancy
                 if (week >= PregnancyDataUtils.ReturnToSchoolWeek)
                     week = 0;
 
-                Logger.Log(LogLevel.Debug, $"Preg - pregnancy week for {chaFile.parameter.fullname} is now {week}");
+                //Logger.Log(LogLevel.Debug, $"Preg - pregnancy week for {chaFile.parameter.fullname} is now {week}");
                 ExtendedSave.SetExtendedDataById(chaFile, PregnancyPlugin.GUID, PregnancyDataUtils.SerializeData(week, true, fertility));
             }
         }
