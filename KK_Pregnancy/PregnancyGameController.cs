@@ -105,14 +105,14 @@ namespace KK_Pregnancy
         private static void StartPregnancy(ChaFileControl chaFile)
         {
             var data = ExtendedSave.GetExtendedDataById(chaFile, PregnancyPlugin.GUID);
-            PregnancyDataUtils.ParseData(data, out var week, out var gameplayEnabled, out var fertility);
+            PregnancyDataUtils.DeserializeData(data, out var week, out var gameplayEnabled, out var fertility);
 
             // If week is 0 the character is not pregnant
             if (gameplayEnabled && week <= 0)
             {
                 Logger.Log(LogLevel.Debug, "Preg - starting pregnancy on " + chaFile.parameter.fullname + ", new week is " + 1);
 
-                ExtendedSave.SetExtendedDataById(chaFile, PregnancyPlugin.GUID, PregnancyDataUtils.WriteData(1, true, fertility));
+                ExtendedSave.SetExtendedDataById(chaFile, PregnancyPlugin.GUID, PregnancyDataUtils.SerializeData(1, true, fertility));
             }
         }
 
@@ -121,7 +121,7 @@ namespace KK_Pregnancy
             var data = ExtendedSave.GetExtendedDataById(chaFile, PregnancyPlugin.GUID);
             if (data == null) return;
 
-            PregnancyDataUtils.ParseData(data, out var week, out var gameplayEnabled, out var fertility);
+            PregnancyDataUtils.DeserializeData(data, out var week, out var gameplayEnabled, out var fertility);
             // Advance the week of pregnancy. If week is 0 the character is not pregnant
             if (gameplayEnabled && week > 0)
             {
@@ -142,7 +142,7 @@ namespace KK_Pregnancy
                     week = 0;
 
                 Logger.Log(LogLevel.Debug, $"Preg - pregnancy week for {chaFile.parameter.fullname} is now {week}");
-                ExtendedSave.SetExtendedDataById(chaFile, PregnancyPlugin.GUID, PregnancyDataUtils.WriteData(week, true, fertility));
+                ExtendedSave.SetExtendedDataById(chaFile, PregnancyPlugin.GUID, PregnancyDataUtils.SerializeData(week, true, fertility));
             }
         }
     }

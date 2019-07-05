@@ -60,7 +60,7 @@ namespace KK_Pregnancy
         {
             if (_controller.IsDuringPregnancy()
                 || MakerAPI.InsideMaker
-                //|| StudioAPI.InsideStudio todo needed after adding studio slider
+                //|| StudioAPI.InsideStudio todo needed after adding studio slider (or make the slider reload as necessary)
                 )
                 return _pregnancyFullValues.Keys;
 

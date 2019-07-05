@@ -62,13 +62,13 @@ namespace KK_Pregnancy
 
         public void SaveData()
         {
-            SetExtendedData(PregnancyDataUtils.WriteData(Week, GameplayEnabled, Fertility));
+            SetExtendedData(PregnancyDataUtils.SerializeData(Week, GameplayEnabled, Fertility));
         }
 
         public void ReadData()
         {
             var data = GetExtendedData();
-            PregnancyDataUtils.ParseData(data, out _week, out _gameplayEnabled, out _fertility);
+            PregnancyDataUtils.DeserializeData(data, out _week, out _gameplayEnabled, out _fertility);
 
             if (!CanGetDangerousDays())
             {

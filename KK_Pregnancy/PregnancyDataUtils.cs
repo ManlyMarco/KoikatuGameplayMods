@@ -7,25 +7,29 @@ namespace KK_Pregnancy
 {
     public static class PregnancyDataUtils
     {
-        public static bool IsChaFilePregnant(this ChaFileControl c)
+        /// <param name="c">ChaFile to test</param>
+        /// <param name="afterWasDiscovered">The girl knows about it / tested it</param>
+        public static bool IsChaFilePregnant(this ChaFileControl c, bool afterWasDiscovered)
         {
             if (c == null) return false;
 
             var d = ExtendedSave.GetExtendedDataById(c, PregnancyPlugin.GUID);
             if (d == null) return false;
 
-            ParseData(d, out var week, out var _, out var _);
-            return week > 0;
+            DeserializeData(d, out var week, out var _, out var _);
+            return afterWasDiscovered ? week > 1 : week > 0;
         }
 
-        public static bool IsHeroinePregnant(this SaveData.Heroine heroine)
+        /// <param name="heroine">Heroine to test</param>
+        /// <param name="afterWasDiscovered">The girl knows about it / tested it</param>
+        public static bool IsHeroinePregnant(this SaveData.Heroine heroine, bool afterWasDiscovered)
         {
             if (heroine == null) return false;
 
-            return heroine.GetRelatedChaFiles().Any(IsChaFilePregnant);
+            return heroine.GetRelatedChaFiles().Any(control => IsChaFilePregnant(control, afterWasDiscovered));
         }
 
-        public static void ParseData(PluginData data, out int week, out bool gameplayEnabled, out float fertility)
+        public static void DeserializeData(PluginData data, out int week, out bool gameplayEnabled, out float fertility)
         {
             week = 0;
             gameplayEnabled = true;
@@ -38,7 +42,7 @@ namespace KK_Pregnancy
             if (data.data.TryGetValue("Fertility", out var value3) && value3 is float f) fertility = f;
         }
 
-        public static PluginData WriteData(int week, bool gameplayEnabled, float fertility)
+        public static PluginData SerializeData(int week, bool gameplayEnabled, float fertility)
         {
             if (week <= 0 && gameplayEnabled && Mathf.Approximately(fertility, DefaultFertility)) return null;
 

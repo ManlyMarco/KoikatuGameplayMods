@@ -33,6 +33,8 @@ namespace KK_Pregnancy
                 return pregSprite;
             }
 
+            #region Class roster
+
             [HarmonyPostfix]
             [HarmonyPatch(typeof(ClassRoomList), "PreviewUpdate")]
             public static void ClassroomPregIconUpdate(ClassRoomList __instance)
@@ -49,9 +51,16 @@ namespace KK_Pregnancy
                 foreach (var chaEntry in entries)
                 {
                     var baseImg = Traverse.Create(chaEntry).Field("_objHeart").GetValue<GameObject>();
-                    SetHeart(baseImg, chaEntry.data?.charFile != null && chaEntry.data.charFile.IsChaFilePregnant(), -70f);
+                    var isPregnant = chaEntry.data?.charFile != null && 
+                                     chaEntry.data.charFile.IsChaFilePregnant(!PregnancyPlugin.ShowPregnancyIconEarly.Value);
+                    // Need to call this every time in case characters get transferred/edited
+                    SetHeart(baseImg, isPregnant, -70f);
                 }
             }
+
+            #endregion
+
+            #region InGameCharaList
 
             private static void SceneManager_sceneLoaded(Scene scene, LoadSceneMode mode)
             {
@@ -70,7 +79,8 @@ namespace KK_Pregnancy
 
                 foreach (var chaStatusComponent in chaStatusScene.transform.GetComponentsInChildren<ChaStatusComponent>())
                 {
-                    if (chaStatusComponent.heroine.IsHeroinePregnant())
+                    // The list can't change without being recreated so it's fine to never disable
+                    if (chaStatusComponent.heroine.IsHeroinePregnant(!PregnancyPlugin.ShowPregnancyIconEarly.Value))
                     {
                         var heartObj = chaStatusComponent.objHeart;
                         SetHeart(heartObj, true, -91.1f);
@@ -78,6 +88,14 @@ namespace KK_Pregnancy
                 }
             }
 
+            #endregion
+
+            /// <summary>
+            /// Enable/disable pregnancy icon
+            /// </summary>
+            /// <param name="heartObj">The lovers icon object</param>
+            /// <param name="enabled">Is the preg icon shown</param>
+            /// <param name="xOffset">Offset from the lovers icon</param>
             private static void SetHeart(GameObject heartObj, bool enabled, float xOffset)
             {
                 const string name = "Pregnancy_Icon";

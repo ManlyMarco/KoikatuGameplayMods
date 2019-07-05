@@ -21,6 +21,11 @@ namespace KK_Pregnancy
         [Description("If disabled no new characters will be able to get pregnant. Doesn't affect already pregnant characters.")]
         public static ConfigWrapper<bool> ConceptionEnabled { get; private set; }
 
+        [DisplayName("Show pregnancy icon early")]
+        [Description("By default pregnancy status icon in class roster is shown after a few days (the girl had a chance to do the test). " +
+                     "Turning this on will make the icon show up at the end of the current day.")]
+        public static ConfigWrapper<bool> ShowPregnancyIconEarly { get; private set; }
+
         [DisplayName("Pregnancy progression speed")]
         [Description("How much faster does the in-game pregnancy progresses than the standard 40 weeks. " +
                      "It also reduces the time characters leave school for after birth.\n\n" +
@@ -30,11 +35,12 @@ namespace KK_Pregnancy
 
         private void Start()
         {
-            if(!KoikatuAPI.CheckRequiredPlugin(this, KoikatuAPI.GUID, new Version(KoikatuAPI.VersionConst))) return;
-            if(!KoikatuAPI.CheckRequiredPlugin(this, KKABMX_Core.GUID, new Version("3.2.3"))) return;
+            if (!KoikatuAPI.CheckRequiredPlugin(this, KoikatuAPI.GUID, new Version(KoikatuAPI.VersionConst))) return;
+            if (!KoikatuAPI.CheckRequiredPlugin(this, KKABMX_Core.GUID, new Version("3.2.3"))) return;
 
             PregnancyProgressionSpeed = new ConfigWrapper<int>(nameof(PregnancyProgressionSpeed), this, 4);
             ConceptionEnabled = new ConfigWrapper<bool>(nameof(ConceptionEnabled), this, true);
+            ShowPregnancyIconEarly = new ConfigWrapper<bool>(nameof(ShowPregnancyIconEarly), this, false);
 
             CharacterApi.RegisterExtraBehaviour<PregnancyCharaController>(GUID);
             GameAPI.RegisterExtraBehaviour<PregnancyGameController>(GUID);

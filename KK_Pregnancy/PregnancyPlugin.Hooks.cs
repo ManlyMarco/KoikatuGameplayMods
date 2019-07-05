@@ -48,7 +48,7 @@ namespace KK_Pregnancy
 
                         if (data == null) return false;
 
-                        PregnancyDataUtils.ParseData(data, out var week, out var gameplayEnabled, out var _);
+                        PregnancyDataUtils.DeserializeData(data, out var week, out var gameplayEnabled, out var _);
                         if (gameplayEnabled && week >= PregnancyDataUtils.LeaveSchoolWeek)
                             return true;
 
