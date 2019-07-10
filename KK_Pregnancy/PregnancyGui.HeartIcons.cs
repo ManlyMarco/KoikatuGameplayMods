@@ -105,7 +105,7 @@ namespace KK_Pregnancy
                 if (!enabled)
                 {
                     if (existing != null)
-                        Object.Destroy(existing);
+                        Object.Destroy(existing.gameObject);
                 }
                 else
                 {
