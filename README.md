@@ -22,11 +22,15 @@ Plugin that adds pregnancy to the main game and as a maker option. Busting a nut
 
 The plugin can be configured in plugin settings and per-character in female chara maker. The default conception chance (fertility) is around 30% and can be changed per-character from main-menu maker (pregnancy settings cannot be changed from class maker to prevent cheating). Conception can be completely disabled per-character and globally.
 
+Because the pregnant effect is made by manipulating bones, there are some limitations and potential issues. On some characters the effect might look bad, especially if they use many ABMX sliders around the belly area. Clothes that use skirt bones (skirts, dresses, etc.) can look glitchy, which is sadly unavoidable without tweaking each character manually in maker. Clothes that stick close to the body will work best.
+
 ### How to install
 1. Needs BepInEx and latest BepisPlugins, KKAPI (v1.3.6.1) and KKABMX (v3.2.3). Update these as needed.
 2. Download the latest release from [releases](https://github.com/ManlyMarco/Koikatu-Gameplay-Mod/releases).
 3. To install copy the dll to your BepInEx directory.
 4. Check if there are no warnings on game startup, Pregnancy options should appear in plugin settings (not in studio).
+
+![preview](https://user-images.githubusercontent.com/39247311/60744379-f8764000-9f75-11e9-886b-be5e74448258.png)
 
 # KK_NightDarkener
 Plugin that darkens the night scenes to something slightly more realistic. Configurable, can go down to horror levels of darkness.
