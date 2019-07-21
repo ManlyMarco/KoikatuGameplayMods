@@ -95,7 +95,7 @@ namespace KK_Pregnancy
 
             GetComponent<BoneController>().AddBoneEffect(_boneEffect);
 
-            PregnancyGui.UpdateInterface(this);
+            PregnancyGui.UpdateMakerInterface(this);
         }
     }
 }
