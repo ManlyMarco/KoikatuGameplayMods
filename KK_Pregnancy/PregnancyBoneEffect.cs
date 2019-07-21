@@ -2,6 +2,7 @@
 using System.Linq;
 using KKABMX.Core;
 using KKAPI.Maker;
+using KKAPI.Studio;
 using UnityEngine;
 
 namespace KK_Pregnancy
@@ -58,10 +59,7 @@ namespace KK_Pregnancy
 
         public override IEnumerable<string> GetAffectedBones(BoneController origin)
         {
-            if (_controller.IsDuringPregnancy()
-                || MakerAPI.InsideMaker
-                //|| StudioAPI.InsideStudio todo needed after adding studio slider (or make the slider reload as necessary)
-                )
+            if (_controller.IsDuringPregnancy() || MakerAPI.InsideMaker || StudioAPI.InsideStudio)
                 return _pregnancyFullValues.Keys;
 
             return Enumerable.Empty<string>();
