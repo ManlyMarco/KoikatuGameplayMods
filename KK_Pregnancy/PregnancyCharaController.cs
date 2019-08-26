@@ -86,16 +86,18 @@ namespace KK_Pregnancy
 
         protected override void OnReload(GameMode currentGameMode)
         {
-            if (MakerAPI.GetCharacterLoadFlags()?.Parameters == false) return;
+            // Parameters are false by default in class chara maker, but we need to load them the 1st time to not lose progress
+            if (_boneEffect == null || MakerAPI.GetCharacterLoadFlags()?.Parameters != false)
+            {
+                ReadData();
 
-            ReadData();
+                if (_boneEffect == null)
+                    _boneEffect = new PregnancyBoneEffect(this);
 
-            if (_boneEffect == null)
-                _boneEffect = new PregnancyBoneEffect(this);
+                GetComponent<BoneController>().AddBoneEffect(_boneEffect);
 
-            GetComponent<BoneController>().AddBoneEffect(_boneEffect);
-
-            PregnancyGui.UpdateMakerInterface(this);
+                PregnancyGui.UpdateMakerInterface(this);
+            }
         }
     }
 }
