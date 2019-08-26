@@ -86,6 +86,7 @@ namespace KK_Pregnancy
 
             _weeksSlider = e.AddControl(new MakerSlider(cat, "Week of pregnancy", 0f, PregnancyDataUtils.LeaveSchoolWeek - 1f, 0f, _pluginInstance));
             _weeksSlider.ValueToString = f => Mathf.RoundToInt(f).ToString();
+            _weeksSlider.StringToValue = s => int.Parse(s);
             _weeksSlider.ValueChanged.Subscribe(val => GetMakerController().Week = Mathf.RoundToInt(val));
 
             e.AddControl(new MakerText("If the character is pregnant when added to the game, the pregnancy will continue from this point.", cat, _pluginInstance) { TextColor = hintColor });
