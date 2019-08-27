@@ -15,7 +15,7 @@ namespace KK_Pregnancy
     public partial class PregnancyPlugin : BaseUnityPlugin
     {
         public const string GUID = "KK_Pregnancy";
-        internal const string Version = "1.1";
+        internal const string Version = "1.1.1";
 
         [DisplayName("Enable conception")]
         [Description("If disabled no new characters will be able to get pregnant. Doesn't affect already pregnant characters.")]
@@ -35,7 +35,7 @@ namespace KK_Pregnancy
 
         private void Start()
         {
-            if (!KoikatuAPI.CheckRequiredPlugin(this, KoikatuAPI.GUID, new Version(KoikatuAPI.VersionConst))) return;
+            if (!KoikatuAPI.CheckRequiredPlugin(this, KoikatuAPI.GUID, new Version("1.4"))) return;
             if (!KoikatuAPI.CheckRequiredPlugin(this, KKABMX_Core.GUID, new Version("3.2.3"))) return;
 
             PregnancyProgressionSpeed = new ConfigWrapper<int>(nameof(PregnancyProgressionSpeed), this, 4);
