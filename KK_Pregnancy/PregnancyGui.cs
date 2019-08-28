@@ -1,11 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using Harmony;
+﻿using Harmony;
 using KKAPI.Maker;
 using KKAPI.Maker.UI;
 using KKAPI.Studio;
 using KKAPI.Studio.UI;
-using Studio;
 using UniRx;
 using UnityEngine;
 
@@ -30,8 +27,16 @@ namespace KK_Pregnancy
             else
             {
                 MakerAPI.MakerBaseLoaded += MakerAPI_MakerBaseLoaded;
+                MakerAPI.MakerExiting += MakerAPI_MakerExiting;
                 HeartIcons.Init(hi);
             }
+        }
+
+        private static void MakerAPI_MakerExiting(object sender, System.EventArgs e)
+        {
+            _gameplayToggle = null;
+            _fertilityToggle = null;
+            _weeksSlider = null;
         }
 
         private static void RegisterStudioControls()
@@ -39,15 +44,7 @@ namespace KK_Pregnancy
             var cat = StudioAPI.GetOrCreateCurrentStateCategory(null);
             cat.AddControl(new CurrentStateCategorySlider("Pregnancy",
                 c => c.charInfo?.GetComponent<PregnancyCharaController>()?.Week ?? 0, 0, 40)).Value.Subscribe(
-                f => { foreach (var ctrl in GetSelectedStudioControllers()) ctrl.Week = Mathf.RoundToInt(f); });
-        }
-
-        // todo use the one from studioapi when it gets updated
-        private static IEnumerable<PregnancyCharaController> GetSelectedStudioControllers()
-        {
-            if (!StudioAPI.StudioLoaded) return Enumerable.Empty<PregnancyCharaController>();
-            var objects = GuideObjectManager.Instance.selectObjectKey.Select(Studio.Studio.GetCtrlInfo).OfType<OCIChar>();
-            return objects.Select(c => c.charInfo?.GetComponent<PregnancyCharaController>()).Where(x => x != null);
+                f => { foreach (var ctrl in StudioAPI.GetSelectedControllers<PregnancyCharaController>()) ctrl.Week = Mathf.RoundToInt(f); });
         }
 
         internal static void UpdateMakerInterface(PregnancyCharaController controller)
