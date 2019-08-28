@@ -15,7 +15,7 @@ namespace KK_Pregnancy
     public partial class PregnancyPlugin : BaseUnityPlugin
     {
         public const string GUID = "KK_Pregnancy";
-        internal const string Version = "1.1.1";
+        internal const string Version = "1.1.2";
 
         [DisplayName("Enable conception")]
         [Description("If disabled no new characters will be able to get pregnant. Doesn't affect already pregnant characters.")]
