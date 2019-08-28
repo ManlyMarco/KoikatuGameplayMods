@@ -86,13 +86,14 @@ namespace KK_Pregnancy
 
         protected override void OnReload(GameMode currentGameMode)
         {
+            if (_boneEffect == null)
+                _boneEffect = new PregnancyBoneEffect(this);
+
             // Parameters are false by default in class chara maker, but we need to load them the 1st time to not lose progress
-            if (_boneEffect == null || MakerAPI.GetCharacterLoadFlags()?.Parameters != false)
+            // InsideAndLoaded is true when the initial card is being loaded into maker so we can use that
+            if (!MakerAPI.InsideAndLoaded || MakerAPI.GetCharacterLoadFlags()?.Parameters != false)
             {
                 ReadData();
-
-                if (_boneEffect == null)
-                    _boneEffect = new PregnancyBoneEffect(this);
 
                 GetComponent<BoneController>().AddBoneEffect(_boneEffect);
 
