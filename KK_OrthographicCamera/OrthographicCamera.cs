@@ -1,4 +1,5 @@
 ﻿using BepInEx;
+using BepInEx.Configuration;
 using UnityEngine;
 
 namespace KK_OrthographicCamera
@@ -9,11 +10,11 @@ namespace KK_OrthographicCamera
         public const string GUID = "KK_OrthographicCamera";
         internal const string Version = "1.0";
 
-        public SavedKeyboardShortcut ToggleOrthoCamera { get; private set; }
+        public ConfigEntry<KeyboardShortcut> ToggleOrthoCamera { get; private set; }
 
         private void Start()
         {
-            ToggleOrthoCamera = new SavedKeyboardShortcut(nameof(ToggleOrthoCamera), this, new KeyboardShortcut(KeyCode.I));
+            ToggleOrthoCamera = Config.Bind("", "Toggle orthographic mode", new KeyboardShortcut(KeyCode.I));
         }
 
         private Camera _mainCamera;
@@ -31,7 +32,7 @@ namespace KK_OrthographicCamera
             {
                 _mainCamera.orthographicSize = Mathf.Max(0.1f, _mainCamera.orthographicSize + _mainCamera.orthographicSize * Input.mouseScrollDelta.y * 0.1f);
             }
-            else if (ToggleOrthoCamera.IsDown())
+            else if (ToggleOrthoCamera.Value.IsDown())
             {
                 _mainCamera.orthographic = !_mainCamera.orthographic;
             }
