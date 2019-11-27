@@ -16,18 +16,24 @@ namespace KK_OrthographicCamera
             ToggleOrthoCamera = new SavedKeyboardShortcut(nameof(ToggleOrthoCamera), this, new KeyboardShortcut(KeyCode.I));
         }
 
+        private Camera _mainCamera;
+
         private void Update()
         {
-            var cam = Camera.main;
-            if (cam == null) return;
-
-            if (ToggleOrthoCamera.IsDown())
+            if (_mainCamera == null)
             {
-                cam.orthographic = !cam.orthographic;
+                _mainCamera = Camera.main;
+                if (_mainCamera == null)
+                    return;
             }
-            else if (cam.orthographic && !Mathf.Approximately(Input.mouseScrollDelta.y, 0))
+
+            if (_mainCamera.orthographic && Input.mouseScrollDelta.y != 0)
             {
-                cam.orthographicSize = Mathf.Max(0.1f, cam.orthographicSize + cam.orthographicSize * Input.mouseScrollDelta.y * 0.1f);
+                _mainCamera.orthographicSize = Mathf.Max(0.1f, _mainCamera.orthographicSize + _mainCamera.orthographicSize * Input.mouseScrollDelta.y * 0.1f);
+            }
+            else if (ToggleOrthoCamera.IsDown())
+            {
+                _mainCamera.orthographic = !_mainCamera.orthographic;
             }
         }
     }
