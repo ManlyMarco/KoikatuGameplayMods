@@ -5,6 +5,7 @@ using UnityEngine;
 namespace KK_OrthographicCamera
 {
     [BepInPlugin(GUID, GUID, Version)]
+    [DefaultExecutionOrder(1000)]
     public class OrthographicCamera : BaseUnityPlugin
     {
         public const string GUID = "KK_OrthographicCamera";
@@ -18,23 +19,30 @@ namespace KK_OrthographicCamera
         }
 
         private Camera _mainCamera;
+        private float _orthoSize;
 
-        private void Update()
+        private void LateUpdate()
         {
-            if (_mainCamera == null)
+            if (_mainCamera == null || !_mainCamera.isActiveAndEnabled)
             {
                 _mainCamera = Camera.main;
                 if (_mainCamera == null)
                     return;
+                _orthoSize = _mainCamera.orthographicSize;
             }
 
-            if (_mainCamera.orthographic && Input.mouseScrollDelta.y != 0)
+            if (_mainCamera.orthographic)
             {
-                _mainCamera.orthographicSize = Mathf.Max(0.1f, _mainCamera.orthographicSize + _mainCamera.orthographicSize * Input.mouseScrollDelta.y * 0.1f);
+                if (Input.mouseScrollDelta.y != 0)
+                    _orthoSize = Mathf.Max(0.1f, _orthoSize + _orthoSize * Input.mouseScrollDelta.y * 0.1f);
+                _mainCamera.orthographicSize = _orthoSize;
             }
-            else if (ToggleOrthoCamera.Value.IsDown())
+
+            if (ToggleOrthoCamera.Value.IsDown())
             {
                 _mainCamera.orthographic = !_mainCamera.orthographic;
+                if (_mainCamera.orthographic)
+                    _orthoSize = _mainCamera.orthographicSize;
             }
         }
     }
