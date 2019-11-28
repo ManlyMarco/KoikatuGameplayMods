@@ -12,10 +12,13 @@ namespace KK_OrthographicCamera
         internal const string Version = "1.1";
 
         public ConfigEntry<KeyboardShortcut> ToggleOrthoCamera { get; private set; }
+        public bool ForceOrthographicSize;
 
         private void Start()
         {
             ToggleOrthoCamera = Config.Bind("", "Toggle orthographic mode", new KeyboardShortcut(KeyCode.I));
+            // No need to force it in studio
+            ForceOrthographicSize = !(Application.productName == "CharaStudio" || Application.productName == "StudioNEOV2");
         }
 
         private Camera _mainCamera;
@@ -33,8 +36,12 @@ namespace KK_OrthographicCamera
 
             if (_mainCamera.orthographic)
             {
+                if (!ForceOrthographicSize)
+                    _orthoSize = _mainCamera.orthographicSize;
+
                 if (Input.mouseScrollDelta.y != 0)
                     _orthoSize = Mathf.Max(0.1f, _orthoSize + _orthoSize * Input.mouseScrollDelta.y * 0.1f);
+
                 _mainCamera.orthographicSize = _orthoSize;
             }
 
