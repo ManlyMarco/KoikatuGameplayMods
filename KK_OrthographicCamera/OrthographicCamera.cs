@@ -8,7 +8,7 @@ namespace KK_OrthographicCamera
     public class OrthographicCamera : BaseUnityPlugin
     {
         public const string GUID = "KK_OrthographicCamera";
-        internal const string Version = "1.0";
+        internal const string Version = "1.1";
 
         public ConfigEntry<KeyboardShortcut> ToggleOrthoCamera { get; private set; }
 
