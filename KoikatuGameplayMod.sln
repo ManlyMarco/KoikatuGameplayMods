@@ -9,7 +9,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KK_NightDarkener", "KK_Nigh
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KK_Pregnancy", "KK_Pregnancy\KK_Pregnancy.csproj", "{930A00A6-2935-4EA0-81F0-B16D3E71B74C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrthographicCamera", "KK_OrthographicCamera\OrthographicCamera.csproj", "{7F7A7273-500B-41EB-B229-9B374FC5598D}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrthographicCamera", "OrthographicCamera\OrthographicCamera.csproj", "{7F7A7273-500B-41EB-B229-9B374FC5598D}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
