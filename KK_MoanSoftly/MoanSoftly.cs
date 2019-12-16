@@ -13,7 +13,7 @@ using UnityEngine;
 namespace KK_MoanSoftly
 {
     [BepInPlugin(GUID, "Moan softly when I H you", Version)]
-    [BepInDependency(KKAPI.KoikatuAPI.VersionConst, "1.6")]
+    [BepInDependency(KKAPI.KoikatuAPI.GUID, "1.6")]
     public class MoanSoftly : BaseUnityPlugin
     {
         public const string GUID = "KK_MoanSoftly";
