@@ -45,11 +45,11 @@ Works under BepInEx with Harmony. Needs latest BepisPlugins - universal Configur
 ![Preview](https://user-images.githubusercontent.com/39247311/55674510-07395200-58b6-11e9-8b85-d15f8fab54fa.png)
 
 # KK_OrthographicCamera
-Plugin that allows using of the orthographic (parallel projection) camera mode. This is the effect that is used in isometric games like for example Diablo 2 and Fallout 2.
+Plugin that allows using of the orthographic (parallel projection) camera mode. Works in both Studio and main game/maker. (This is the effect that is used in isometric games like for example Diablo 2 and Fallout 2)
 
-### Requirements
-Works under BepInEx v4.x and needs latest BepisPlugins. Put the .dll inside your BepInEx folder.
 ### How to use
-To toggle between perspective (normal) and orthographic camera mode press the I key (can be changed in settings) and then use your mouse scroll wheel to zoom in and out. The plugin works both in main game and studio.
+- Needs BepInEx v5.x
+- Place the .dll inside your `BepInEx\plugins` folder.
+- To toggle between perspective (normal) and orthographic camera mode press the I key (can be changed in settings) and then use your mouse scroll wheel to zoom in and out.
 
 ![preview](https://user-images.githubusercontent.com/39247311/59981520-dd661080-9604-11e9-9b2b-eefbd1a1a66b.png)
