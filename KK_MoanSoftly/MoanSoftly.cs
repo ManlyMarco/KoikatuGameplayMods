@@ -6,6 +6,7 @@ using BepInEx;
 using BepInEx.Harmony;
 using HarmonyLib;
 using KKAPI.MainGame;
+using KKAPI.Studio;
 using KKAPI.Utilities;
 using UnityEngine;
 
@@ -24,6 +25,8 @@ namespace KK_MoanSoftly
 
         private void Awake()
         {
+            if(StudioAPI.InsideStudio) return;
+
             _findMethod = AccessTools.Method(typeof(ChaControl), nameof(ChaControl.SetVoiceTransform));
             if (_findMethod == null) throw new ArgumentNullException(nameof(_findMethod));
             _addMethod = AccessTools.Method(typeof(MoanSoftly), nameof(ApplyBreathingTweaks));
