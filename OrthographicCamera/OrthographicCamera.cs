@@ -9,7 +9,7 @@ namespace KK_OrthographicCamera
     public class OrthographicCamera : BaseUnityPlugin
     {
         public const string GUID = "KK_OrthographicCamera";
-        internal const string Version = "1.1";
+        internal const string Version = "1.1.1";
 
         public ConfigEntry<KeyboardShortcut> ToggleOrthoCamera { get; private set; }
         public bool ForceOrthographicSize;
@@ -17,8 +17,8 @@ namespace KK_OrthographicCamera
         private void Start()
         {
             ToggleOrthoCamera = Config.Bind("", "Toggle orthographic mode", new KeyboardShortcut(KeyCode.I));
-            // No need to force it in studio
-            ForceOrthographicSize = !(Application.productName == "CharaStudio" || Application.productName == "StudioNEOV2");
+            // No need to force it in koi studio
+            ForceOrthographicSize = Application.productName != "CharaStudio";
         }
 
         private Camera _mainCamera;
