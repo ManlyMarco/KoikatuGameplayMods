@@ -2,8 +2,9 @@
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
+using BepInEx.Harmony;
 using ExtensibleSaveFormat;
-using Harmony;
+using HarmonyLib;
 using KKAPI.MainGame;
 using Manager;
 
@@ -13,9 +14,9 @@ namespace KK_Pregnancy
     {
         private static class Hooks
         {
-            public static void InitHooks(HarmonyInstance harmonyInstance)
+            public static void InitHooks(Harmony harmonyInstance)
             {
-                harmonyInstance.PatchAll(typeof(Hooks));
+                HarmonyWrapper.PatchAll(typeof(Hooks), harmonyInstance);
 
                 PatchNPCLoadAll(harmonyInstance, new HarmonyMethod(typeof(Hooks), nameof(NPCLoadAllTpl)));
             }
@@ -63,7 +64,7 @@ namespace KK_Pregnancy
                 return filteredHeroines;
             }
 
-            private static void PatchNPCLoadAll(HarmonyInstance instance, HarmonyMethod transpiler)
+            private static void PatchNPCLoadAll(Harmony instance, HarmonyMethod transpiler)
             {
                 var t = typeof(ActionScene).GetNestedTypes(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Single(x => x.Name.StartsWith("<NPCLoadAll>c__Iterator"));
                 var m = t.GetMethod("MoveNext");

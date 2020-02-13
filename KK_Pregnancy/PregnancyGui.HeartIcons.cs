@@ -1,7 +1,8 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using ActionGame;
-using Harmony;
+using BepInEx.Harmony;
+using HarmonyLib;
 using KK_Pregnancy.Properties;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -15,13 +16,13 @@ namespace KK_Pregnancy
         {
             private static Sprite _pregSprite;
 
-            internal static void Init(HarmonyInstance hi)
+            internal static void Init(Harmony hi)
             {
                 _pregSprite = LoadPregnancyIcon();
 
                 SceneManager.sceneLoaded += SceneManager_sceneLoaded;
 
-                hi.PatchAll(typeof(HeartIcons));
+                HarmonyWrapper.PatchAll(typeof(HeartIcons), hi);
             }
 
             private static Sprite LoadPregnancyIcon()

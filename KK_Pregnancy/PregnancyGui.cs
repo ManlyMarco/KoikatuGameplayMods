@@ -1,4 +1,4 @@
-﻿using Harmony;
+﻿using HarmonyLib;
 using KKAPI.Maker;
 using KKAPI.Maker.UI;
 using KKAPI.Studio;
@@ -16,7 +16,7 @@ namespace KK_Pregnancy
 
         private static PregnancyPlugin _pluginInstance;
 
-        internal static void Init(HarmonyInstance hi, PregnancyPlugin instance)
+        internal static void Init(Harmony hi, PregnancyPlugin instance)
         {
             _pluginInstance = instance;
 

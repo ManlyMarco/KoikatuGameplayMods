@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using ActionGame;
-using BepInEx.Logging;
 using ExtensibleSaveFormat;
 using KKAPI.MainGame;
 using Manager;
 using UnityEngine;
-using Logger = BepInEx.Logger;
 using Random = UnityEngine.Random;
 
 namespace KK_Pregnancy
