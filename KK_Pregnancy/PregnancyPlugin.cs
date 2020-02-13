@@ -14,9 +14,10 @@ namespace KK_Pregnancy
     public partial class PregnancyPlugin : BaseUnityPlugin
     {
         public const string GUID = "KK_Pregnancy";
-        public const string Version = "1.1.3";
+        public const string Version = "1.2";
 
         public static ConfigEntry<bool> ConceptionEnabled { get; private set; }
+        public static ConfigEntry<bool> AnalConceptionEnabled { get; private set; }
         public static ConfigEntry<bool> ShowPregnancyIconEarly { get; private set; }
         public static ConfigEntry<int> PregnancyProgressionSpeed { get; private set; }
 
@@ -29,7 +30,10 @@ namespace KK_Pregnancy
                     new AcceptableValueList<int>(1, 2, 4, 10)));
 
             ConceptionEnabled = Config.Bind("General", "Enable conception", true,
-                "If disabled no new characters will be able to get pregnant. Doesn't affect already pregnant characters.");
+                "Allows characters to get pregnant from vaginal sex. Doesn't affect already pregnant characters.");
+
+            AnalConceptionEnabled = Config.Bind("General", "Enable anal conception", false,
+                "Allows characters to get pregnant from anal sex. Doesn't affect already pregnant characters.");
 
             ShowPregnancyIconEarly = Config.Bind("General", "Show pregnancy icon early", false, 
                 "By default pregnancy status icon in class roster is shown after a few days (the girl had a chance to do the test). " +

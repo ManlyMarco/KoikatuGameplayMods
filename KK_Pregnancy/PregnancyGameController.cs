@@ -27,15 +27,16 @@ namespace KK_Pregnancy
         // Figure out if conception happened at end of h scene
         protected override void OnEndH(HSceneProc proc, bool freeH)
         {
-            if (!PregnancyPlugin.ConceptionEnabled.Value) return;
-
             // Don't know which girl player came inside
             if (proc.flags.mode == HFlag.EMode.houshi3P || proc.flags.mode == HFlag.EMode.sonyu3P) return;
 
             var heroine = proc.flags.lstHeroine.First(x => x != null);
             var isDangerousDay = HFlag.GetMenstruation(heroine.MenstruationDay) == HFlag.MenstruationType.危険日;
-            var cameInside = proc.flags.count.sonyuInside > 0;
-            if (isDangerousDay && cameInside)
+            if (!isDangerousDay) return;
+
+            var cameInside = PregnancyPlugin.ConceptionEnabled.Value && proc.flags.count.sonyuInside > 0;
+            var cameInsideAnal = PregnancyPlugin.AnalConceptionEnabled.Value && proc.flags.count.sonyuAnalInside > 0;
+            if (cameInside || cameInsideAnal)
             {
                 var controller = heroine.chaCtrl.GetComponent<PregnancyCharaController>();
                 if (controller == null) throw new ArgumentNullException(nameof(controller));
