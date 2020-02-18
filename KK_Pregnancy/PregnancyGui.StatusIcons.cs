@@ -241,15 +241,21 @@ namespace KK_Pregnancy
 
             private static HeroineStatus GetHeroineStatus(SaveData.Heroine heroine)
             {
-                if (!heroine.isGirlfriend && (heroine.isVirgin || heroine.hCount < 2))
-                    return HeroineStatus.Unknown;
+                // Check if she wants to tell
+                if (heroine.intimacy >= 80 ||
+                    heroine.hCount >= 5 ||
+                    heroine.parameter.attribute.bitch && heroine.favor > 50 ||
+                    (heroine.isGirlfriend || heroine.favor >= 90) && (!heroine.isVirgin || heroine.hCount >= 2 || heroine.intimacy >= 40))
+                {
+                    if (heroine.IsHeroinePregnant(!PregnancyPlugin.ShowPregnancyIconEarly.Value))
+                        return HeroineStatus.Pregnant;
 
-                if (heroine.IsHeroinePregnant(!PregnancyPlugin.ShowPregnancyIconEarly.Value))
-                    return HeroineStatus.Pregnant;
+                    return HFlag.GetMenstruation(heroine.MenstruationDay) == HFlag.MenstruationType.安全日
+                        ? HeroineStatus.Safe
+                        : HeroineStatus.Risky;
+                }
 
-                return HFlag.GetMenstruation(heroine.MenstruationDay) == HFlag.MenstruationType.安全日
-                    ? HeroineStatus.Safe
-                    : HeroineStatus.Risky;
+                return HeroineStatus.Unknown;
             }
 
             private enum HeroineStatus
