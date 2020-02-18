@@ -13,6 +13,7 @@ namespace KK_Pregnancy
         private float _fertility;
         private bool _gameplayEnabled;
         private int _week;
+        private PregnancyDataUtils.MenstruationSchedule _schedule;
 
         /// <summary>
         /// The character is harder to get pregnant.
@@ -44,6 +45,12 @@ namespace KK_Pregnancy
             set => _week = value;
         }
 
+        public PregnancyDataUtils.MenstruationSchedule Schedule
+        {
+            get => _schedule;
+            set => _schedule = value;
+        }
+
         public float GetBellySizePercent()
         {
             // Don't show any effect at week 1 since it begins right after winning a child lottery
@@ -62,13 +69,13 @@ namespace KK_Pregnancy
 
         public void SaveData()
         {
-            SetExtendedData(PregnancyDataUtils.SerializeData(Week, GameplayEnabled, Fertility));
+            SetExtendedData(PregnancyDataUtils.SerializeData(_week, _gameplayEnabled, _fertility, _schedule));
         }
 
         public void ReadData()
         {
             var data = GetExtendedData();
-            PregnancyDataUtils.DeserializeData(data, out _week, out _gameplayEnabled, out _fertility);
+            PregnancyDataUtils.DeserializeData(data, out _week, out _gameplayEnabled, out _fertility, out _schedule);
 
             if (!CanGetDangerousDays())
             {
@@ -96,9 +103,78 @@ namespace KK_Pregnancy
                 ReadData();
 
                 GetComponent<BoneController>().AddBoneEffect(_boneEffect);
-
-                PregnancyGui.UpdateMakerInterface(this);
             }
         }
+
+        internal static byte[] GetMenstruationsArr(PregnancyDataUtils.MenstruationSchedule menstruationSchedule)
+        {
+            switch (menstruationSchedule)
+            {
+                default:
+                    return HFlag.menstruations;
+                case PregnancyDataUtils.MenstruationSchedule.MostlyRisky:
+                    return _menstruationsRisky;
+                case PregnancyDataUtils.MenstruationSchedule.AlwaysSafe:
+                    return _menstruationsAlwaysSafe;
+                case PregnancyDataUtils.MenstruationSchedule.AlwaysRisky:
+                    return _menstruationsAlwaysRisky;
+            }
+        }
+
+        private static readonly byte[] _menstruationsRisky = {
+            0,
+            0,
+            0,
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            0,
+            0
+        };
+
+        // Always needs at least one day of different type to prevent infinite loop when trying to set that type of day
+        private static readonly byte[] _menstruationsAlwaysSafe = {
+            0,
+            0,
+            0,
+            0,
+            1,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0
+        };
+
+        // Always needs at least one day of different type to prevent infinite loop when trying to set that type of day
+        private static readonly byte[] _menstruationsAlwaysRisky = {
+            0,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1,
+            1
+        };
     }
 }

@@ -16,7 +16,7 @@ namespace KK_Pregnancy
             var d = ExtendedSave.GetExtendedDataById(c, PregnancyPlugin.GUID);
             if (d == null) return false;
 
-            DeserializeData(d, out var week, out var _, out var _);
+            DeserializeData(d, out var week, out _, out _, out _);
             return afterWasDiscovered ? week > 1 : week > 0;
         }
 
@@ -29,20 +29,22 @@ namespace KK_Pregnancy
             return heroine.GetRelatedChaFiles().Any(control => IsChaFilePregnant(control, afterWasDiscovered));
         }
 
-        public static void DeserializeData(PluginData data, out int week, out bool gameplayEnabled, out float fertility)
+        public static void DeserializeData(PluginData data, out int week, out bool gameplayEnabled, out float fertility, out MenstruationSchedule schedule)
         {
             week = 0;
             gameplayEnabled = true;
             fertility = DefaultFertility;
+            schedule = MenstruationSchedule.Default;
 
             if (data?.data == null) return;
 
             if (data.data.TryGetValue("Week", out var value) && value is int w) week = w;
             if (data.data.TryGetValue("GameplayEnabled", out var value2) && value2 is bool g) gameplayEnabled = g;
             if (data.data.TryGetValue("Fertility", out var value3) && value3 is float f) fertility = f;
+            if (data.data.TryGetValue("MenstruationSchedule", out var value4) && value4 is int s) schedule = (MenstruationSchedule)s;
         }
 
-        public static PluginData SerializeData(int week, bool gameplayEnabled, float fertility)
+        public static PluginData SerializeData(int week, bool gameplayEnabled, float fertility, MenstruationSchedule schedule)
         {
             if (week <= 0 && gameplayEnabled && Mathf.Approximately(fertility, DefaultFertility)) return null;
 
@@ -53,10 +55,19 @@ namespace KK_Pregnancy
                 {
                     ["Week"] = week,
                     ["GameplayEnabled"] = gameplayEnabled,
-                    ["Fertility"] = fertility
+                    ["Fertility"] = fertility,
+                    ["MenstruationSchedule"] = (int)schedule
                 }
             };
             return data;
+        }
+
+        public enum MenstruationSchedule
+        {
+            Default = 0,
+            MostlyRisky = 1,
+            AlwaysSafe = 2,
+            AlwaysRisky = 3
         }
 
         public static readonly float DefaultFertility = 0.3f;

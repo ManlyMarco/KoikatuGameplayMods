@@ -13,6 +13,7 @@ namespace KK_Pregnancy
         private static MakerToggle _gameplayToggle;
         private static MakerSlider _fertilityToggle;
         private static MakerSlider _weeksSlider;
+        private static MakerRadioButtons _scheduleToggle;
 
         private static PregnancyPlugin _pluginInstance;
 
@@ -26,17 +27,12 @@ namespace KK_Pregnancy
             }
             else
             {
-                MakerAPI.MakerBaseLoaded += MakerAPI_MakerBaseLoaded;
+                MakerAPI.RegisterCustomSubCategories += MakerAPI_MakerBaseLoaded;
                 MakerAPI.MakerExiting += MakerAPI_MakerExiting;
+                MakerAPI.ReloadCustomInterface += MakerAPI_ReloadCustomInterface;
+
                 StatusIcons.Init(hi);
             }
-        }
-
-        private static void MakerAPI_MakerExiting(object sender, System.EventArgs e)
-        {
-            _gameplayToggle = null;
-            _fertilityToggle = null;
-            _weeksSlider = null;
         }
 
         private static void RegisterStudioControls()
@@ -47,28 +43,40 @@ namespace KK_Pregnancy
                 f => { foreach (var ctrl in StudioAPI.GetSelectedControllers<PregnancyCharaController>()) ctrl.Week = Mathf.RoundToInt(f); });
         }
 
-        internal static void UpdateMakerInterface(PregnancyCharaController controller)
+        private static void MakerAPI_ReloadCustomInterface(object sender, System.EventArgs e)
         {
-            if (MakerAPI.InsideMaker && _gameplayToggle != null)
+            var controller = GetMakerController();
+            if (controller != null && _gameplayToggle != null)
             {
                 _gameplayToggle.Value = controller.GameplayEnabled;
                 _fertilityToggle.Value = controller.Fertility;
                 _weeksSlider.Value = controller.Week;
+                _scheduleToggle.Value = (int)controller.Schedule;
             }
+        }
+
+        private static void MakerAPI_MakerExiting(object sender, System.EventArgs e)
+        {
+            _gameplayToggle = null;
+            _fertilityToggle = null;
+            _weeksSlider = null;
+            _scheduleToggle = null;
         }
 
         private static PregnancyCharaController GetMakerController()
         {
-            return MakerAPI.GetCharacterControl().GetComponent<PregnancyCharaController>();
+            return MakerAPI.GetCharacterControl()?.GetComponent<PregnancyCharaController>();
         }
 
-        private static void MakerAPI_MakerBaseLoaded(object sender, RegisterCustomControlsEvent e)
+        private static void MakerAPI_MakerBaseLoaded(object sender, RegisterSubCategoriesEvent e)
         {
             // Only female characters
             if (MakerAPI.GetMakerSex() == 0) return;
 
             // This category is inaccessible from class maker
-            var cat = MakerConstants.Parameter.Character;
+            var cat = new MakerCategory(MakerConstants.Parameter.Character.CategoryName, "Pregnancy"); //MakerConstants.Parameter.Character;
+            e.AddSubCategory(cat);
+
             var hintColor = new Color(0.7f, 0.7f, 0.7f);
 
             _gameplayToggle = e.AddControl(new MakerToggle(cat, "Enable pregnancy progression", true, _pluginInstance));
@@ -87,6 +95,13 @@ namespace KK_Pregnancy
             _weeksSlider.ValueChanged.Subscribe(val => GetMakerController().Week = Mathf.RoundToInt(val));
 
             e.AddControl(new MakerText("If the character is pregnant when added to the game, the pregnancy will continue from this point.", cat, _pluginInstance) { TextColor = hintColor });
+
+            _scheduleToggle = e.AddControl(new MakerRadioButtons(cat, _pluginInstance, "Menstruation schedule", "Default", "More risky", "Always safe", "Always risky"));
+            _scheduleToggle.ValueChanged.Subscribe(i => GetMakerController().Schedule = (PregnancyDataUtils.MenstruationSchedule)i);
+
+            e.AddControl(new MakerText("Changes how many risky days the character has in a cycle. Default is more safe days than risky days.", cat, _pluginInstance) { TextColor = hintColor });
+
+            MakerAPI_ReloadCustomInterface(sender, e);
         }
     }
 }

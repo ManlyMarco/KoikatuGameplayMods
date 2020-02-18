@@ -123,7 +123,7 @@ namespace KK_Pregnancy
 
                 var status = GetHeroineStatus(heroine);
 
-                var windowHeight = status == HeroineStatus.Unknown || status == HeroineStatus.Pregnant ? 100 : 270;
+                var windowHeight = status == HeroineStatus.Unknown || status == HeroineStatus.Pregnant ? 110 : 270;
                 var screenRect = new Rect(pos.x + 30, pos.y - windowHeight / 2, 180, windowHeight);
                 IMGUIUtils.DrawSolidBox(screenRect);
                 GUILayout.BeginArea(screenRect, GUI.skin.box);
