@@ -100,8 +100,6 @@ namespace KK_Pregnancy
             _scheduleToggle.ValueChanged.Subscribe(i => GetMakerController().Schedule = (PregnancyDataUtils.MenstruationSchedule)i);
 
             e.AddControl(new MakerText("Changes how many risky days the character has in a cycle. Default is more safe days than risky days.", cat, _pluginInstance) { TextColor = hintColor });
-
-            MakerAPI_ReloadCustomInterface(sender, e);
         }
     }
 }

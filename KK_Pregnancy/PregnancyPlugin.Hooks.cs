@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -49,7 +48,6 @@ namespace KK_Pregnancy
                         return s;
                     }).FirstOrDefault(x => x != PregnancyDataUtils.MenstruationSchedule.Default);
 
-                    Console.WriteLine(schedule);
                     _menstruationsBackup = HFlag.menstruations;
                     HFlag.menstruations = PregnancyCharaController.GetMenstruationsArr(schedule);
                 }
