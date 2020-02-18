@@ -28,9 +28,9 @@ The plugin can be configured in plugin settings and per-character in female char
 Because the pregnant effect is made by manipulating bones, there are some limitations and potential issues. On some characters the effect might look bad, especially if they use many ABMX sliders around the belly area. Clothes that use skirt bones (skirts, dresses, etc.) can look glitchy, which is sadly unavoidable without tweaking each character manually in maker. Clothes that stick close to the body will work best.
 
 ### How to install
-1. Needs BepInEx 5.x and latest BepisPlugins, KKAPI and KKABMX. Update these as needed.
-2. Download the latest release from [releases](https://github.com/ManlyMarco/Koikatu-Gameplay-Mod/releases).
-3. To install copy the dll to your BepInEx\plugins directory.
+1. Make sure you have at least BepInEx 5.0 and latest BepisPlugins, KKAPI and KKABMX.
+2. Download the latest [release](https://github.com/ManlyMarco/Koikatu-Gameplay-Mod/releases).
+3. Extract the archive into your game directory. The plugin .dll should end up inside of your BepInEx\plugins directory.
 4. Check if there are no warnings on game startup, Pregnancy options should appear in plugin settings and in female chara maker.
 
 ![preview](https://user-images.githubusercontent.com/39247311/60744379-f8764000-9f75-11e9-886b-be5e74448258.png)
