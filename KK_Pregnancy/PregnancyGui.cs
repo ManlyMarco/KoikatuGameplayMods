@@ -28,7 +28,7 @@ namespace KK_Pregnancy
             {
                 MakerAPI.MakerBaseLoaded += MakerAPI_MakerBaseLoaded;
                 MakerAPI.MakerExiting += MakerAPI_MakerExiting;
-                HeartIcons.Init(hi);
+                StatusIcons.Init(hi);
             }
         }
 
