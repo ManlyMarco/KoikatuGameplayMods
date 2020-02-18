@@ -81,7 +81,7 @@
     <Compile Include="PregnancyDataUtils.cs" />
     <Compile Include="PregnancyGameController.cs" />
     <Compile Include="PregnancyGui.cs" />
-    <Compile Include="PregnancyGui.HeartIcons.cs" />
+    <Compile Include="PregnancyGui.StatusIcons.cs" />
     <Compile Include="PregnancyPlugin.cs" />
     <Compile Include="PregnancyPlugin.Hooks.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
