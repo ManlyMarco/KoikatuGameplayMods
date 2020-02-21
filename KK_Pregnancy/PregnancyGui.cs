@@ -1,4 +1,5 @@
 ﻿using HarmonyLib;
+using KKAPI.Chara;
 using KKAPI.Maker;
 using KKAPI.Maker.UI;
 using KKAPI.Studio;
@@ -10,11 +11,6 @@ namespace KK_Pregnancy
 {
     public static partial class PregnancyGui
     {
-        private static MakerToggle _gameplayToggle;
-        private static MakerSlider _fertilityToggle;
-        private static MakerSlider _weeksSlider;
-        private static MakerRadioButtons _scheduleToggle;
-
         private static PregnancyPlugin _pluginInstance;
 
         internal static void Init(Harmony hi, PregnancyPlugin instance)
@@ -28,8 +24,6 @@ namespace KK_Pregnancy
             else
             {
                 MakerAPI.RegisterCustomSubCategories += MakerAPI_MakerBaseLoaded;
-                MakerAPI.MakerExiting += MakerAPI_MakerExiting;
-                MakerAPI.ReloadCustomInterface += MakerAPI_ReloadCustomInterface;
 
                 StatusIcons.Init(hi);
             }
@@ -38,34 +32,14 @@ namespace KK_Pregnancy
         private static void RegisterStudioControls()
         {
             var cat = StudioAPI.GetOrCreateCurrentStateCategory(null);
-            cat.AddControl(new CurrentStateCategorySlider("Pregnancy",
-                c => c.charInfo?.GetComponent<PregnancyCharaController>()?.Week ?? 0, 0, 40)).Value.Subscribe(
-                f => { foreach (var ctrl in StudioAPI.GetSelectedControllers<PregnancyCharaController>()) ctrl.Week = Mathf.RoundToInt(f); });
-        }
-
-        private static void MakerAPI_ReloadCustomInterface(object sender, System.EventArgs e)
-        {
-            var controller = GetMakerController();
-            if (controller != null && _gameplayToggle != null)
-            {
-                _gameplayToggle.Value = controller.GameplayEnabled;
-                _fertilityToggle.Value = controller.Fertility;
-                _weeksSlider.Value = controller.Week;
-                _scheduleToggle.Value = (int)controller.Schedule;
-            }
-        }
-
-        private static void MakerAPI_MakerExiting(object sender, System.EventArgs e)
-        {
-            _gameplayToggle = null;
-            _fertilityToggle = null;
-            _weeksSlider = null;
-            _scheduleToggle = null;
-        }
-
-        private static PregnancyCharaController GetMakerController()
-        {
-            return MakerAPI.GetCharacterControl()?.GetComponent<PregnancyCharaController>();
+            cat.AddControl(new CurrentStateCategorySlider("Pregnancy", c =>
+                {
+                    if (c.charInfo == null) return 0;
+                    var controller = c.charInfo.GetComponent<PregnancyCharaController>();
+                    if (controller == null) return 0;
+                    return controller.Week;
+                }, 0, 40))
+                .Value.Subscribe(f => { foreach (var ctrl in StudioAPI.GetSelectedControllers<PregnancyCharaController>()) ctrl.Week = Mathf.RoundToInt(f); });
         }
 
         private static void MakerAPI_MakerBaseLoaded(object sender, RegisterSubCategoriesEvent e)
@@ -79,25 +53,25 @@ namespace KK_Pregnancy
 
             var hintColor = new Color(0.7f, 0.7f, 0.7f);
 
-            _gameplayToggle = e.AddControl(new MakerToggle(cat, "Enable pregnancy progression", true, _pluginInstance));
-            _gameplayToggle.ValueChanged.Subscribe(val => GetMakerController().GameplayEnabled = val);
+            var gameplayToggle = e.AddControl(new MakerToggle(cat, "Enable pregnancy progression", true, _pluginInstance));
+            gameplayToggle.BindToFunctionController<PregnancyCharaController, bool>(controller => controller.GameplayEnabled, (controller, value) => controller.GameplayEnabled = value);
 
             e.AddControl(new MakerText("If off, the character can't get pregnant and current pregnancy will stop progressing.", cat, _pluginInstance) { TextColor = hintColor });
 
-            _fertilityToggle = e.AddControl(new MakerSlider(cat, "Fertility", 0f, 1f, PregnancyDataUtils.DefaultFertility, _pluginInstance));
-            _fertilityToggle.ValueChanged.Subscribe(val => GetMakerController().Fertility = val);
+            var fertilityToggle = e.AddControl(new MakerSlider(cat, "Fertility", 0f, 1f, PregnancyDataUtils.DefaultFertility, _pluginInstance));
+            fertilityToggle.BindToFunctionController<PregnancyCharaController, float>(controller => controller.Fertility, (controller, value) => controller.Fertility = value);
 
             e.AddControl(new MakerText("How likely this character is to get pregnant.", cat, _pluginInstance) { TextColor = hintColor });
 
-            _weeksSlider = e.AddControl(new MakerSlider(cat, "Week of pregnancy", 0f, PregnancyDataUtils.LeaveSchoolWeek - 1f, 0f, _pluginInstance));
-            _weeksSlider.ValueToString = f => Mathf.RoundToInt(f).ToString();
-            _weeksSlider.StringToValue = s => int.Parse(s);
-            _weeksSlider.ValueChanged.Subscribe(val => GetMakerController().Week = Mathf.RoundToInt(val));
+            var weeksSlider = e.AddControl(new MakerSlider(cat, "Week of pregnancy", 0f, PregnancyDataUtils.LeaveSchoolWeek - 1f, 0f, _pluginInstance));
+            weeksSlider.ValueToString = f => Mathf.RoundToInt(f).ToString();
+            weeksSlider.StringToValue = s => int.Parse(s);
+            weeksSlider.BindToFunctionController<PregnancyCharaController, float>(controller => controller.Week, (controller, value) => controller.Week = Mathf.RoundToInt(value));
 
             e.AddControl(new MakerText("If the character is pregnant when added to the game, the pregnancy will continue from this point.", cat, _pluginInstance) { TextColor = hintColor });
 
-            _scheduleToggle = e.AddControl(new MakerRadioButtons(cat, _pluginInstance, "Menstruation schedule", "Default", "More risky", "Always safe", "Always risky"));
-            _scheduleToggle.ValueChanged.Subscribe(i => GetMakerController().Schedule = (PregnancyDataUtils.MenstruationSchedule)i);
+            var scheduleToggle = e.AddControl(new MakerRadioButtons(cat, _pluginInstance, "Menstruation schedule", "Default", "More risky", "Always safe", "Always risky"));
+            scheduleToggle.BindToFunctionController<PregnancyCharaController, int>(controller => (int)controller.Schedule, (controller, value) => controller.Schedule = (PregnancyDataUtils.MenstruationSchedule)value);
 
             e.AddControl(new MakerText("Changes how many risky days the character has in a cycle. Default is more safe days than risky days.", cat, _pluginInstance) { TextColor = hintColor });
         }
