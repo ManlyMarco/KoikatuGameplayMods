@@ -18,17 +18,20 @@ Works under BepInEx with Harmony. Needs latest BepisPlugins - universal Configur
 ![preview](https://user-images.githubusercontent.com/39247311/50426454-0c860a00-088e-11e9-85d0-493db814cc48.png)
 
 # KK_Pregnancy / Pregnancy mod
-Plugin that adds pregnancy to the main game and as a maker option. Busting a nut inside on a dangerous day has a chance to make the girl pregnant. After a few days a pregnant status icon will appear on character lists and the girl will stop having dangerous days. Over the next x weeks (configurable in plugin settings) the belly will grow, and then the girl stop coming to school for some time (she will eventually return to normal).
+Plugin that adds pregnancy gameplay to the main game with related maker customization options. It can also show and change the characters' menstruation schedules.
+
+### How does it work?
+Busting a nut inside on a dangerous day has a chance to make the girl pregnant. After a few days a pregnant status icon will appear on character lists and the girl will stop having dangerous days. Over the next x weeks (configurable in plugin settings) the belly will grow, and then the girl stop coming to school for some time (she will eventually return to normal).
 
 The plugin can be configured in plugin settings and per-character in female chara maker. The default conception chance (fertility) is around 30% and can be changed per-character from main-menu maker (pregnancy settings cannot be changed from class maker to prevent cheating). Conception can be completely disabled per-character and globally.
 
 Because the pregnant effect is made by manipulating bones, there are some limitations and potential issues. On some characters the effect might look bad, especially if they use many ABMX sliders around the belly area. Clothes that use skirt bones (skirts, dresses, etc.) can look glitchy, which is sadly unavoidable without tweaking each character manually in maker. Clothes that stick close to the body will work best.
 
 ### How to install
-1. Needs BepInEx and latest BepisPlugins, KKAPI (v1.3.6.1) and KKABMX (v3.2.3). Update these as needed.
-2. Download the latest release from [releases](https://github.com/ManlyMarco/Koikatu-Gameplay-Mod/releases).
-3. To install copy the dll to your BepInEx directory.
-4. Check if there are no warnings on game startup, Pregnancy options should appear in plugin settings (not in studio).
+1. Make sure you have at least BepInEx 5.0 and latest BepisPlugins, KKAPI and KKABMX.
+2. Download the latest [release](https://github.com/ManlyMarco/Koikatu-Gameplay-Mod/releases).
+3. Extract the archive into your game directory. The plugin .dll should end up inside of your BepInEx\plugins directory.
+4. Check if there are no warnings on game startup, Pregnancy options should appear in plugin settings and in female chara maker.
 
 ![preview](https://user-images.githubusercontent.com/39247311/60744379-f8764000-9f75-11e9-886b-be5e74448258.png)
 
