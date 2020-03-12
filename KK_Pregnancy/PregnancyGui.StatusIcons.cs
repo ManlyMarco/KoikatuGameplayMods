@@ -32,6 +32,11 @@ namespace KK_Pregnancy
                 _unknownSprite = LoadIcon("unknown.png");
 
                 SceneManager.sceneLoaded += SceneManager_sceneLoaded;
+                SceneManager.sceneUnloaded += s =>
+                {
+                    if (_currentHeroine.Count > 0)
+                        SceneManager_sceneLoaded(s, LoadSceneMode.Additive);
+                };
 
                 HarmonyWrapper.PatchAll(typeof(StatusIcons), hi);
             }
