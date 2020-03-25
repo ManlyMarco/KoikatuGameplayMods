@@ -173,21 +173,46 @@ namespace KK_MobAdder
             var top = new GameObject("silhouette_template");
             DontDestroyOnLoad(top);
 
-            var modelObj = CommonLib.LoadAsset<GameObject>("chara/oo_base.unity3d", "p_cm_body_00_low", true, "abdata");
-            modelObj.transform.SetParent(top.transform);
-            SkinnedMeshRenderer modelRend = null;
-            foreach (var r in modelObj.GetComponentsInChildren<SkinnedMeshRenderer>(true))
+            SkinnedMeshRenderer PrepareRenderers(GameObject obj)
             {
-                if (r.transform.name == "n_body_silhouette")
+                SkinnedMeshRenderer result = null;
+                foreach (var r in obj.GetComponentsInChildren<SkinnedMeshRenderer>(true))
                 {
-                    modelRend = r;
-                    r.transform.parent.gameObject.SetActive(true);
+                    if (r.transform.name == "n_body_silhouette")
+                    {
+                        result = r;
+                        r.transform.parent.gameObject.SetActive(true);
+                    }
+                    else
+                    {
+                        Destroy(r.gameObject);
+                    }
                 }
-                else
-                    Destroy(r.gameObject);
+
+                return result;
             }
 
-            var animObj = CommonLib.LoadAsset<GameObject>("chara/oo_base.unity3d", "p_cf_body_bone_low", true, "abdata");
+            var modelObj = CommonLib.LoadAsset<GameObject>("chara/oo_base.unity3d", "p_cm_body_00_low", true, "abdata");
+            var modelRend = PrepareRenderers(modelObj);
+            GameObject animObj = null;
+            if (modelRend != null)
+            {
+                animObj = CommonLib.LoadAsset<GameObject>("chara/oo_base.unity3d", "p_cf_body_bone_low", true, "abdata");
+            }
+            else
+            {
+                // The fallback is needed for KK Party, posibly pre-darkness KK
+                Destroy(modelObj);
+                modelObj = CommonLib.LoadAsset<GameObject>("chara/oo_base.unity3d", "p_cm_body_00", true, "abdata");
+                modelRend = PrepareRenderers(modelObj);
+                if (modelRend == null)
+                {
+                    Destroy(modelObj);
+                    throw new InvalidOperationException("Could not find silhouette model data");
+                }
+                animObj = CommonLib.LoadAsset<GameObject>("chara/oo_base.unity3d", "p_cf_body_bone", true, "abdata");
+            }
+            modelObj.transform.SetParent(top.transform);
             animObj.transform.SetParent(top.transform);
 
             var animCmp = animObj.GetComponent<Animator>();
