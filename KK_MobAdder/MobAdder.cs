@@ -8,6 +8,7 @@ using BepInEx;
 using BepInEx.Configuration;
 using Illusion.Component.Correct;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityEngine.SceneManagement;
 
 namespace KK_MobAdder
@@ -224,6 +225,12 @@ namespace KK_MobAdder
             animCmp.runtimeAnimatorController = ctrl;
 
             animBundle.Unload(false);
+
+            // Add colliders so characters avoid them and player can't walk through
+            var obst = top.AddComponent<NavMeshObstacle>();
+            obst.carving = true;
+            obst.shape = NavMeshObstacleShape.Capsule;
+            obst.radius = 0.35f;
 
             top.SetActive(false);
 
