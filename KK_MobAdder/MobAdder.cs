@@ -87,6 +87,7 @@ namespace KK_MobAdder
 
         private ConfigEntry<KeyboardShortcut> _spawnMobKey;
         private ConfigEntry<KeyboardShortcut> _saveMobPositionDataKey;
+        private ConfigEntry<float> _mobAmountModifier;
 
         private void Start()
         {
@@ -104,6 +105,7 @@ namespace KK_MobAdder
 
             _spawnMobKey = Config.Bind("Developer", "Spawn or remove mob", KeyboardShortcut.Empty, new ConfigDescription("Create a new mob at player position, or remove nearest mob if Shift is pressed.", null, "Advanced"));
             _saveMobPositionDataKey = Config.Bind("Developer", "Spawn mob position data", KeyboardShortcut.Empty, new ConfigDescription("Save all mob positions to the position .csv file, overwriting the original. Hold shift to also save spread data.", null, "Advanced"));
+            _mobAmountModifier = Config.Bind("General", "Mob amount modifier", 1f, new ConfigDescription("How many mobs should be spawned compared to the default (1x). 0x will disable mob spawning.", new AcceptableValueRange<float>(0, 1.5f)));
 
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
         }
@@ -421,7 +423,7 @@ namespace KK_MobAdder
 
             if (currentMap < 0) yield break;
 
-            if (!Manager.Config.AddData.mobVisible) yield break;
+            if (!Manager.Config.AddData.mobVisible || _mobAmountModifier.Value <= 0) yield break;
 
             // todo remove all if map or period changed and reapply
 
@@ -449,7 +451,7 @@ namespace KK_MobAdder
                     amount *= 0.3f;
 
                 // Choose a different amount of mobs based on the time of day and some random spread
-                int mobCount = (int)(list.Count * amount * UnityEngine.Random.Range(0.5f, 1.2f));
+                int mobCount = (int)(list.Count * amount * UnityEngine.Random.Range(0.5f, 1.2f) * _mobAmountModifier.Value);
                 if (mobCount > 0)
                 {
                     // Choose random mob positions
