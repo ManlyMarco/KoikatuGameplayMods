@@ -54,6 +54,7 @@
   <PropertyGroup>
     <PostBuildEvent>copy "$(TargetPath)" "$(TargetDir)AI_$(TargetFileName)"
 copy "$(TargetPath)" "$(TargetDir)KK_$(TargetFileName)"
+copy "$(TargetPath)" "$(TargetDir)HS2_$(TargetFileName)"
 del "$(TargetPath)"</PostBuildEvent>
   </PropertyGroup>
 </Project>
