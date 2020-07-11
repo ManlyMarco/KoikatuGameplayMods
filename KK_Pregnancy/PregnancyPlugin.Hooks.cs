@@ -2,7 +2,6 @@
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
-using BepInEx.Harmony;
 using ExtensibleSaveFormat;
 using HarmonyLib;
 using KKAPI.MainGame;
@@ -16,7 +15,7 @@ namespace KK_Pregnancy
         {
             public static void InitHooks(Harmony harmonyInstance)
             {
-                HarmonyWrapper.PatchAll(typeof(Hooks), harmonyInstance);
+                harmonyInstance.PatchAll(typeof(Hooks));
 
                 PatchNPCLoadAll(harmonyInstance, new HarmonyMethod(typeof(Hooks), nameof(NPCLoadAllTpl)));
             }
@@ -27,7 +26,7 @@ namespace KK_Pregnancy
             private static byte[] _menstruationsBackup;
 
             [HarmonyPostfix]
-            [HarmonyPatch(typeof(SaveData.Heroine), "get_" + nameof(SaveData.Heroine.MenstruationDay))]
+            [HarmonyPatch(typeof(SaveData.Heroine), nameof(SaveData.Heroine.MenstruationDay), MethodType.Getter)]
             private static void LastAccessedHeroinePatch(SaveData.Heroine __instance)
             {
                 _lastHeroine = __instance;
