@@ -14,16 +14,16 @@ namespace KK_Pregnancy
         private readonly Dictionary<string, BoneModifierData> _pregnancyFullValues = new Dictionary<string, BoneModifierData>
         {
             // Belly
-            {"cf_s_spine01"  , new BoneModifierData(new Vector3(1.62f, 1.50f, 1.90f), 1f, new Vector3( 0.00f, 0.00f , 0.08f), new Vector3( 10f, 0f, 0f))},
+            {"cf_s_spine01"  , new BoneModifierData(new Vector3(1.62f, 1.50f, 1.90f), 1f, new Vector3( 0.00f, 0.00f , 0.05f), new Vector3( 10f, 0f, 0f))},
             {"cf_s_spine02"  , new BoneModifierData(new Vector3(1.00f, 1.00f, 1.00f), 1f, new Vector3( 0.00f, 0.00f , 0.01f), new Vector3(-05f, 0f, 0f))},
-            {"cf_s_waist01"  , new BoneModifierData(new Vector3(1.25f, 1.55f, 1.70f), 1f, new Vector3( 0.00f, 0.02f , 0.17f), new Vector3( 15f, 0f, 0f))},
+            {"cf_s_waist01"  , new BoneModifierData(new Vector3(1.25f, 1.55f, 1.70f), 1f, new Vector3( 0.00f, 0.02f , 0.12f), new Vector3( 15f, 0f, 0f))},
             {"cf_s_waist02"  , new BoneModifierData(new Vector3(1.17f, 1.00f, 1.00f), 1f, new Vector3( 0.00f, 0.00f , 0.00f), new Vector3(  0f, 0f, 0f))},
             // Skirt
-            {"cf_d_sk_00_00" , new BoneModifierData(new Vector3(1.00f, 1.01f, 1.00f), 1f, new Vector3( 0.00f,-0.02f , 0.14f), new Vector3(-10f, 0f, 0f))},
-            {"cf_d_sk_07_00" , new BoneModifierData(new Vector3(1.00f, 1.01f, 1.00f), 1f, new Vector3(-0.03f,-0.02f , 0.12f), new Vector3(-10f, 0f, 0f))},
-            {"cf_d_sk_01_00" , new BoneModifierData(new Vector3(1.00f, 1.01f, 1.00f), 1f, new Vector3( 0.03f,-0.02f , 0.12f), new Vector3(-10f, 0f, 0f))},
-            {"cf_d_sk_06_00" , new BoneModifierData(new Vector3(1.00f, 1.01f, 1.00f), 1f, new Vector3(-0.03f, 0.00f , 0.05f), new Vector3(  0f, 0f, 0f))},
-            {"cf_d_sk_02_00" , new BoneModifierData(new Vector3(1.00f, 1.01f, 1.00f), 1f, new Vector3( 0.03f, 0.00f , 0.05f), new Vector3(  0f, 0f, 0f))},
+            {"cf_d_sk_00_00" , new BoneModifierData(new Vector3(1.00f, 1.00f, 1.00f), 1f, new Vector3( 0.00f,-0.02f , 0.14f), new Vector3(-10f, 0f, 0f))},
+            {"cf_d_sk_07_00" , new BoneModifierData(new Vector3(1.00f, 1.00f, 1.00f), 1f, new Vector3(-0.03f,-0.02f , 0.12f), new Vector3(-10f, 0f, 0f))},
+            {"cf_d_sk_01_00" , new BoneModifierData(new Vector3(1.00f, 1.00f, 1.00f), 1f, new Vector3( 0.03f,-0.02f , 0.12f), new Vector3(-10f, 0f, 0f))},
+            {"cf_d_sk_06_00" , new BoneModifierData(new Vector3(1.00f, 1.00f, 1.00f), 1f, new Vector3(-0.03f, 0.00f , 0.05f), new Vector3(  0f, 0f, 0f))},
+            {"cf_d_sk_02_00" , new BoneModifierData(new Vector3(1.00f, 1.00f, 1.00f), 1f, new Vector3( 0.03f, 0.00f , 0.05f), new Vector3(  0f, 0f, 0f))},
             // Breasts
             {"cf_d_bust01_L" , new BoneModifierData(new Vector3(1.15f, 1.15f, 1.15f), 1f)},
             {"cf_d_bust01_R" , new BoneModifierData(new Vector3(1.15f, 1.15f, 1.15f), 1f)},
@@ -72,7 +72,15 @@ namespace KK_Pregnancy
                             Mathf.Lerp(1f, mod.ScaleModifier.x, bellySize),
                             Mathf.Lerp(1f, mod.ScaleModifier.y, bellySize),
                             Mathf.Lerp(1f, mod.ScaleModifier.z, bellySize)),
-                        Mathf.Lerp(1f, mod.LengthModifier, bellySize));
+                        Mathf.Lerp(1f, mod.LengthModifier, bellySize),
+                        new Vector3(
+                            Mathf.Lerp(0f, mod.PositionModifier.x, bellySize),
+                            Mathf.Lerp(0f, mod.PositionModifier.y, bellySize),
+                            Mathf.Lerp(0f, mod.PositionModifier.z, bellySize)),
+                        new Vector3(
+                            Mathf.Lerp(0f, mod.RotationModifier.x, bellySize),
+                            Mathf.Lerp(0f, mod.RotationModifier.y, bellySize),
+                            Mathf.Lerp(0f, mod.RotationModifier.z, bellySize)));
                 }
             }
 
