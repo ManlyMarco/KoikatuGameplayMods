@@ -11,7 +11,7 @@ namespace KoikatuGameplayMod
 {
     [BepInPlugin(GUID, "Koikatu Gameplay Tweaks and Improvements", Version)]
     [BepInDependency(KoikatuAPI.GUID)]
-    [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
+    [BepInDependency(KoikatuAPI.GUID, "1.12")]
     public class KoikatuGameplayMod : BaseUnityPlugin
     {
         public const string GUID = "marco-gameplaymod";
@@ -36,14 +36,14 @@ namespace KoikatuGameplayMod
             var hScene = "H Scene tweaks";
             ForceInsert = Config.Bind(hScene, "Allow force insert", true, "Can insert raw even if it's denied.\nTo force insert - click on the blue insert button right after being denied, after coming outside, or after making her come multiple times. Other contitions might apply.");
             ForceInsertAnger = Config.Bind(hScene, "Force insert causes anger", true, "If you cum inside on or force insert too many times the girl will get angry with you.\nWhen enabled girl's expression changes during H (if forced).");
-            DecreaseLewd = Config.Bind(hScene, "Decrease girl's lewdness after H", false);
+            DecreaseLewd = Config.Bind(hScene, "Decrease lewdness after H", false, "Decreases girl's H bar after an H scene.");
             DisableTrapVagInsert = Config.Bind(hScene, "Disable vaginal insert for traps/men", true, "Only works if you use UncensorSelector to give a female card a penis but no vagina in maker. Some positions don't have the anal option so you won't be able to insert at all in them.\nChanges take effect after game restart.");
 
             ResetNoCondom = Config.Bind(hScene, "Make experienced girls ask for condom", true, "If enabled, sometimes a girl will refuse raw insert on dangerous day until the second insert (once per day).\nIf disabled the default game logic is used (girl will never refuse if you did raw 5 times or more in total.)");
             var mainGame = "Main game";
             FastTravelTimePenalty = Config.Bind(mainGame, "Fast travel (F3) time cost", 50, new ConfigDescription("Value is in seconds. One period has 500 seconds.", new AcceptableValueRange<int>(0, 100)));
-            StatDecay = Config.Bind(mainGame, "Player's stats slowly decay overnight", true);
-            LewdDecay = Config.Bind(mainGame, "Girls' lewdness decays overnight", false);
+            StatDecay = Config.Bind(mainGame, "Player stats slowly decay overnight", true, "Player's stats slowly decrease every day to keep the training points relevant.");
+            LewdDecay = Config.Bind(mainGame, "Girl lewdness decays overnight", false, "H bar of all heroines decreases overnight.");
             AdjustBreastSizeQuestion = Config.Bind(mainGame, "Adjust preferred breast size question", true, "Lowers the breast size needed for 'Average' and 'Large' breast options when a girl asks you what size you prefer.\nChanges take effect after game restart.");
 
             var i = new Harmony(GUID);
