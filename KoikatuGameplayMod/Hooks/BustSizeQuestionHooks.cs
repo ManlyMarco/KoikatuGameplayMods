@@ -1,12 +1,12 @@
 ﻿using System.Collections.Generic;
 using ADV.Commands.Game;
-using Harmony;
+using HarmonyLib;
 
 namespace KoikatuGameplayMod
 {
     internal static class BustSizeQuestionHooks
     {
-        public static void ApplyHooks(HarmonyInstance instance)
+        public static void ApplyHooks(Harmony instance)
         {
             instance.PatchAll(typeof(BustSizeQuestionHooks));
         }

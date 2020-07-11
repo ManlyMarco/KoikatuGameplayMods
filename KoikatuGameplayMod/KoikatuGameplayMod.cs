@@ -1,10 +1,9 @@
 ﻿using System;
-using System.ComponentModel;
 using System.Linq;
 using BepInEx;
-using Harmony;
+using BepInEx.Configuration;
+using HarmonyLib;
 using KKAPI;
-using KKAPI.Studio;
 using Manager;
 using UnityEngine;
 
@@ -12,82 +11,42 @@ namespace KoikatuGameplayMod
 {
     [BepInPlugin(GUID, "Koikatu Gameplay Tweaks and Improvements", Version)]
     [BepInDependency(KoikatuAPI.GUID)]
+    [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
     public class KoikatuGameplayMod : BaseUnityPlugin
     {
         public const string GUID = "marco-gameplaymod";
         internal const string Version = "1.4.2";
 
-        private const string HScene = "H Scene tweaks";
+        public static ConfigEntry<bool> ForceInsert { get; set; }
+        public static ConfigEntry<bool> ForceInsertAnger { get; set; }
+        public static ConfigEntry<bool> DecreaseLewd { get; set; }
+        public static ConfigEntry<bool> DisableTrapVagInsert { get; set; }
 
-        [Category(HScene)]
-        [DisplayName("!Allow force insert")]
-        [Description("Can insert raw even if it's denied.\n\n" +
-                     "To force insert - click on the blue insert button right after being denied, " +
-                     "after coming outside, or after making her come multiple times. Other contitions might apply.")]
-        public static ConfigWrapper<bool> ForceInsert { get; set; }
-
-        [Category(HScene)]
-        [DisplayName("!Force insert causes anger")]
-        [Description("If you cum inside on or force insert too many times the girl will get angry with you.\n\n" +
-                     "When enabled girl's expression changes during H (if forced).")]
-        public static ConfigWrapper<bool> ForceInsertAnger { get; set; }
-
-        [Category(HScene)]
-        [DisplayName("Decrease girl's lewdness after H")]
-        public static ConfigWrapper<bool> DecreaseLewd { get; set; }
-
-        [Category(HScene)]
-        [DisplayName("Disable vaginal insert for traps/men")]
-        [Description("Only works if you use UncensorSelector to give a female card a penis but no vagina in maker. " +
-                     "Some positions don't have the anal option so you won't be able to insert at all in them.\n\n" +
-                     "Changes take effect after game restart.")]
-        public static ConfigWrapper<bool> DisableTrapVagInsert { get; set; }
-
-        [DisplayName("Player's stats slowly decay overnight")]
-        public static ConfigWrapper<bool> StatDecay { get; set; }
-
-        [DisplayName("Girls' lewdness decays overnight. Will make lesbian and masturbation scenes less common.")]
-        public static ConfigWrapper<bool> LewdDecay { get; set; }
-
-        [DisplayName("Make experienced girls ask for condom")]
-        [Description("If enabled, sometimes a girl will refuse raw insert on dangerous day until the second insert (once per day).\n" +
-                     "If disabled the default game logic is used (girl will never refuse if you did raw 5 times or more in total.)")]
-        public static ConfigWrapper<bool> ResetNoCondom { get; set; }
-
-        [DisplayName("Fast travel (F3) time cost")]
-        [Description("Value is in seconds.\nOne period has 500 seconds.")]
-        [AcceptableValueRange(0, 100, false)]
-        public static ConfigWrapper<int> FastTravelTimePenalty { get; set; }
-
-        [DisplayName("Adjust preferred breast size question")]
-        [Description("Lowers the breast size needed for 'Average' and 'Large' breast options when a girl asks you what size you prefer.\n\n" +
-                     "Changes take effect after game restart.")]
-        public static ConfigWrapper<bool> AdjustBreastSizeQuestion { get; set; }
+        public static ConfigEntry<bool> StatDecay { get; set; }
+        public static ConfigEntry<bool> LewdDecay { get; set; }
+        public static ConfigEntry<bool> ResetNoCondom { get; set; }
+        public static ConfigEntry<int> FastTravelTimePenalty { get; set; }
+        public static ConfigEntry<bool> AdjustBreastSizeQuestion { get; set; }
 
         private Game _gameMgr;
         private Scene _sceneMgr;
 
         private void Start()
         {
-            if (!KoikatuAPI.CheckRequiredPlugin(this, KoikatuAPI.GUID, new Version(KoikatuAPI.VersionConst)) || StudioAPI.InsideStudio)
-            {
-                enabled = false;
-                return;
-            }
+            var hScene = "H Scene tweaks";
+            ForceInsert = Config.Bind(hScene, "Allow force insert", true, "Can insert raw even if it's denied.\nTo force insert - click on the blue insert button right after being denied, after coming outside, or after making her come multiple times. Other contitions might apply.");
+            ForceInsertAnger = Config.Bind(hScene, "Force insert causes anger", true, "If you cum inside on or force insert too many times the girl will get angry with you.\nWhen enabled girl's expression changes during H (if forced).");
+            DecreaseLewd = Config.Bind(hScene, "Decrease girl's lewdness after H", false);
+            DisableTrapVagInsert = Config.Bind(hScene, "Disable vaginal insert for traps/men", true, "Only works if you use UncensorSelector to give a female card a penis but no vagina in maker. Some positions don't have the anal option so you won't be able to insert at all in them.\nChanges take effect after game restart.");
 
-            ForceInsert = new ConfigWrapper<bool>("ForceInsert", this, true);
-            ForceInsertAnger = new ConfigWrapper<bool>("ForceInsertAnger", this, true);
-            DecreaseLewd = new ConfigWrapper<bool>("DecreaseLewd", this, false);
-            DisableTrapVagInsert = new ConfigWrapper<bool>("DisableTrapVagInsert", this, true);
+            ResetNoCondom = Config.Bind(hScene, "Make experienced girls ask for condom", true, "If enabled, sometimes a girl will refuse raw insert on dangerous day until the second insert (once per day).\nIf disabled the default game logic is used (girl will never refuse if you did raw 5 times or more in total.)");
+            var mainGame = "Main game";
+            FastTravelTimePenalty = Config.Bind(mainGame, "Fast travel (F3) time cost", 50, new ConfigDescription("Value is in seconds. One period has 500 seconds.", new AcceptableValueRange<int>(0, 100)));
+            StatDecay = Config.Bind(mainGame, "Player's stats slowly decay overnight", true);
+            LewdDecay = Config.Bind(mainGame, "Girls' lewdness decays overnight", false);
+            AdjustBreastSizeQuestion = Config.Bind(mainGame, "Adjust preferred breast size question", true, "Lowers the breast size needed for 'Average' and 'Large' breast options when a girl asks you what size you prefer.\nChanges take effect after game restart.");
 
-            ResetNoCondom = new ConfigWrapper<bool>("ResetNoCondom", this, true);
-
-            FastTravelTimePenalty = new ConfigWrapper<int>("FastTravelTimePenalty", this, 50);
-            StatDecay = new ConfigWrapper<bool>("StatDecay", this, true);
-            LewdDecay = new ConfigWrapper<bool>("LewdDecay", this, false);
-            AdjustBreastSizeQuestion = new ConfigWrapper<bool>("AdjustBreastSizeQuestion", this, true);
-
-            var i = HarmonyInstance.Create(GUID);
+            var i = new Harmony(GUID);
             Utilities.ApplyHooks(i);
             Utilities.HSceneEndClicked += UpdateGirlLewdness;
 

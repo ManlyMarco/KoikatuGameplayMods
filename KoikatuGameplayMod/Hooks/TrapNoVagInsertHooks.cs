@@ -1,6 +1,6 @@
 ﻿using System.Linq;
 using ExtensibleSaveFormat;
-using Harmony;
+using HarmonyLib;
 using KKAPI.MainGame;
 using UnityEngine;
 
@@ -8,7 +8,7 @@ namespace KoikatuGameplayMod
 {
     internal static class TrapNoVagInsertHooks
     {
-        public static void ApplyHooks(HarmonyInstance instance)
+        public static void ApplyHooks(Harmony instance)
         {
             instance.PatchAll(typeof(TrapNoVagInsertHooks));
         }

@@ -4,7 +4,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using ActionGame;
 using Config;
-using Harmony;
+using HarmonyLib;
 using UnityEngine.UI;
 
 namespace KoikatuGameplayMod
@@ -13,14 +13,14 @@ namespace KoikatuGameplayMod
     {
         private const int UnlockedMaxCharacters = 99;
 
-        public static void ApplyHooks(HarmonyInstance instance)
+        public static void ApplyHooks(Harmony instance)
         {
             instance.PatchAll(typeof(ClassCharaLimitUnlockHooks));
             var transpiler = new HarmonyMethod(typeof(ClassCharaLimitUnlockHooks), nameof(NPCLoadAllUnlock));
             PatchNPCLoadAll(instance, transpiler);
         }
 
-        private static void PatchNPCLoadAll(HarmonyInstance instance, HarmonyMethod transpiler)
+        private static void PatchNPCLoadAll(Harmony instance, HarmonyMethod transpiler)
         {
             var t = typeof(ActionScene).GetNestedTypes(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Single(x => x.Name.StartsWith("<NPCLoadAll>c__Iterator"));
             var m = t.GetMethod("MoveNext");

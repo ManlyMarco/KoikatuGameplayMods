@@ -1,14 +1,14 @@
 ﻿using System;
 using System.Linq;
 using System.Reflection;
-using Harmony;
+using HarmonyLib;
 using UniRx;
 
 namespace KoikatuGameplayMod
 {
     internal static class FastTravelCostHooks
     {
-        public static void ApplyHooks(HarmonyInstance instance)
+        public static void ApplyHooks(Harmony instance)
         {
             instance.PatchAll(typeof(FastTravelCostHooks));
         }

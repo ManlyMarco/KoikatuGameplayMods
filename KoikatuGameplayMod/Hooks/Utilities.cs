@@ -1,13 +1,13 @@
 ﻿using System;
 using System.Reflection;
-using Harmony;
+using HarmonyLib;
 using UniRx;
 
 namespace KoikatuGameplayMod
 {
     internal static class Utilities
     {
-        public static void ApplyHooks(HarmonyInstance instance)
+        public static void ApplyHooks(Harmony instance)
         {
             instance.PatchAll(typeof(Utilities));
         }

@@ -1,11 +1,11 @@
-﻿using Harmony;
+﻿using HarmonyLib;
 using UnityEngine;
 
 namespace KoikatuGameplayMod
 {
     internal static class ExitFirstHHooks
     {
-        public static void ApplyHooks(HarmonyInstance instance)
+        public static void ApplyHooks(Harmony instance)
         {
             instance.PatchAll(typeof(ExitFirstHHooks));
         }
