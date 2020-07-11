@@ -20,7 +20,7 @@ namespace KK_Pregnancy
             private static Sprite _pregSprite;
             private static Sprite _riskySprite;
             private static Sprite _safeSprite;
-            private static Sprite _unknownSprite;
+            internal static Sprite _unknownSprite;
 
             private static readonly List<KeyValuePair<SaveData.Heroine, Rect>> _currentHeroine = new List<KeyValuePair<SaveData.Heroine, Rect>>();
 
@@ -38,7 +38,7 @@ namespace KK_Pregnancy
                         SceneManager_sceneLoaded(s, LoadSceneMode.Additive);
                 };
 
-                HarmonyWrapper.PatchAll(typeof(StatusIcons), hi);
+                hi.PatchAll(typeof(StatusIcons));
             }
 
             private static Sprite LoadIcon(string resourceFileName)
@@ -244,7 +244,7 @@ namespace KK_Pregnancy
                 }
             }
 
-            private static HeroineStatus GetHeroineStatus(SaveData.Heroine heroine)
+            internal static HeroineStatus GetHeroineStatus(SaveData.Heroine heroine)
             {
                 // Check if she wants to tell
                 if (heroine.intimacy >= 80 ||
@@ -263,7 +263,7 @@ namespace KK_Pregnancy
                 return HeroineStatus.Unknown;
             }
 
-            private enum HeroineStatus
+            internal enum HeroineStatus
             {
                 Unknown,
                 Safe,

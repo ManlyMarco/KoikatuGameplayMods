@@ -26,6 +26,7 @@ namespace KK_Pregnancy
                 MakerAPI.RegisterCustomSubCategories += MakerAPI_MakerBaseLoaded;
 
                 StatusIcons.Init(hi);
+                HideHSceneMenstrIcon.Init(hi, StatusIcons._unknownSprite);
             }
         }
 
