@@ -81,5 +81,34 @@ namespace KK_Pregnancy
         /// Week at which pregnancy ends and the girl returns to school
         /// </summary>
         public static readonly int ReturnToSchoolWeek = LeaveSchoolWeek + 7;
+
+        public static HeroineStatus GetHeroineStatus(this SaveData.Heroine heroine)
+        {
+            if (heroine == null) return HeroineStatus.Unknown;
+
+            // Check if she wants to tell
+            if (heroine.intimacy >= 80 ||
+                heroine.hCount >= 5 ||
+                heroine.parameter.attribute.bitch && heroine.favor > 50 ||
+                (heroine.isGirlfriend || heroine.favor >= 90) && (!heroine.isVirgin || heroine.hCount >= 2 || heroine.intimacy >= 40))
+            {
+                if (heroine.IsHeroinePregnant(!PregnancyPlugin.ShowPregnancyIconEarly.Value))
+                    return HeroineStatus.Pregnant;
+
+                return HFlag.GetMenstruation(heroine.MenstruationDay) == HFlag.MenstruationType.安全日
+                    ? HeroineStatus.Safe
+                    : HeroineStatus.Risky;
+            }
+
+            return HeroineStatus.Unknown;
+        }
+
+        public enum HeroineStatus
+        {
+            Unknown,
+            Safe,
+            Risky,
+            Pregnant
+        }
     }
 }

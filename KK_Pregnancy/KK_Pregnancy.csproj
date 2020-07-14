@@ -86,7 +86,7 @@
     <Compile Include="PregnancyDataUtils.cs" />
     <Compile Include="PregnancyGameController.cs" />
     <Compile Include="PregnancyGui.cs" />
-    <Compile Include="PregnancyGui.HideHSceneMenstrIcon.cs" />
+    <Compile Include="PregnancyGui.HSceneMenstrIconOverride.cs" />
     <Compile Include="PregnancyGui.StatusIcons.cs" />
     <Compile Include="PregnancyPlugin.cs" />
     <Compile Include="PregnancyPlugin.Hooks.cs" />

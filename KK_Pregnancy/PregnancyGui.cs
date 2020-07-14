@@ -4,6 +4,7 @@ using KKAPI.Maker;
 using KKAPI.Maker.UI;
 using KKAPI.Studio;
 using KKAPI.Studio.UI;
+using KKAPI.Utilities;
 using UniRx;
 using UnityEngine;
 
@@ -25,8 +26,23 @@ namespace KK_Pregnancy
             {
                 MakerAPI.RegisterCustomSubCategories += MakerAPI_MakerBaseLoaded;
 
-                StatusIcons.Init(hi);
-                HideHSceneMenstrIcon.Init(hi, StatusIcons._unknownSprite);
+                Sprite LoadIcon(string resourceFileName)
+                {
+                    var iconTex = new Texture2D(2, 2, TextureFormat.DXT5, false);
+                    Object.DontDestroyOnLoad(iconTex);
+                    iconTex.LoadImage(ResourceUtils.GetEmbeddedResource(resourceFileName));
+                    var sprite = Sprite.Create(iconTex, new Rect(0f, 0f, iconTex.width, iconTex.height),
+                        new Vector2(0.5f, 0.5f), 100f, 0u, SpriteMeshType.FullRect);
+                    Object.DontDestroyOnLoad(sprite);
+                    return sprite;
+                }
+                var pregSprite = LoadIcon("pregnant.png");
+                var riskySprite = LoadIcon("risky.png");
+                var safeSprite = LoadIcon("safe.png");
+                var unknownSprite = LoadIcon("unknown.png");
+
+                StatusIcons.Init(hi, unknownSprite, pregSprite, safeSprite, riskySprite);
+                HSceneMenstrIconOverride.Init(hi, unknownSprite, pregSprite, safeSprite, riskySprite);
             }
         }
 

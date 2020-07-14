@@ -21,7 +21,7 @@ namespace KK_Pregnancy
         public static ConfigEntry<bool> AnalConceptionEnabled { get; private set; }
         public static ConfigEntry<bool> ShowPregnancyIconEarly { get; private set; }
         public static ConfigEntry<int> PregnancyProgressionSpeed { get; private set; }
-        public static ConfigEntry<bool> HideHSceneMenstrIcon { get; private set; }
+        public static ConfigEntry<bool> HSceneMenstrIconOverride { get; private set; }
 
         internal static new ManualLogSource Logger { get; private set; }
 
@@ -45,9 +45,9 @@ namespace KK_Pregnancy
                 "By default pregnancy status icon in class roster is shown after a few days (the girl had a chance to do the test). " +
                 "Turning this on will make the icon show up at the end of the current day.");
 
-            HideHSceneMenstrIcon = Config.Bind("General", "Allow hiding safe/risky icon in H Scenes", true,
-                "Replaces the safe/risky indicator with a question mark if the character didn't tell you their schedule yet. You have to listen for the voice cues instead.\n" +
-                "Changes take effect after game restart.");
+            HSceneMenstrIconOverride = Config.Bind("General", "Use custom safe/risky icons in H Scenes", true,
+                "Replaces the standard safe/risky indicators with custom indicators that can also show pregnancy and unknown status. " +
+                "If the status is unknown you will have to listen for the voice cues instead.\nChanges take effect after game restart.");
 
             CharacterApi.RegisterExtraBehaviour<PregnancyCharaController>(GUID);
             GameAPI.RegisterExtraBehaviour<PregnancyGameController>(GUID);

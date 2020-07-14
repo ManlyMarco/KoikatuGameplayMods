@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ActionGame;
-using BepInEx.Harmony;
 using HarmonyLib;
 using KKAPI.MainGame;
 using KKAPI.Utilities;
@@ -20,16 +19,16 @@ namespace KK_Pregnancy
             private static Sprite _pregSprite;
             private static Sprite _riskySprite;
             private static Sprite _safeSprite;
-            internal static Sprite _unknownSprite;
+            private static Sprite _unknownSprite;
 
             private static readonly List<KeyValuePair<SaveData.Heroine, Rect>> _currentHeroine = new List<KeyValuePair<SaveData.Heroine, Rect>>();
 
-            internal static void Init(Harmony hi)
+            internal static void Init(Harmony hi, Sprite unknownSprite, Sprite pregSprite, Sprite safeSprite, Sprite riskySprite)
             {
-                _pregSprite = LoadIcon("pregnant.png");
-                _riskySprite = LoadIcon("risky.png");
-                _safeSprite = LoadIcon("safe.png");
-                _unknownSprite = LoadIcon("unknown.png");
+                _unknownSprite = unknownSprite ? unknownSprite : throw new ArgumentNullException(nameof(unknownSprite));
+                _pregSprite = pregSprite ? pregSprite : throw new ArgumentNullException(nameof(pregSprite));
+                _riskySprite = riskySprite ? riskySprite : throw new ArgumentNullException(nameof(riskySprite));
+                _safeSprite = safeSprite ? safeSprite : throw new ArgumentNullException(nameof(safeSprite));
 
                 SceneManager.sceneLoaded += SceneManager_sceneLoaded;
                 SceneManager.sceneUnloaded += s =>
@@ -39,17 +38,6 @@ namespace KK_Pregnancy
                 };
 
                 hi.PatchAll(typeof(StatusIcons));
-            }
-
-            private static Sprite LoadIcon(string resourceFileName)
-            {
-                var iconTex = new Texture2D(2, 2, TextureFormat.DXT5, false);
-                DontDestroyOnLoad(iconTex);
-                iconTex.LoadImage(ResourceUtils.GetEmbeddedResource(resourceFileName));
-                var sprite = Sprite.Create(iconTex, new Rect(0f, 0f, iconTex.width, iconTex.height),
-                    new Vector2(0.5f, 0.5f), 100f, 0u, SpriteMeshType.FullRect);
-                DontDestroyOnLoad(sprite);
-                return sprite;
             }
 
             /// <summary>
@@ -126,9 +114,9 @@ namespace KK_Pregnancy
                 var heroine = _currentHeroine.FirstOrDefault(x => x.Value.Contains(pos)).Key;
                 if (heroine == null) return;
 
-                var status = GetHeroineStatus(heroine);
+                var status = PregnancyDataUtils.GetHeroineStatus(heroine);
 
-                var windowHeight = status == HeroineStatus.Unknown || status == HeroineStatus.Pregnant ? 110 : 270;
+                var windowHeight = status == PregnancyDataUtils.HeroineStatus.Unknown || status == PregnancyDataUtils.HeroineStatus.Pregnant ? 110 : 270;
                 var screenRect = new Rect(pos.x + 30, pos.y - windowHeight / 2, 180, windowHeight);
                 IMGUIUtils.DrawSolidBox(screenRect);
                 GUILayout.BeginArea(screenRect, GUI.skin.box);
@@ -139,17 +127,17 @@ namespace KK_Pregnancy
 
                         switch (status)
                         {
-                            case HeroineStatus.Unknown:
+                            case PregnancyDataUtils.HeroineStatus.Unknown:
                                 GUILayout.Label("This character didn't tell you their risky day schedule yet.\n\nBecome closer to learn it!");
                                 break;
 
-                            case HeroineStatus.Pregnant:
+                            case PregnancyDataUtils.HeroineStatus.Pregnant:
                                 GUILayout.Label("This character is pregnant.\n\nOver time the character's belly will grow, and at the end they will leave school temporarily.");
                                 break;
 
-                            case HeroineStatus.Safe:
-                            case HeroineStatus.Risky:
-                                GUILayout.Label(status == HeroineStatus.Safe
+                            case PregnancyDataUtils.HeroineStatus.Safe:
+                            case PregnancyDataUtils.HeroineStatus.Risky:
+                                GUILayout.Label(status == PregnancyDataUtils.HeroineStatus.Safe
                                     ? "This character is on a safe day, have fun!"
                                     : "This character is on a risky day, be careful!");
                                 GUILayout.Space(5);
@@ -224,51 +212,24 @@ namespace KK_Pregnancy
                         worldCorners[2].x - worldCorners[0].x,
                         worldCorners[2].y - worldCorners[0].y)));
 
-                    switch (GetHeroineStatus(heroine))
+                    switch (PregnancyDataUtils.GetHeroineStatus(heroine))
                     {
-                        case HeroineStatus.Unknown:
+                        case PregnancyDataUtils.HeroineStatus.Unknown:
                             image.sprite = _unknownSprite;
                             break;
-                        case HeroineStatus.Safe:
+                        case PregnancyDataUtils.HeroineStatus.Safe:
                             image.sprite = _safeSprite;
                             break;
-                        case HeroineStatus.Risky:
+                        case PregnancyDataUtils.HeroineStatus.Risky:
                             image.sprite = _riskySprite;
                             break;
-                        case HeroineStatus.Pregnant:
+                        case PregnancyDataUtils.HeroineStatus.Pregnant:
                             image.sprite = _pregSprite;
                             break;
                         default:
                             throw new ArgumentOutOfRangeException();
                     }
                 }
-            }
-
-            internal static HeroineStatus GetHeroineStatus(SaveData.Heroine heroine)
-            {
-                // Check if she wants to tell
-                if (heroine.intimacy >= 80 ||
-                    heroine.hCount >= 5 ||
-                    heroine.parameter.attribute.bitch && heroine.favor > 50 ||
-                    (heroine.isGirlfriend || heroine.favor >= 90) && (!heroine.isVirgin || heroine.hCount >= 2 || heroine.intimacy >= 40))
-                {
-                    if (heroine.IsHeroinePregnant(!PregnancyPlugin.ShowPregnancyIconEarly.Value))
-                        return HeroineStatus.Pregnant;
-
-                    return HFlag.GetMenstruation(heroine.MenstruationDay) == HFlag.MenstruationType.安全日
-                        ? HeroineStatus.Safe
-                        : HeroineStatus.Risky;
-                }
-
-                return HeroineStatus.Unknown;
-            }
-
-            internal enum HeroineStatus
-            {
-                Unknown,
-                Safe,
-                Risky,
-                Pregnant
             }
         }
     }
