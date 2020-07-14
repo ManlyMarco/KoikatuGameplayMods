@@ -1,5 +1,6 @@
 ﻿using BepInEx;
 using BepInEx.Configuration;
+using BepInEx.Logging;
 using HarmonyLib;
 using KKABMX.Core;
 using KKAPI;
@@ -22,8 +23,12 @@ namespace KK_Pregnancy
         public static ConfigEntry<int> PregnancyProgressionSpeed { get; private set; }
         public static ConfigEntry<bool> HideHSceneMenstrIcon { get; private set; }
 
+        internal static new ManualLogSource Logger { get; private set; }
+
         private void Start()
         {
+            Logger = base.Logger;
+
             PregnancyProgressionSpeed = Config.Bind("General", "Pregnancy progression speed", 4,
                 new ConfigDescription("How much faster does the in-game pregnancy progresses than the standard 40 weeks. " +
                                       "It also reduces the time characters leave school for after birth.\n\n" +

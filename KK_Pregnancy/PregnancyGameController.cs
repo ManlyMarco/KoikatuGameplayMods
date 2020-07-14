@@ -24,10 +24,19 @@ namespace KK_Pregnancy
             }
         }
 
-        // Figure out if conception happened at end of h scene
+        protected override void OnStartH(HSceneProc proc, bool freeH)
+        {
+            base.OnStartH(proc, freeH);
+
+            proc.gameObject.AddComponent<LactationController>();
+        }
+
         protected override void OnEndH(HSceneProc proc, bool freeH)
         {
-            // Don't know which girl player came inside
+            GameObject.Destroy(proc.GetComponent<LactationController>());
+
+            // Figure out if conception happened at end of h scene
+            // bug Don't know which character is which
             if (proc.flags.mode == HFlag.EMode.houshi3P || proc.flags.mode == HFlag.EMode.sonyu3P) return;
 
             var heroine = proc.flags.lstHeroine.First(x => x != null);
