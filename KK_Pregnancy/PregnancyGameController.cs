@@ -113,14 +113,13 @@ namespace KK_Pregnancy
         private static void StartPregnancy(ChaFileControl chaFile)
         {
             var data = ExtendedSave.GetExtendedDataById(chaFile, PregnancyPlugin.GUID);
-            PregnancyDataUtils.DeserializeData(data, out var week, out var gameplayEnabled, out var fertility, out var schedule);
+            var pd = PregnancyData.Load(data);
 
             // If week is 0 the character is not pregnant
-            if (gameplayEnabled && week <= 0)
+            if (pd.GameplayEnabled && !pd.IsPregnant)
             {
-                //Logger.Log(LogLevel.Debug, "Preg - starting pregnancy on " + chaFile.parameter.fullname + ", new week is " + 1);
-
-                ExtendedSave.SetExtendedDataById(chaFile, PregnancyPlugin.GUID, PregnancyDataUtils.SerializeData(1, true, fertility, schedule));
+                pd.StartPregnancy();
+                ExtendedSave.SetExtendedDataById(chaFile, PregnancyPlugin.GUID, pd.Save());
             }
         }
 
@@ -129,28 +128,28 @@ namespace KK_Pregnancy
             var data = ExtendedSave.GetExtendedDataById(chaFile, PregnancyPlugin.GUID);
             if (data == null) return;
 
-            PregnancyDataUtils.DeserializeData(data, out var week, out var gameplayEnabled, out var fertility, out var schedule);
-            // Advance the week of pregnancy. If week is 0 the character is not pregnant
-            if (gameplayEnabled && week > 0)
+            var pd = PregnancyData.Load(data);
+
+            if (pd.GameplayEnabled && pd.IsPregnant)
             {
-                if (week < PregnancyDataUtils.LeaveSchoolWeek)
+                if (pd.Week < PregnancyData.LeaveSchoolWeek)
                 {
                     // Advance through in-school at full configured speed
                     var weekChange = PregnancyPlugin.PregnancyProgressionSpeed.Value;
-                    week = Mathf.Min(PregnancyDataUtils.LeaveSchoolWeek, week + weekChange);
+                    pd.Week = Mathf.Min(PregnancyData.LeaveSchoolWeek, pd.Week + weekChange);
                 }
-                else if (week < PregnancyDataUtils.ReturnToSchoolWeek)
+                else if (pd.Week < PregnancyData.ReturnToSchoolWeek)
                 {
                     // Make sure at least one week is spent out of school
-                    var weekChange = Mathf.Min(PregnancyDataUtils.ReturnToSchoolWeek - PregnancyDataUtils.LeaveSchoolWeek - 1, PregnancyPlugin.PregnancyProgressionSpeed.Value);
-                    week = week + weekChange;
+                    var weekChange = Mathf.Min(PregnancyData.ReturnToSchoolWeek - PregnancyData.LeaveSchoolWeek - 1, PregnancyPlugin.PregnancyProgressionSpeed.Value);
+                    pd.Week = pd.Week + weekChange;
                 }
 
-                if (week >= PregnancyDataUtils.ReturnToSchoolWeek)
-                    week = 0;
+                if (pd.Week >= PregnancyData.ReturnToSchoolWeek)
+                    pd.Week = 0;
 
                 //Logger.Log(LogLevel.Debug, $"Preg - pregnancy week for {chaFile.parameter.fullname} is now {week}");
-                ExtendedSave.SetExtendedDataById(chaFile, PregnancyPlugin.GUID, PregnancyDataUtils.SerializeData(week, true, fertility, schedule));
+                ExtendedSave.SetExtendedDataById(chaFile, PregnancyPlugin.GUID, pd.Save());
             }
         }
     }

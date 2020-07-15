@@ -114,9 +114,9 @@ namespace KK_Pregnancy
                 var heroine = _currentHeroine.FirstOrDefault(x => x.Value.Contains(pos)).Key;
                 if (heroine == null) return;
 
-                var status = PregnancyDataUtils.GetHeroineStatus(heroine);
+                var status = heroine.GetHeroineStatus();
 
-                var windowHeight = status == PregnancyDataUtils.HeroineStatus.Unknown || status == PregnancyDataUtils.HeroineStatus.Pregnant ? 110 : 270;
+                var windowHeight = status == HeroineStatus.Unknown || status == HeroineStatus.Pregnant ? 110 : 270;
                 var screenRect = new Rect(pos.x + 30, pos.y - windowHeight / 2, 180, windowHeight);
                 IMGUIUtils.DrawSolidBox(screenRect);
                 GUILayout.BeginArea(screenRect, GUI.skin.box);
@@ -127,17 +127,17 @@ namespace KK_Pregnancy
 
                         switch (status)
                         {
-                            case PregnancyDataUtils.HeroineStatus.Unknown:
+                            case HeroineStatus.Unknown:
                                 GUILayout.Label("This character didn't tell you their risky day schedule yet.\n\nBecome closer to learn it!");
                                 break;
 
-                            case PregnancyDataUtils.HeroineStatus.Pregnant:
+                            case HeroineStatus.Pregnant:
                                 GUILayout.Label("This character is pregnant.\n\nOver time the character's belly will grow, and at the end they will leave school temporarily.");
                                 break;
 
-                            case PregnancyDataUtils.HeroineStatus.Safe:
-                            case PregnancyDataUtils.HeroineStatus.Risky:
-                                GUILayout.Label(status == PregnancyDataUtils.HeroineStatus.Safe
+                            case HeroineStatus.Safe:
+                            case HeroineStatus.Risky:
+                                GUILayout.Label(status == HeroineStatus.Safe
                                     ? "This character is on a safe day, have fun!"
                                     : "This character is on a risky day, be careful!");
                                 GUILayout.Space(5);
@@ -212,18 +212,18 @@ namespace KK_Pregnancy
                         worldCorners[2].x - worldCorners[0].x,
                         worldCorners[2].y - worldCorners[0].y)));
 
-                    switch (PregnancyDataUtils.GetHeroineStatus(heroine))
+                    switch (heroine.GetHeroineStatus())
                     {
-                        case PregnancyDataUtils.HeroineStatus.Unknown:
+                        case HeroineStatus.Unknown:
                             image.sprite = _unknownSprite;
                             break;
-                        case PregnancyDataUtils.HeroineStatus.Safe:
+                        case HeroineStatus.Safe:
                             image.sprite = _safeSprite;
                             break;
-                        case PregnancyDataUtils.HeroineStatus.Risky:
+                        case HeroineStatus.Risky:
                             image.sprite = _riskySprite;
                             break;
-                        case PregnancyDataUtils.HeroineStatus.Pregnant:
+                        case HeroineStatus.Pregnant:
                             image.sprite = _pregSprite;
                             break;
                         default:

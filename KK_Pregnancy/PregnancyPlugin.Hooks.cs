@@ -39,13 +39,9 @@ namespace KK_Pregnancy
                 if (_lastHeroine != null)
                 {
                     // Get a schedule directly this way since the controller is not spawned in class roster
-                    var schedule = _lastHeroine.GetRelatedChaFiles().Select(control =>
-                    {
-                        var d = ExtendedSave.GetExtendedDataById(control, GUID);
-                        if (d == null) return PregnancyDataUtils.MenstruationSchedule.Default;
-                        PregnancyDataUtils.DeserializeData(d, out _, out _, out _, out var s);
-                        return s;
-                    }).FirstOrDefault(x => x != PregnancyDataUtils.MenstruationSchedule.Default);
+                    var schedule = _lastHeroine.GetRelatedChaFiles()
+                        .Select(c => PregnancyData.Load(ExtendedSave.GetExtendedDataById(c, GUID))?.MenstruationSchedule ?? MenstruationSchedule.Default)
+                        .FirstOrDefault(x => x != MenstruationSchedule.Default);
 
                     _menstruationsBackup = HFlag.menstruations;
                     HFlag.menstruations = PregnancyCharaController.GetMenstruationsArr(schedule);
@@ -98,15 +94,9 @@ namespace KK_Pregnancy
                 var isOnLeave = heroine.GetRelatedChaFiles()
                     .Any(c =>
                     {
-                        var data = ExtendedSave.GetExtendedDataById(heroine.charFile, GUID);
-
-                        if (data == null) return false;
-
-                        PregnancyDataUtils.DeserializeData(data, out var week, out var gameplayEnabled, out _, out _);
-                        if (gameplayEnabled && week >= PregnancyDataUtils.LeaveSchoolWeek)
-                            return true;
-
-                        return false;
+                        var pd = PregnancyData.Load(ExtendedSave.GetExtendedDataById(heroine.charFile, GUID));
+                        if (pd == null) return false;
+                        return pd.GameplayEnabled && pd.Week >= PregnancyData.LeaveSchoolWeek;
                     });
                 return !isOnLeave;
             }

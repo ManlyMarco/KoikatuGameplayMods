@@ -75,12 +75,12 @@ namespace KK_Pregnancy
 
             e.AddControl(new MakerText("If off, the character can't get pregnant and current pregnancy will stop progressing.", cat, _pluginInstance) { TextColor = hintColor });
 
-            var fertilityToggle = e.AddControl(new MakerSlider(cat, "Fertility", 0f, 1f, PregnancyDataUtils.DefaultFertility, _pluginInstance));
+            var fertilityToggle = e.AddControl(new MakerSlider(cat, "Fertility", 0f, 1f, PregnancyData.DefaultFertility, _pluginInstance));
             fertilityToggle.BindToFunctionController<PregnancyCharaController, float>(controller => controller.Fertility, (controller, value) => controller.Fertility = value);
 
             e.AddControl(new MakerText("How likely this character is to get pregnant.", cat, _pluginInstance) { TextColor = hintColor });
 
-            var weeksSlider = e.AddControl(new MakerSlider(cat, "Week of pregnancy", 0f, PregnancyDataUtils.LeaveSchoolWeek - 1f, 0f, _pluginInstance));
+            var weeksSlider = e.AddControl(new MakerSlider(cat, "Week of pregnancy", 0f, PregnancyData.LeaveSchoolWeek - 1f, 0f, _pluginInstance));
             weeksSlider.ValueToString = f => Mathf.RoundToInt(f).ToString();
             weeksSlider.StringToValue = s => int.Parse(s);
             weeksSlider.BindToFunctionController<PregnancyCharaController, float>(controller => controller.Week, (controller, value) => controller.Week = Mathf.RoundToInt(value));
@@ -88,7 +88,7 @@ namespace KK_Pregnancy
             e.AddControl(new MakerText("If the character is pregnant when added to the game, the pregnancy will continue from this point.", cat, _pluginInstance) { TextColor = hintColor });
 
             var scheduleToggle = e.AddControl(new MakerRadioButtons(cat, _pluginInstance, "Menstruation schedule", "Default", "More risky", "Always safe", "Always risky"));
-            scheduleToggle.BindToFunctionController<PregnancyCharaController, int>(controller => (int)controller.Schedule, (controller, value) => controller.Schedule = (PregnancyDataUtils.MenstruationSchedule)value);
+            scheduleToggle.BindToFunctionController<PregnancyCharaController, int>(controller => (int)controller.Schedule, (controller, value) => controller.Schedule = (MenstruationSchedule)value);
 
             e.AddControl(new MakerText("Changes how many risky days the character has in a cycle. Default is more safe days than risky days.", cat, _pluginInstance) { TextColor = hintColor });
         }

@@ -55,19 +55,19 @@ namespace KK_Pregnancy
                         AddNewState(_riskySprite);
                     }
 
-                    var heroineStatus = PregnancyDataUtils.GetHeroineStatus(__instance.GetLeadingHeroine());
+                    var heroineStatus = __instance.GetLeadingHeroine().GetHeroineStatus();
                     switch (heroineStatus)
                     {
-                        case PregnancyDataUtils.HeroineStatus.Unknown:
+                        case HeroineStatus.Unknown:
                             __instance.categoryMenstruation.SetActiveToggle(2);
                             break;
-                        case PregnancyDataUtils.HeroineStatus.Pregnant:
+                        case HeroineStatus.Pregnant:
                             __instance.categoryMenstruation.SetActiveToggle(3);
                             break;
-                        case PregnancyDataUtils.HeroineStatus.Safe:
+                        case HeroineStatus.Safe:
                             __instance.categoryMenstruation.SetActiveToggle(4);
                             break;
-                        case PregnancyDataUtils.HeroineStatus.Risky:
+                        case HeroineStatus.Risky:
                             __instance.categoryMenstruation.SetActiveToggle(5);
                             break;
                     }

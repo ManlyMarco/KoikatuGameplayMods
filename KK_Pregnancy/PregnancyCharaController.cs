@@ -9,19 +9,22 @@ namespace KK_Pregnancy
 {
     public class PregnancyCharaController : CharaCustomFunctionController
     {
-        private PregnancyBoneEffect _boneEffect;
-        private float _fertility;
-        private bool _gameplayEnabled;
-        private int _week;
-        private PregnancyDataUtils.MenstruationSchedule _schedule;
+        private readonly PregnancyBoneEffect _boneEffect;
+        private PregnancyData _pregnancyData;
+
+        public PregnancyCharaController()
+        {
+            _pregnancyData = new PregnancyData();
+            _boneEffect = new PregnancyBoneEffect(this);
+        }
 
         /// <summary>
         /// The character is harder to get pregnant.
         /// </summary>
         public float Fertility
         {
-            get => _fertility;
-            set => _fertility = value;
+            get => _pregnancyData.Fertility;
+            set => _pregnancyData.Fertility = value;
         }
 
         /// <summary>
@@ -30,31 +33,31 @@ namespace KK_Pregnancy
         /// </summary>
         public bool GameplayEnabled
         {
-            get => _gameplayEnabled;
-            set => _gameplayEnabled = value;
+            get => _pregnancyData.GameplayEnabled;
+            set => _pregnancyData.GameplayEnabled = value;
         }
 
         /// <summary>
         /// If 0 or negative, the character is not pregnant.
-        /// If between 0 and <see cref="PregnancyDataUtils.LeaveSchoolWeek"/> the character is pregnant and the belly is proportionately sized.
-        /// If equal or above <see cref="PregnancyDataUtils.LeaveSchoolWeek"/> the character is on a maternal leave until <see cref="PregnancyDataUtils.ReturnToSchoolWeek"/>.
+        /// If between 0 and <see cref="PregnancyData.LeaveSchoolWeek"/> the character is pregnant and the belly is proportionately sized.
+        /// If equal or above <see cref="PregnancyData.LeaveSchoolWeek"/> the character is on a maternal leave until <see cref="PregnancyData.ReturnToSchoolWeek"/>.
         /// </summary>
         public int Week
         {
-            get => _week;
-            set => _week = value;
+            get => _pregnancyData.Week;
+            set => _pregnancyData.Week = value;
         }
 
-        public PregnancyDataUtils.MenstruationSchedule Schedule
+        public MenstruationSchedule Schedule
         {
-            get => _schedule;
-            set => _schedule = value;
+            get => _pregnancyData.MenstruationSchedule;
+            set => _pregnancyData.MenstruationSchedule = value;
         }
 
         public float GetBellySizePercent()
         {
             // Don't show any effect at week 1 since it begins right after winning a child lottery
-            return Mathf.Clamp01((Week - 1f) / (PregnancyDataUtils.LeaveSchoolWeek - 1f));
+            return Mathf.Clamp01((Week - 1f) / (PregnancyData.LeaveSchoolWeek - 1f));
         }
 
         public bool IsDuringPregnancy()
@@ -69,13 +72,13 @@ namespace KK_Pregnancy
 
         public void SaveData()
         {
-            SetExtendedData(PregnancyDataUtils.SerializeData(_week, _gameplayEnabled, _fertility, _schedule));
+            SetExtendedData(_pregnancyData.Save());
         }
 
         public void ReadData()
         {
             var data = GetExtendedData();
-            PregnancyDataUtils.DeserializeData(data, out _week, out _gameplayEnabled, out _fertility, out _schedule);
+            _pregnancyData = PregnancyData.Load(data) ?? new PregnancyData();
 
             if (!CanGetDangerousDays())
             {
@@ -93,11 +96,8 @@ namespace KK_Pregnancy
 
         protected override void OnReload(GameMode currentGameMode)
         {
-            if (_boneEffect == null)
-                _boneEffect = new PregnancyBoneEffect(this);
-
-            // Parameters are false by default in class chara maker, but we need to load them the 1st time to not lose progress
-            // InsideAndLoaded is true when the initial card is being loaded into maker so we can use that
+            // Parameters are false by default in class chara maker, so we need to load them the 1st time to not lose progress
+            // !MakerAPI.InsideAndLoaded is true when the initial card is being loaded into maker so we can use that
             if (!MakerAPI.InsideAndLoaded || MakerAPI.GetCharacterLoadFlags()?.Parameters != false)
             {
                 ReadData();
@@ -106,17 +106,17 @@ namespace KK_Pregnancy
             }
         }
 
-        internal static byte[] GetMenstruationsArr(PregnancyDataUtils.MenstruationSchedule menstruationSchedule)
+        internal static byte[] GetMenstruationsArr(MenstruationSchedule menstruationSchedule)
         {
             switch (menstruationSchedule)
             {
                 default:
                     return HFlag.menstruations;
-                case PregnancyDataUtils.MenstruationSchedule.MostlyRisky:
+                case MenstruationSchedule.MostlyRisky:
                     return _menstruationsRisky;
-                case PregnancyDataUtils.MenstruationSchedule.AlwaysSafe:
+                case MenstruationSchedule.AlwaysSafe:
                     return _menstruationsAlwaysSafe;
-                case PregnancyDataUtils.MenstruationSchedule.AlwaysRisky:
+                case MenstruationSchedule.AlwaysRisky:
                     return _menstruationsAlwaysRisky;
             }
         }

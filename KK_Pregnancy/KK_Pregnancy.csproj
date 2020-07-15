@@ -80,10 +80,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Data\HeroineStatus.cs" />
     <Compile Include="Lactation.cs" />
+    <Compile Include="Data\MenstruationSchedule.cs" />
     <Compile Include="PregnancyBoneEffect.cs" />
     <Compile Include="PregnancyCharaController.cs" />
-    <Compile Include="PregnancyDataUtils.cs" />
+    <Compile Include="Data\PregnancyData.cs" />
+    <Compile Include="Data\PregnancyDataUtils.cs" />
     <Compile Include="PregnancyGameController.cs" />
     <Compile Include="PregnancyGui.cs" />
     <Compile Include="PregnancyGui.HSceneMenstrIconOverride.cs" />
