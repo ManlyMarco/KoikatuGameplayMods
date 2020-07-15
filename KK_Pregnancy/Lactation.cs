@@ -1,16 +1,21 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using HarmonyLib;
 using Illusion.Game;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace KK_Pregnancy
 {
     public class LactationController : MonoBehaviour
     {
+        private const float MinimumMilk = 0.4f;
+        private const float MoreMilk = 0.65f;
         private readonly List<CharaData> _charas = new List<CharaData>();
         private float _orgasmDelayTimer;
-
         private HSceneProc _proc;
+        private float _touchingDelayTimer;
 
         private void Start()
         {
@@ -18,34 +23,56 @@ namespace KK_Pregnancy
 
             var lstFemale = (List<ChaControl>)AccessTools.Field(typeof(HSceneProc), "lstFemale").GetValue(_proc);
 
-            _charas.Add(new CharaData(lstFemale[0], _proc.particle));
+            _charas.Add(new CharaData(lstFemale[0], _proc.particle, _proc.hand));
             if (lstFemale.Count > 1 && lstFemale[1] != null)
-                _charas.Add(new CharaData(lstFemale[1], _proc.particle));
+                _charas.Add(new CharaData(lstFemale[1], _proc.particle1, _proc.hand1));
 
-            if (_charas.TrueForAll(x => x.MaxMilk < 10))
+            if (_charas.TrueForAll(x => x.MaxMilk < MinimumMilk))
                 enabled = false;
-
-            // todo Is this safe only run once?
-            InitializeParticles(_charas);
         }
 
         private void Update()
         {
             // figure out when to fire
             var animatorStateInfo = _charas[0].ChaControl.getAnimatorStateInfo(0);
-            var oloop = _proc.flags.mode == HFlag.EMode.aibu
+            var orgasmloop = _proc.flags.mode == HFlag.EMode.aibu
                 ? animatorStateInfo.IsName("Orgasm_Start")
                 : animatorStateInfo.IsName("OLoop") || animatorStateInfo.IsName("A_OLoop");
 
-            if (oloop)
+            if (orgasmloop)
             {
-                _orgasmDelayTimer = 0.1f;
+                _orgasmDelayTimer = Random.value / 8; //0.1f;
             }
             else if (_orgasmDelayTimer > 0)
             {
                 _orgasmDelayTimer -= Time.deltaTime;
                 if (_orgasmDelayTimer <= 0)
                     OnOrgasm();
+            }
+            else
+            {
+                if (_proc.flags.drag && _proc.flags.speed > 0.6)
+                {
+                    if (_touchingDelayTimer <= 0)
+                    {
+                        foreach (var charaData in _charas)
+                        {
+                            if (charaData.IsTouchingMune(true, true))
+                            {
+                                charaData.FireParticles(false);
+                                _touchingDelayTimer = 1f;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        _touchingDelayTimer -= Time.deltaTime;
+                    }
+                }
+                else
+                {
+                    _touchingDelayTimer = 0;
+                }
             }
 
             // Regenerate milk over time
@@ -62,143 +89,214 @@ namespace KK_Pregnancy
         private void OnOrgasm()
         {
             foreach (var charaData in _charas)
-            {
-                var chaControl = charaData.ChaControl;
-
-                var clothesState = chaControl.fileStatus.clothesState;
-                // Only trigger when the top clothes are not present or removed
-                if ((!chaControl.IsClothesStateKind(0) || clothesState[0] != 0) &&
-                    (!chaControl.IsClothesStateKind(2) || clothesState[2] != 0))
-                {
-                    PregnancyPlugin.Logger.LogDebug(
-                        $"OnOrgasm > CurrentMilk level for chara {chaControl.chaFile.parameter.fullname}: {Mathf.RoundToInt(charaData.CurrentMilk * 100)}%");
-
-                    if (charaData.CurrentMilk >= 0.65f)
-                    {
-                        charaData.ParticleCtrl.Play(33);
-                        charaData.ParticleCtrl.Play(43);
-
-                        charaData.CurrentMilk -= 0.35f;
-                        PlaySoundEffect(chaControl, ChaReference.RefObjKey.a_n_bust_f);
-
-                        var currentState = chaControl.GetSiruFlags(ChaFileDefine.SiruParts.SiruFrontUp);
-                        if (currentState < 2) // Has 3 states, value is max 2
-                            chaControl.SetSiruFlags(ChaFileDefine.SiruParts.SiruFrontUp, (byte)(currentState + 1));
-                    }
-                    else if (charaData.CurrentMilk >= 0.4f)
-                    {
-                        charaData.ParticleCtrl.Play(35);
-                        charaData.ParticleCtrl.Play(45);
-
-                        charaData.CurrentMilk -= 0.25f;
-                        PlaySoundEffect(chaControl, ChaReference.RefObjKey.a_n_bust_f);
-
-                        var currentState = chaControl.GetSiruFlags(ChaFileDefine.SiruParts.SiruFrontUp);
-                        if (currentState < 1) // Only go up to the 1st level since quantity is lower
-                            chaControl.SetSiruFlags(ChaFileDefine.SiruParts.SiruFrontUp, (byte)(currentState + 1));
-                    }
-                }
-                else
-                {
-                    PregnancyPlugin.Logger.LogDebug(
-                        $"OnOrgasm > Blocked by clothes for chara {chaControl.chaFile.parameter.fullname}");
-                }
-            }
-        }
-
-        private static void PlaySoundEffect(ChaControl chaControl, ChaReference.RefObjKey reference)
-        {
-            var soundEffectSetting = new Utils.Sound.Setting(Manager.Sound.Type.GameSE3D)
-            {
-                assetBundleName = "sound/data/se/h/00/00_00.unity3d",
-                assetName = "khse_06"
-            };
-            // Alternative sound effect, much longer
-            //assetBundleName = @"sound/data/se/h/12/12_00.unity3d";
-            //assetName = "hse_siofuki";
-
-            var soundTr = Utils.Sound.Play(soundEffectSetting);
-            var chaRef = chaControl.GetReferenceInfo(reference);
-            if (soundTr && chaRef)
-                soundTr.SetParent(chaRef.transform, false);
-        }
-
-        private static void InitializeParticles(List<CharaData> charas)
-        {
-            for (var i = 0; i < charas.Count; i++)
-            {
-                var charaData = charas[i];
-                if (charaData == null) continue;
-
-                var particleDic = (Dictionary<int, HParticleCtrl.ParticleInfo>)AccessTools
-                    .Field(typeof(HParticleCtrl), "dicParticle").GetValue(charaData.ParticleCtrl);
-                if (particleDic.ContainsKey(33)) return; // Already added
-
-                PregnancyPlugin.Logger.LogDebug("Adding particles to heroine #" + i);
-
-                particleDic.Add(33, new HParticleCtrl.ParticleInfo
-                {
-                    assetPath = @"h/common/00_00.unity3d",
-                    file = "LiquidSiru",
-                    numParent = 1,
-                    nameParent = "a_n_nip_R",
-                    pos = new Vector3(0f, 0f, 0.05f),
-                    rot = new Vector3(-25f, 0, 0f)
-                });
-
-                particleDic.Add(35, new HParticleCtrl.ParticleInfo
-                {
-                    assetPath = @"h/common/00_00.unity3d",
-                    file = "LiquidSio",
-                    numParent = 1,
-                    nameParent = "a_n_nip_R",
-                    pos = new Vector3(0, 0f, 0.05f),
-                    rot = new Vector3(-20, 0, 0)
-                });
-
-                particleDic.Add(43, new HParticleCtrl.ParticleInfo
-                {
-                    assetPath = @"h/common/00_00.unity3d",
-                    file = "LiquidSiru",
-                    numParent = 1,
-                    nameParent = "a_n_nip_L",
-                    pos = new Vector3(0, 0f, 0.05f),
-                    rot = new Vector3(-25f, 0, 0f)
-                });
-
-                particleDic.Add(45, new HParticleCtrl.ParticleInfo
-                {
-                    assetPath = @"h/common/00_00.unity3d",
-                    file = "LiquidSio",
-                    numParent = 1,
-                    nameParent = "a_n_nip_L",
-                    pos = new Vector3(0, 0f, 0.05f),
-                    rot = new Vector3(-20, 0, 0)
-                });
-
-                charaData.ParticleCtrl.Load(charaData.ChaControl.objBodyBone, 1);
-            }
+                charaData.FireParticles(true);
         }
 
         private class CharaData
         {
+            private readonly HParticleCtrl _particleCtrl;
+            private readonly HandCtrl _procHand;
+
             public readonly ChaControl ChaControl;
-            public readonly PregnancyCharaController Controller;
-            public readonly HParticleCtrl ParticleCtrl;
+
+            // Range from 0 to 1
+            public readonly float MaxMilk;
+            private HParticleCtrl.ParticleInfo _partHeavyL;
+
+            private HParticleCtrl.ParticleInfo _partHeavyR;
+            private HParticleCtrl.ParticleInfo _partLightL;
+            private HParticleCtrl.ParticleInfo _partLightR;
+
+            private int _singleTriggerCount;
 
             // Range from 0 to MaxMilk
             public float CurrentMilk;
-            // Range from 0 to 1
-            public readonly float MaxMilk;
 
-            public CharaData(ChaControl chaControl, HParticleCtrl particleCtrl)
+            public CharaData(ChaControl chaControl, HParticleCtrl particleCtrl, HandCtrl procHand)
             {
-                ChaControl = chaControl;
-                ParticleCtrl = particleCtrl;
+                ChaControl = chaControl ? chaControl : throw new ArgumentNullException(nameof(chaControl));
+                _procHand = procHand ? procHand : throw new ArgumentNullException(nameof(procHand));
+                _particleCtrl = particleCtrl ? particleCtrl : throw new ArgumentNullException(nameof(particleCtrl));
 
-                Controller = chaControl.GetComponent<PregnancyCharaController>();
-                MaxMilk = Mathf.Clamp01(Controller.Week / 40f);
+                var controller = chaControl.GetComponent<PregnancyCharaController>();
+                MaxMilk = controller != null ? Mathf.Clamp01(controller.Week / 40f) : 0;
                 CurrentMilk = MaxMilk;
+            }
+
+            public bool IsTouchingMune(bool l, bool r)
+            {
+                for (var i = 0; i < 3; i++)
+                {
+                    var useItemStickArea = _procHand.GetUseItemStickArea(i);
+                    if (useItemStickArea == HandCtrl.AibuColliderKind.muneL && l ||
+                        useItemStickArea == HandCtrl.AibuColliderKind.muneR && r) return true;
+                }
+
+                return false;
+            }
+
+            public void FireParticles(bool orgasm)
+            {
+                var clothesState = ChaControl.fileStatus.clothesState;
+                // Only trigger when the top clothes are not present or removed
+                if ((!ChaControl.IsClothesStateKind(0) || clothesState[0] != 0) &&
+                    (!ChaControl.IsClothesStateKind(2) || clothesState[2] != 0))
+                {
+                    //PregnancyPlugin.Logger.LogDebug(
+                    //    $"OnOrgasm > CurrentMilk level for chara {ChaControl.chaFile.parameter.fullname}: {Mathf.RoundToInt(CurrentMilk * 100)}%");
+
+                    InitializeParticles();
+
+                    if (CurrentMilk >= MoreMilk)
+                    {
+                        if (orgasm)
+                            OnOrgasm(true);
+                        else
+                            OnSingle(true);
+                    }
+                    else if (CurrentMilk >= MinimumMilk)
+                    {
+                        if (orgasm)
+                            OnOrgasm(false);
+                        else
+                            OnSingle(false);
+                    }
+                }
+            }
+
+            private void OnSingle(bool large)
+            {
+                if (IsTouchingMune(true, false))
+                {
+                    _partLightL.particle.Simulate(0f);
+                    _partLightL.particle.Play();
+                    CurrentMilk -= 0.025f;
+                }
+
+                if (IsTouchingMune(false, true))
+                {
+                    _partLightR.particle.Simulate(0f);
+                    _partLightR.particle.Play();
+                    CurrentMilk -= 0.025f;
+                }
+
+                ChaControl.StartCoroutine(OnSingleCo());
+
+                if (_singleTriggerCount++ == 4)
+                {
+                    var currentState = ChaControl.GetSiruFlags(ChaFileDefine.SiruParts.SiruFrontUp);
+                    if (currentState < 1) // Only go up to the 1st level since quantity is lower
+                        ChaControl.SetSiruFlags(ChaFileDefine.SiruParts.SiruFrontUp, (byte)(currentState + 1));
+                }
+            }
+
+            private IEnumerator OnSingleCo()
+            {
+                yield return new WaitForSeconds(0.3f);
+                //_partHeavyL.particle.Stop();
+                //_partHeavyR.particle.Stop();
+                _partLightL.particle.Stop();
+                _partLightR.particle.Stop();
+            }
+
+            private void OnOrgasm(bool large)
+            {
+                void PlaySoundEffect(ChaControl chaControl, ChaReference.RefObjKey reference)
+                {
+                    var soundEffectSetting = new Utils.Sound.Setting(Manager.Sound.Type.GameSE3D)
+                    {
+                        assetBundleName = "sound/data/se/h/00/00_00.unity3d",
+                        assetName = "khse_06"
+                    };
+                    // Alternative sound effect, much longer
+                    //assetBundleName = @"sound/data/se/h/12/12_00.unity3d";
+                    //assetName = "hse_siofuki";
+
+                    var soundTr = Utils.Sound.Play(soundEffectSetting);
+                    var chaRef = chaControl.GetReferenceInfo(reference);
+                    if (soundTr && chaRef)
+                        soundTr.SetParent(chaRef.transform, false);
+                }
+
+                PlaySoundEffect(ChaControl, ChaReference.RefObjKey.a_n_bust_f);
+
+                var currentState = ChaControl.GetSiruFlags(ChaFileDefine.SiruParts.SiruFrontUp);
+                if (large)
+                {
+                    _partHeavyL.particle.Simulate(0f);
+                    _partHeavyL.particle.Play();
+                    _partHeavyR.particle.Simulate(0f);
+                    _partHeavyR.particle.Play();
+
+                    CurrentMilk -= 0.35f;
+                    if (currentState < 2) // Has 3 states, value is max 2
+                        ChaControl.SetSiruFlags(ChaFileDefine.SiruParts.SiruFrontUp, (byte)(currentState + 1));
+                }
+                else
+                {
+                    _partLightL.particle.Simulate(0f);
+                    _partLightL.particle.Play();
+                    _partLightR.particle.Simulate(0f);
+                    _partLightR.particle.Play();
+
+                    CurrentMilk -= 0.25f;
+                    if (currentState < 1) // Only go up to the 1st level since quantity is lower
+                        ChaControl.SetSiruFlags(ChaFileDefine.SiruParts.SiruFrontUp, (byte)(currentState + 1));
+                }
+            }
+
+            private void InitializeParticles()
+            {
+                // todo what happens when switching characters?
+                if (_partHeavyR != null) return;
+
+                PregnancyPlugin.Logger.LogDebug("Adding particles to heroine: " + ChaControl.fileParam.fullname);
+
+                _partHeavyR = new HParticleCtrl.ParticleInfo
+                {
+                    assetPath = @"h/common/00_00.unity3d",
+                    file = "LiquidSiru",
+                    numParent = 1,
+                    nameParent = "a_n_nip_R",
+                    //pos = new Vector3(0f, 0f, 0.05f),
+                    rot = new Vector3(-25f, 0, 0f)
+                };
+                _partLightR = new HParticleCtrl.ParticleInfo
+                {
+                    assetPath = @"h/common/00_00.unity3d",
+                    file = "LiquidSio",
+                    numParent = 1,
+                    nameParent = "a_n_nip_R",
+                    //pos = new Vector3(0, 0f, 0.05f),
+                    rot = new Vector3(-20, 0, 0)
+                };
+                _partHeavyL = new HParticleCtrl.ParticleInfo
+                {
+                    assetPath = @"h/common/00_00.unity3d",
+                    file = "LiquidSiru",
+                    numParent = 1,
+                    nameParent = "a_n_nip_L",
+                    //pos = new Vector3(0, 0f, 0.05f),
+                    rot = new Vector3(-25f, 0, 0f)
+                };
+                _partLightL = new HParticleCtrl.ParticleInfo
+                {
+                    assetPath = @"h/common/00_00.unity3d",
+                    file = "LiquidSio",
+                    numParent = 1,
+                    nameParent = "a_n_nip_L",
+                    //pos = new Vector3(0, 0f, 0.05f),
+                    rot = new Vector3(-20, 0, 0)
+                };
+
+                // Load the particles
+                var particleDic = (Dictionary<int, HParticleCtrl.ParticleInfo>)AccessTools
+                    .Field(typeof(HParticleCtrl), "dicParticle").GetValue(_particleCtrl);
+                particleDic[691] = _partHeavyR;
+                particleDic[692] = _partLightR;
+                particleDic[693] = _partHeavyL;
+                particleDic[694] = _partLightL;
+                _particleCtrl.Load(ChaControl.objBodyBone, 1);
             }
         }
     }
