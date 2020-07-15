@@ -10,75 +10,35 @@ namespace KK_Pregnancy
     public class PregnancyCharaController : CharaCustomFunctionController
     {
         private readonly PregnancyBoneEffect _boneEffect;
-        private PregnancyData _pregnancyData;
+        public PregnancyData Data { get; private set; }
 
         public PregnancyCharaController()
         {
-            _pregnancyData = new PregnancyData();
+            Data = new PregnancyData();
             _boneEffect = new PregnancyBoneEffect(this);
-        }
-
-        /// <summary>
-        /// The character is harder to get pregnant.
-        /// </summary>
-        public float Fertility
-        {
-            get => _pregnancyData.Fertility;
-            set => _pregnancyData.Fertility = value;
-        }
-
-        /// <summary>
-        /// Should any gameplay code be executed for this character.
-        /// If false the current pregnancy week doesn't change and the character can't get pregnant.
-        /// </summary>
-        public bool GameplayEnabled
-        {
-            get => _pregnancyData.GameplayEnabled;
-            set => _pregnancyData.GameplayEnabled = value;
-        }
-
-        /// <summary>
-        /// If 0 or negative, the character is not pregnant.
-        /// If between 0 and <see cref="PregnancyData.LeaveSchoolWeek"/> the character is pregnant and the belly is proportionately sized.
-        /// If equal or above <see cref="PregnancyData.LeaveSchoolWeek"/> the character is on a maternal leave until <see cref="PregnancyData.ReturnToSchoolWeek"/>.
-        /// </summary>
-        public int Week
-        {
-            get => _pregnancyData.Week;
-            set => _pregnancyData.Week = value;
-        }
-
-        public MenstruationSchedule Schedule
-        {
-            get => _pregnancyData.MenstruationSchedule;
-            set => _pregnancyData.MenstruationSchedule = value;
         }
 
         public float GetBellySizePercent()
         {
             // Don't show any effect at week 1 since it begins right after winning a child lottery
-            return Mathf.Clamp01((Week - 1f) / (PregnancyData.LeaveSchoolWeek - 1f));
+            return Mathf.Clamp01((Data.Week - 1f) / (PregnancyData.LeaveSchoolWeek - 1f));
         }
 
-        public bool IsDuringPregnancy()
-        {
-            return Week > 0;
-        }
-
+        // todo depends on personality
         public bool CanGetDangerousDays()
         {
-            return Week <= 1;
+            return Data.Week <= 1;
         }
 
         public void SaveData()
         {
-            SetExtendedData(_pregnancyData.Save());
+            SetExtendedData(Data.Save());
         }
 
         public void ReadData()
         {
             var data = GetExtendedData();
-            _pregnancyData = PregnancyData.Load(data) ?? new PregnancyData();
+            Data = PregnancyData.Load(data) ?? new PregnancyData();
 
             if (!CanGetDangerousDays())
             {

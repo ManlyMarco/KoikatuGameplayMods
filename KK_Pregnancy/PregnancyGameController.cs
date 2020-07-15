@@ -33,7 +33,7 @@ namespace KK_Pregnancy
 
         protected override void OnEndH(HSceneProc proc, bool freeH)
         {
-            GameObject.Destroy(proc.GetComponent<LactationController>());
+            Destroy(proc.GetComponent<LactationController>());
 
             // Figure out if conception happened at end of h scene
             // bug Don't know which character is which
@@ -50,9 +50,9 @@ namespace KK_Pregnancy
                 var controller = heroine.chaCtrl.GetComponent<PregnancyCharaController>();
                 if (controller == null) throw new ArgumentNullException(nameof(controller));
 
-                if (!controller.GameplayEnabled || controller.IsDuringPregnancy()) return;
+                if (!controller.Data.GameplayEnabled || controller.Data.IsPregnant) return;
 
-                var winThreshold = Mathf.RoundToInt(controller.Fertility * 100);
+                var winThreshold = Mathf.RoundToInt(controller.Data.Fertility * 100);
                 var childLottery = Random.Range(1, 100);
                 //Logger.Log(LogLevel.Debug, $"Preg - OnEndH calc pregnancy chance {childLottery} to {winThreshold}");
                 var wonAChild = winThreshold >= childLottery;
@@ -130,25 +130,33 @@ namespace KK_Pregnancy
 
             var pd = PregnancyData.Load(data);
 
-            if (pd.GameplayEnabled && pd.IsPregnant)
+            if (pd.GameplayEnabled)
             {
-                if (pd.Week < PregnancyData.LeaveSchoolWeek)
+                if (pd.IsPregnant)
                 {
-                    // Advance through in-school at full configured speed
-                    var weekChange = PregnancyPlugin.PregnancyProgressionSpeed.Value;
-                    pd.Week = Mathf.Min(PregnancyData.LeaveSchoolWeek, pd.Week + weekChange);
+                    if (pd.Week < PregnancyData.LeaveSchoolWeek)
+                    {
+                        // Advance through in-school at full configured speed
+                        var weekChange = PregnancyPlugin.PregnancyProgressionSpeed.Value;
+                        pd.Week = Mathf.Min(PregnancyData.LeaveSchoolWeek, pd.Week + weekChange);
+                    }
+                    else if (pd.Week < PregnancyData.ReturnToSchoolWeek)
+                    {
+                        // Make sure at least one week is spent out of school
+                        var weekChange = Mathf.Min(PregnancyData.ReturnToSchoolWeek - PregnancyData.LeaveSchoolWeek - 1, PregnancyPlugin.PregnancyProgressionSpeed.Value);
+                        pd.Week = pd.Week + weekChange;
+                    }
+
+                    if (pd.Week >= PregnancyData.ReturnToSchoolWeek)
+                        pd.Week = 0;
+
+                    //Logger.Log(LogLevel.Debug, $"Preg - pregnancy week for {chaFile.parameter.fullname} is now {week}");
                 }
-                else if (pd.Week < PregnancyData.ReturnToSchoolWeek)
+                else
                 {
-                    // Make sure at least one week is spent out of school
-                    var weekChange = Mathf.Min(PregnancyData.ReturnToSchoolWeek - PregnancyData.LeaveSchoolWeek - 1, PregnancyPlugin.PregnancyProgressionSpeed.Value);
-                    pd.Week = pd.Week + weekChange;
+                    pd.WeeksSinceLastPregnancy++;
                 }
 
-                if (pd.Week >= PregnancyData.ReturnToSchoolWeek)
-                    pd.Week = 0;
-
-                //Logger.Log(LogLevel.Debug, $"Preg - pregnancy week for {chaFile.parameter.fullname} is now {week}");
                 ExtendedSave.SetExtendedDataById(chaFile, PregnancyPlugin.GUID, pd.Save());
             }
         }

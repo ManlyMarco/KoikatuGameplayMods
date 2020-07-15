@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using ExtensibleSaveFormat;
 using KKAPI.MainGame;
 
@@ -7,24 +8,24 @@ namespace KK_Pregnancy
     public static class PregnancyDataUtils
     {
         /// <param name="c">ChaFile to test</param>
-        /// <param name="afterWasDiscovered">The girl knows about it / tested it</param>
-        public static int GetPregnancyWeek(this ChaFileControl c)
+        ///// <param name="afterWasDiscovered">The girl knows about it / tested it</param>
+        public static T GetPregnancyData<T>(this ChaFileControl c, Func<PregnancyData, T> selector)
         {
-            if (c == null) return 0;
+            if (c == null) return default(T);
 
             var d = ExtendedSave.GetExtendedDataById(c, PregnancyPlugin.GUID);
-            if (d == null) return 0;
+            if (d == null) return default(T);
 
-            return PregnancyData.Load(d).Week;
+            return selector(PregnancyData.Load(d));
         }
 
         /// <param name="heroine">Heroine to test</param>
-        /// <param name="afterWasDiscovered">The girl knows about it / tested it</param>
-        public static int GetPregnancyWeek(this SaveData.Heroine heroine)
+        ///// <param name="afterWasDiscovered">The girl knows about it / tested it</param>
+        public static T GetPregnancyData<T>(this SaveData.Heroine heroine, Func<PregnancyData, T> selector)
         {
-            if (heroine == null) return 0;
+            if (heroine == null) return default(T);
 
-            return heroine.GetRelatedChaFiles().Max(GetPregnancyWeek);
+            return heroine.GetRelatedChaFiles().Max(control => GetPregnancyData(control, selector));
         }
 
         public static HeroineStatus GetHeroineStatus(this SaveData.Heroine heroine)
@@ -38,7 +39,7 @@ namespace KK_Pregnancy
                 (heroine.isGirlfriend || heroine.favor >= 90) &&
                 (!heroine.isVirgin || heroine.hCount >= 2 || heroine.intimacy >= 40))
             {
-                var pregnancyWeek = heroine.GetPregnancyWeek();
+                var pregnancyWeek = heroine.GetPregnancyData(data => data.Week);
                 if (PregnancyPlugin.ShowPregnancyIconEarly.Value ? pregnancyWeek > 0 : pregnancyWeek > 1
                 ) //todo show it later
                     return HeroineStatus.Pregnant;

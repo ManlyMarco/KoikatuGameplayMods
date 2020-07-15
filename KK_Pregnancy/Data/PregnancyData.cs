@@ -9,20 +9,44 @@ namespace KK_Pregnancy
         public static readonly float DefaultFertility = 0.3f;
 
         /// <summary>
-        /// Week at which pregnancy reaches max level and the girl leaves school
+        /// Week at which pregnancy reaches max level and the character leaves school
         /// </summary>
         public static readonly int LeaveSchoolWeek = 41;
 
         /// <summary>
-        /// Week at which pregnancy ends and the girl returns to school
+        /// Week at which pregnancy ends and the character returns to school
         /// </summary>
         public static readonly int ReturnToSchoolWeek = LeaveSchoolWeek + 7;
 
         #region Names of these are important, used as dictionary keys
+
+        /// <summary>
+        /// The character is harder to get pregnant.
+        /// </summary>
         public float Fertility;
+
+        /// <summary>
+        /// Should any gameplay code be executed for this character.
+        /// If false the current pregnancy week doesn't change and the character can't get pregnant.
+        /// </summary>
         public bool GameplayEnabled;
+
         public MenstruationSchedule MenstruationSchedule;
+
+        /// <summary>
+        /// If 0 or negative, the character is not pregnant.
+        /// If between 0 and <see cref="LeaveSchoolWeek"/> the character is pregnant and the belly is proportionately sized.
+        /// If equal or above <see cref="LeaveSchoolWeek"/> the character is on a maternal leave until <see cref="ReturnToSchoolWeek"/>.
+        /// </summary>
         public int Week;
+
+        /// <summary>
+        /// How many times the character was pregnant, including the current one.
+        /// </summary>
+        public int PregnancyCount;
+
+        public int WeeksSinceLastPregnancy;
+
         #endregion
 
         public static PregnancyData Load(PluginData data)
@@ -44,6 +68,12 @@ namespace KK_Pregnancy
                         Console.WriteLine(ex);
                     }
                 }
+            }
+
+            if (result.IsPregnant)
+            {
+                result.WeeksSinceLastPregnancy = 0;
+                if (result.PregnancyCount == 0) result.PregnancyCount = 1;
             }
 
             return result;
@@ -70,7 +100,11 @@ namespace KK_Pregnancy
         public void StartPregnancy()
         {
             if (GameplayEnabled && !IsPregnant)
+            {
                 Week = 1;
+                PregnancyCount++;
+                WeeksSinceLastPregnancy = 0;
+            }
         }
     }
 }

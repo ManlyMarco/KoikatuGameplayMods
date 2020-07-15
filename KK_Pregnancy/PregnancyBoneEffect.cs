@@ -54,7 +54,7 @@ namespace KK_Pregnancy
 
         public override IEnumerable<string> GetAffectedBones(BoneController origin)
         {
-            if (_controller.IsDuringPregnancy() || MakerAPI.InsideMaker || StudioAPI.InsideStudio)
+            if (_controller.Data.IsPregnant || MakerAPI.InsideMaker || StudioAPI.InsideStudio)
                 return _pregnancyFullValues.Keys;
 
             return Enumerable.Empty<string>();
@@ -62,7 +62,7 @@ namespace KK_Pregnancy
 
         public override BoneModifierData GetEffect(string bone, BoneController origin, ChaFileDefine.CoordinateType coordinate)
         {
-            if (_controller.IsDuringPregnancy())
+            if (_controller.Data.IsPregnant)
             {
                 if (_pregnancyFullValues.TryGetValue(bone, out var mod))
                 {

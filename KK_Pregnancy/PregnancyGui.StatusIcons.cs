@@ -116,8 +116,8 @@ namespace KK_Pregnancy
 
                 var status = heroine.GetHeroineStatus();
 
-                var windowHeight = status == HeroineStatus.Unknown || status == HeroineStatus.Pregnant ? 110 : 270;
-                var screenRect = new Rect(pos.x + 30, pos.y - windowHeight / 2, 180, windowHeight);
+                var windowHeight = status == HeroineStatus.Unknown ? 100 : status == HeroineStatus.Pregnant ? 175 : 375;
+                var screenRect = new Rect((int)pos.x + 30, (int)pos.y - windowHeight / 2, 180, windowHeight);
                 IMGUIUtils.DrawSolidBox(screenRect);
                 GUILayout.BeginArea(screenRect, GUI.skin.box);
                 {
@@ -128,11 +128,19 @@ namespace KK_Pregnancy
                         switch (status)
                         {
                             case HeroineStatus.Unknown:
-                                GUILayout.Label("This character didn't tell you their risky day schedule yet.\n\nBecome closer to learn it!");
+                                GUILayout.Label("This character didn't tell you their risky day schedule yet.");
+                                GUILayout.Space(5);
+                                GUILayout.Label("Become closer to learn it!");
                                 break;
 
                             case HeroineStatus.Pregnant:
-                                GUILayout.Label("This character is pregnant.\n\nOver time the character's belly will grow, and at the end they will leave school temporarily.");
+                                GUILayout.Label($"This character is pregnant (on week {heroine.GetPregnancyData(data => data.Week)} / 40).");
+                                GUILayout.Space(5);
+                                GUILayout.Label("The character's body will slowly change, and at the end they will temporarily leave.");
+
+                                GUILayout.Space(5);
+                                var previousPregcount = Mathf.Max(0, heroine.GetPregnancyData(data => data.PregnancyCount) - 1);
+                                GUILayout.Label($"This character was pregnant {previousPregcount} times before.");
                                 break;
 
                             case HeroineStatus.Safe:
@@ -140,7 +148,8 @@ namespace KK_Pregnancy
                                 GUILayout.Label(status == HeroineStatus.Safe
                                     ? "This character is on a safe day, have fun!"
                                     : "This character is on a risky day, be careful!");
-                                GUILayout.Space(5);
+                                //GUILayout.Space(5);
+                                GUILayout.FlexibleSpace();
 
                                 var day = Singleton<Cycle>.Instance.nowWeek;
 
@@ -149,13 +158,22 @@ namespace KK_Pregnancy
 
                                 for (var dayOffset = 1; dayOffset < 7; dayOffset++)
                                 {
-                                    var adjustedDay =
-                                        (Cycle.Week)((int)(day + dayOffset) % Enum.GetValues(typeof(Cycle.Week)).Length);
-                                    var adjustedSafe =
-                                        HFlag.GetMenstruation(
-                                            (byte)((heroine.MenstruationDay + dayOffset) % HFlag.menstruations.Length)) ==
-                                        HFlag.MenstruationType.安全日;
+                                    var adjustedDay = (Cycle.Week)((int)(day + dayOffset) % Enum.GetValues(typeof(Cycle.Week)).Length);
+                                    var adjustedSafe = HFlag.GetMenstruation((byte)((heroine.MenstruationDay + dayOffset) % HFlag.menstruations.Length)) == HFlag.MenstruationType.安全日;
                                     GUILayout.Label($"{adjustedDay}: {(adjustedSafe ? "Safe" : "Risky")}");
+                                }
+
+                                var pregcount = heroine.GetPregnancyData(data => data.PregnancyCount);
+                                if (pregcount > 0)
+                                {
+                                    GUILayout.Space(5);
+                                    GUILayout.Label($"This character was pregnant {pregcount} times.");
+                                }
+                                var timeSincePreg = heroine.GetPregnancyData(data => data.WeeksSinceLastPregnancy);
+                                if (timeSincePreg > 0)
+                                {
+                                    GUILayout.Space(5);
+                                    GUILayout.Label($"Last pregnancy was {timeSincePreg} weeks ago.");
                                 }
                                 break;
 

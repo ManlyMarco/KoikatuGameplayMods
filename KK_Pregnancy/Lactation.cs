@@ -119,8 +119,19 @@ namespace KK_Pregnancy
                 _particleCtrl = particleCtrl ? particleCtrl : throw new ArgumentNullException(nameof(particleCtrl));
 
                 var controller = chaControl.GetComponent<PregnancyCharaController>();
-                MaxMilk = controller != null ? Mathf.Clamp01(controller.Week / 40f) : 0;
+                MaxMilk = GetMilkAmount(controller);
                 CurrentMilk = MaxMilk;
+            }
+
+            private static float GetMilkAmount(PregnancyCharaController controller)
+            {
+                if (controller == null) return 0;
+                var data = controller.Data;
+                // Gradually increase
+                if (data.IsPregnant) return Mathf.Clamp01(data.Week / 40f);
+                // Gradually decrease after pregnancy finishes
+                if (data.PregnancyCount > 0) return 1 - Mathf.Clamp01(data.WeeksSinceLastPregnancy / (40f / PregnancyPlugin.PregnancyProgressionSpeed.Value));
+                return 0;
             }
 
             public bool IsTouchingMune(bool l, bool r)

@@ -54,9 +54,9 @@ namespace KK_Pregnancy
                     if (c.charInfo == null) return 0;
                     var controller = c.charInfo.GetComponent<PregnancyCharaController>();
                     if (controller == null) return 0;
-                    return controller.Week;
+                    return controller.Data.Week;
                 }, 0, 40))
-                .Value.Subscribe(f => { foreach (var ctrl in StudioAPI.GetSelectedControllers<PregnancyCharaController>()) ctrl.Week = Mathf.RoundToInt(f); });
+                .Value.Subscribe(f => { foreach (var ctrl in StudioAPI.GetSelectedControllers<PregnancyCharaController>()) ctrl.Data.Week = Mathf.RoundToInt(f); });
         }
 
         private static void MakerAPI_MakerBaseLoaded(object sender, RegisterSubCategoriesEvent e)
@@ -71,24 +71,24 @@ namespace KK_Pregnancy
             var hintColor = new Color(0.7f, 0.7f, 0.7f);
 
             var gameplayToggle = e.AddControl(new MakerToggle(cat, "Enable pregnancy progression", true, _pluginInstance));
-            gameplayToggle.BindToFunctionController<PregnancyCharaController, bool>(controller => controller.GameplayEnabled, (controller, value) => controller.GameplayEnabled = value);
+            gameplayToggle.BindToFunctionController<PregnancyCharaController, bool>(controller => controller.Data.GameplayEnabled, (controller, value) => controller.Data.GameplayEnabled = value);
 
             e.AddControl(new MakerText("If off, the character can't get pregnant and current pregnancy will stop progressing.", cat, _pluginInstance) { TextColor = hintColor });
 
             var fertilityToggle = e.AddControl(new MakerSlider(cat, "Fertility", 0f, 1f, PregnancyData.DefaultFertility, _pluginInstance));
-            fertilityToggle.BindToFunctionController<PregnancyCharaController, float>(controller => controller.Fertility, (controller, value) => controller.Fertility = value);
+            fertilityToggle.BindToFunctionController<PregnancyCharaController, float>(controller => controller.Data.Fertility, (controller, value) => controller.Data.Fertility = value);
 
             e.AddControl(new MakerText("How likely this character is to get pregnant.", cat, _pluginInstance) { TextColor = hintColor });
 
             var weeksSlider = e.AddControl(new MakerSlider(cat, "Week of pregnancy", 0f, PregnancyData.LeaveSchoolWeek - 1f, 0f, _pluginInstance));
             weeksSlider.ValueToString = f => Mathf.RoundToInt(f).ToString();
             weeksSlider.StringToValue = s => int.Parse(s);
-            weeksSlider.BindToFunctionController<PregnancyCharaController, float>(controller => controller.Week, (controller, value) => controller.Week = Mathf.RoundToInt(value));
+            weeksSlider.BindToFunctionController<PregnancyCharaController, float>(controller => controller.Data.Week, (controller, value) => controller.Data.Week = Mathf.RoundToInt(value));
 
             e.AddControl(new MakerText("If the character is pregnant when added to the game, the pregnancy will continue from this point.", cat, _pluginInstance) { TextColor = hintColor });
 
             var scheduleToggle = e.AddControl(new MakerRadioButtons(cat, _pluginInstance, "Menstruation schedule", "Default", "More risky", "Always safe", "Always risky"));
-            scheduleToggle.BindToFunctionController<PregnancyCharaController, int>(controller => (int)controller.Schedule, (controller, value) => controller.Schedule = (MenstruationSchedule)value);
+            scheduleToggle.BindToFunctionController<PregnancyCharaController, int>(controller => (int)controller.Data.MenstruationSchedule, (controller, value) => controller.Data.MenstruationSchedule = (MenstruationSchedule)value);
 
             e.AddControl(new MakerText("Changes how many risky days the character has in a cycle. Default is more safe days than risky days.", cat, _pluginInstance) { TextColor = hintColor });
         }
