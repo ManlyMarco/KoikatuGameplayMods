@@ -42,8 +42,8 @@ namespace KK_Pregnancy
                 "Allows characters to get pregnant from anal sex. Doesn't affect already pregnant characters.");
 
             ShowPregnancyIconEarly = Config.Bind("General", "Show pregnancy icon early", false,
-                "By default pregnancy status icon in class roster is shown after a few days (the girl had a chance to do the test). " +
-                "Turning this on will make the icon show up at the end of the current day.");
+                "By default pregnancy status icon in class roster is shown after a few days or weeks (the character had a chance to do the test or noticed something is wrong).\n" +
+                "Turning this on will always make the icon show up at the end of the current day.");
 
             HSceneMenstrIconOverride = Config.Bind("General", "Use custom safe/risky icons in H Scenes", true,
                 "Replaces the standard safe/risky indicators with custom indicators that can also show pregnancy and unknown status. " +

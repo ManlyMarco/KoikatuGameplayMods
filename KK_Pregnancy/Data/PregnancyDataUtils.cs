@@ -7,6 +7,9 @@ namespace KK_Pregnancy
 {
     public static class PregnancyDataUtils
     {
+        private static readonly int[] _earlyDetectPersonalities = { 00, 11, 12, 13, 19, 24, 31, 33 };
+        private static readonly int[] _lateDetectPersonalities = { 03, 05, 08, 20, 25, 26, 37 };
+
         /// <param name="c">ChaFile to test</param>
         ///// <param name="afterWasDiscovered">The girl knows about it / tested it</param>
         public static T GetPregnancyData<T>(this ChaFileControl c, Func<PregnancyData, T> selector)
@@ -40,9 +43,23 @@ namespace KK_Pregnancy
                 (!heroine.isVirgin || heroine.hCount >= 2 || heroine.intimacy >= 40))
             {
                 var pregnancyWeek = heroine.GetPregnancyData(data => data.Week);
-                if (PregnancyPlugin.ShowPregnancyIconEarly.Value ? pregnancyWeek > 0 : pregnancyWeek > 1
-                ) //todo show it later
-                    return HeroineStatus.Pregnant;
+                if (pregnancyWeek > 0)
+                {
+                    if (PregnancyPlugin.ShowPregnancyIconEarly.Value) return HeroineStatus.Pregnant;
+                    // Different personalities notice at different times
+                    if (_earlyDetectPersonalities.Contains(heroine.personality))
+                    {
+                        if (pregnancyWeek > 1) return HeroineStatus.Pregnant;
+                    }
+                    else if (_lateDetectPersonalities.Contains(heroine.personality))
+                    {
+                        if (pregnancyWeek > 11) return HeroineStatus.Pregnant;
+                    }
+                    else
+                    {
+                        if (pregnancyWeek > 5) return HeroineStatus.Pregnant;
+                    }
+                }
 
                 return HFlag.GetMenstruation(heroine.MenstruationDay) == HFlag.MenstruationType.安全日
                     ? HeroineStatus.Safe
