@@ -81,16 +81,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\HeroineStatus.cs" />
-    <Compile Include="Lactation.cs" />
+    <Compile Include="LactationController.cs" />
     <Compile Include="Data\MenstruationSchedule.cs" />
     <Compile Include="PregnancyBoneEffect.cs" />
     <Compile Include="PregnancyCharaController.cs" />
     <Compile Include="Data\PregnancyData.cs" />
     <Compile Include="Data\PregnancyDataUtils.cs" />
     <Compile Include="PregnancyGameController.cs" />
-    <Compile Include="PregnancyGui.cs" />
-    <Compile Include="PregnancyGui.HSceneMenstrIconOverride.cs" />
-    <Compile Include="PregnancyGui.StatusIcons.cs" />
+    <Compile Include="GUI\PregnancyGui.cs" />
+    <Compile Include="GUI\PregnancyGui.HSceneMenstrIconOverride.cs" />
+    <Compile Include="GUI\PregnancyGui.StatusIcons.cs" />
     <Compile Include="PregnancyPlugin.cs" />
     <Compile Include="PregnancyPlugin.Hooks.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
