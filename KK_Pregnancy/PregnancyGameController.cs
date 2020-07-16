@@ -152,7 +152,7 @@ namespace KK_Pregnancy
 
                     //Logger.Log(LogLevel.Debug, $"Preg - pregnancy week for {chaFile.parameter.fullname} is now {week}");
                 }
-                else
+                else if(pd.PregnancyCount > 0)
                 {
                     pd.WeeksSinceLastPregnancy++;
                 }
