@@ -43,7 +43,7 @@ namespace KK_Pregnancy
                 (!heroine.isVirgin || heroine.hCount >= 2 || heroine.intimacy >= 40))
             {
                 var pregnancyWeek = heroine.GetPregnancyData(data => data.Week);
-                if (pregnancyWeek > 0)
+                if (pregnancyWeek > 0 && pregnancyWeek < PregnancyData.LeaveSchoolWeek) //todo add an extra state for the leave
                 {
                     if (PregnancyPlugin.ShowPregnancyIconEarly.Value) return HeroineStatus.Pregnant;
                     // Different personalities notice at different times
