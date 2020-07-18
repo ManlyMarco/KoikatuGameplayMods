@@ -64,8 +64,8 @@
       <HintPath>..\packages\IllusionModdingAPI.KKAPI.1.12.3\lib\net35\KKAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Sirenix.Serialization">
-      <HintPath>..\..\ManlyMarco\KK-HF_Patch\Input\_Patch\Remote\Patches\koikatu_02plus_cdp0201hbtks_kk\Koikatu_Data\Managed\Sirenix.Serialization.dll</HintPath>
+    <Reference Include="Sirenix.Serialization, Version=1.0.5.1, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\IllusionLibs.Koikatu.Sirenix.Serialization.2019.4.27\lib\net35\Sirenix.Serialization.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
