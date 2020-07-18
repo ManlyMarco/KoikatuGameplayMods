@@ -67,8 +67,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MobAdder.cs" />
+    <Compile Include="MobAdderPlugin.cs" />
+    <Compile Include="MobManager.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="SpawnedMobInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="KK_MobAdder_MobPositions.csv">
