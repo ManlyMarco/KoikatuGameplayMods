@@ -6,16 +6,18 @@ using System.Linq;
 using ActionGame;
 using BepInEx;
 using BepInEx.Configuration;
+using HarmonyLib;
 using Illusion.Component.Correct;
+using KKAPI.MainGame;
+using StrayTech;
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.Rendering;
 using UnityEngine.SceneManagement;
+using Random = UnityEngine.Random;
 
 namespace KK_MobAdder
 {
-    // todo add background noise when many mobs are in
-    // todo add static colliders so mobs cant be pathed around
-    // todo add dynamic colliders to charas so they don't go through each other
     [BepInPlugin(GUID, "Add mob characters to roam mode", Version)]
     [BepInProcess(GameProcessName)]
     [BepInProcess(GameProcessNameSteam)]
@@ -30,8 +32,7 @@ namespace KK_MobAdder
         /// <summary>
         /// Character animation state names to pick from
         /// </summary>
-        private static string[] _charaStateNames = new string[]
-        {
+        private static readonly string[] _charaStateNames = {
                 "Idle",
                 "talk",
                 //"defense",
@@ -74,16 +75,36 @@ namespace KK_MobAdder
                 "Sport6"
         };
 
-        private static string CsvLocationPositions = Path.Combine(Path.GetDirectoryName(typeof(MobAdder).Assembly.Location), "KK_MobAdder_MobPositions.csv");
-        private static string CsvLocationSpread = Path.Combine(Path.GetDirectoryName(typeof(MobAdder).Assembly.Location), "KK_MobAdder_MobSpread.csv");
+        private static readonly string _csvLocationPositions = Path.Combine(Path.GetDirectoryName(typeof(MobAdder).Assembly.Location), "KK_MobAdder_MobPositions.csv");
+        private static readonly string _csvLocationSpread = Path.Combine(Path.GetDirectoryName(typeof(MobAdder).Assembly.Location), "KK_MobAdder_MobSpread.csv");
 
-        private static Dictionary<int, List<KeyValuePair<Vector3, Quaternion>>> _mobPositionData = new Dictionary<int, List<KeyValuePair<Vector3, Quaternion>>>();
-        private static Dictionary<int, float[]> _mobSpreadData = new Dictionary<int, float[]>();
+        private static readonly Dictionary<int, List<KeyValuePair<Vector3, Quaternion>>> _mobPositionData = new Dictionary<int, List<KeyValuePair<Vector3, Quaternion>>>();
+        private static readonly Dictionary<int, float[]> _mobSpreadData = new Dictionary<int, float[]>();
 
-        private static MaterialPropertyBlock _mobColorProperty = new MaterialPropertyBlock();
+        private static readonly MaterialPropertyBlock _mobColorProperty = new MaterialPropertyBlock();
         private static GameObject _mobTemplate;
-        private static List<GameObject> _spawnedMobs = new List<GameObject>();
-        private static int lastLoadedMapNo = -1;
+
+        private sealed class SpawnedMobInfo
+        {
+            public readonly GameObject Object;
+            public readonly Vector3 InitialPosition;
+            public readonly Quaternion InitialRotation;
+
+            public void ResetPosAndRot()
+            {
+                Object.transform.SetPositionAndRotation(InitialPosition, InitialRotation);
+            }
+
+            public SpawnedMobInfo(GameObject o, Vector3 initialPosition, Quaternion initialRotation)
+            {
+                Object = o;
+                InitialPosition = initialPosition;
+                InitialRotation = initialRotation;
+            }
+        }
+
+        private static readonly List<SpawnedMobInfo> _spawnedMobs = new List<SpawnedMobInfo>();
+        private static int _lastLoadedMapNo = -1;
 
         private ConfigEntry<KeyboardShortcut> _spawnMobKey;
         private ConfigEntry<KeyboardShortcut> _saveMobPositionDataKey;
@@ -97,7 +118,7 @@ namespace KK_MobAdder
             }
             catch (Exception ex)
             {
-                Logger.LogError($"Failed to read .csv files with mob data: " + ex);
+                Logger.LogError($"Failed to read .csv files with mob data: {ex}");
                 _mobPositionData.Clear();
                 enabled = false;
                 return;
@@ -108,6 +129,71 @@ namespace KK_MobAdder
             _mobAmountModifier = Config.Bind("General", "Mob amount modifier", 1f, new ConfigDescription("How many mobs should be spawned compared to the default (1x). 0x will disable mob spawning.", new AcceptableValueRange<float>(0, 1.5f)));
 
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
+            GameAPI.StartH += GameAPI_StartH;
+            GameAPI.EndH += GameAPI_EndH;
+            Harmony.CreateAndPatchAll(typeof(MobAdder));
+        }
+
+        /// <summary>
+        /// Triggers when changing location in h scenes
+        /// </summary>
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(HSceneProc), nameof(HSceneProc.ChangeCategory))]
+        private static void HLocationChangeHook(HSceneProc __instance, List<ChaControl> ___lstFemale)
+        {
+            var hsceneCenterPoint = ___lstFemale[0].transform.position;
+            GatherMobsAroundPoint(hsceneCenterPoint);
+        }
+
+        private static void GatherMobsAroundPoint(Vector3 centerPoint)
+        {
+            var usedPositions = new HashSet<Vector3>();
+            bool RandomPoint(out Vector3 result)
+            {
+                const float range = 1.75f;
+                for (int i = 0; i < 30; i++)
+                {
+                    var onUnitSphere = Random.onUnitSphere;
+                    onUnitSphere.y = 0;
+                    onUnitSphere.Normalize();
+                    Vector3 randomPoint = centerPoint + onUnitSphere * (range + (1 - Random.value) * 0.8f);
+                    if (NavMesh.SamplePosition(randomPoint, out var hit, 0.5f, NavMesh.AllAreas))
+                    {
+                        result = hit.position;
+                        if (usedPositions.All(x => Vector3.Distance(hit.position, x) > 0.3f))
+                            return true;
+                    }
+                }
+
+                result = Vector3.zero;
+                return false;
+            }
+
+            foreach (var spawnedMob in _spawnedMobs)
+            {
+                if (Vector3.Distance(spawnedMob.InitialPosition, centerPoint) < 10)
+                {
+                    if (RandomPoint(out var mobPos))
+                    {
+                        spawnedMob.Object.transform.position = mobPos;
+                        spawnedMob.Object.transform.LookAtXZ(centerPoint);
+                        usedPositions.Add(mobPos);
+                        continue;
+                    }
+                }
+                spawnedMob.ResetPosAndRot();
+            }
+        }
+
+        private void GameAPI_EndH(object sender, EventArgs e)
+        {
+            foreach (var spawnedMob in _spawnedMobs) spawnedMob.ResetPosAndRot();
+        }
+
+        private void GameAPI_StartH(object sender, EventArgs e)
+        {
+            var initialPos = FindObjectOfType<HScene>().GetComponentInChildren<ChaControl>().transform.position;
+            GatherMobsAroundPoint(initialPos);
         }
 
         private void Update()
@@ -126,8 +212,8 @@ namespace KK_MobAdder
                         if (toRemove.Length == 1)
                         {
                             list.Remove(toRemove[0]);
-                            var spawned = _spawnedMobs.FirstOrDefault(x => x.transform.position == toRemove[0].Key);
-                            Destroy(spawned);
+                            var spawned = _spawnedMobs.FirstOrDefault(x => x.Object.transform.position == toRemove[0].Key);
+                            Destroy(spawned?.Object);
                         }
                         Logger.LogMessage("Removed mob at " + toRemove[0].Key);
                     }
@@ -146,7 +232,7 @@ namespace KK_MobAdder
 
         private GameObject SpawnMob(Vector3 position, Quaternion rotation, bool log, int no)
         {
-            var copy = Instantiate(_mobTemplate);
+            var copy = Instantiate(_mobTemplate, Manager.Game.Instance.actScene.Map.mapRoot.transform);
 
             copy.transform.SetPositionAndRotation(position, rotation);
             copy.SetActive(true);
@@ -163,9 +249,7 @@ namespace KK_MobAdder
 
             if (log) Logger.LogMessage($"Added a mob: mapno:{no} anim:{stateName} scale:{hBone.localScale} pos:{position} rot:{rotation}");
 
-            _spawnedMobs.Add(copy);
-
-            copy.transform.SetParent(Manager.Game.Instance.actScene.Map.mapRoot.transform);
+            _spawnedMobs.Add(new SpawnedMobInfo(copy, position, rotation));
 
             return copy;
         }
@@ -228,7 +312,8 @@ namespace KK_MobAdder
                 if (c is Animator || c is Transform)
                     continue;
 
-                // Delay these because other components rely on them so they have to be removed later
+                // Get rid of useless performance-eating scripts
+                // Can't DestroyImmediate these two because other components rely on them so they have to be removed later
                 if (c is BaseData || c is NeckLookCalcVer2)
                     Destroy(c);
                 else
@@ -271,7 +356,7 @@ namespace KK_MobAdder
 
         private static void ReadCsv()
         {
-            foreach (var line in File.ReadAllText(CsvLocationPositions).Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
+            foreach (var line in File.ReadAllText(_csvLocationPositions).Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
             {
                 if (!char.IsDigit(line[0])) continue;
 
@@ -286,9 +371,9 @@ namespace KK_MobAdder
             }
 
             int cycleTypeCount = Enum.GetValues(typeof(Cycle.Type)).Length;
-            if (File.Exists(CsvLocationSpread))
+            if (File.Exists(_csvLocationSpread))
             {
-                foreach (var line in File.ReadAllText(CsvLocationSpread).Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
+                foreach (var line in File.ReadAllText(_csvLocationSpread).Split(new char[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries))
                 {
                     if (!char.IsDigit(line[0])) continue;
 
@@ -324,15 +409,15 @@ namespace KK_MobAdder
 
         private void SaveCsv()
         {
-            if (File.Exists(CsvLocationPositions))
+            if (File.Exists(_csvLocationPositions))
             {
-                File.Delete(CsvLocationPositions + ".bak");
-                File.Move(CsvLocationPositions, CsvLocationPositions + ".bak");
+                File.Delete(_csvLocationPositions + ".bak");
+                File.Move(_csvLocationPositions, _csvLocationPositions + ".bak");
             }
 
-            Logger.LogMessage("Writing mob positions to " + CsvLocationPositions);
+            Logger.LogMessage("Writing mob positions to " + _csvLocationPositions);
 
-            using (var f = File.OpenWrite(CsvLocationPositions))
+            using (var f = File.OpenWrite(_csvLocationPositions))
             using (var w = new StreamWriter(f))
             {
                 w.WriteLine($"MapNo, PosX, PosY, PosZ, RotX, RotY, RotZ");
@@ -342,15 +427,15 @@ namespace KK_MobAdder
 
             if (!Input.GetKey(KeyCode.LeftShift)) return;
 
-            if (File.Exists(CsvLocationSpread))
+            if (File.Exists(_csvLocationSpread))
             {
-                File.Delete(CsvLocationSpread + ".bak");
-                File.Move(CsvLocationSpread, CsvLocationSpread + ".bak");
+                File.Delete(_csvLocationSpread + ".bak");
+                File.Move(_csvLocationSpread, _csvLocationSpread + ".bak");
             }
 
-            Logger.LogMessage("Writing mob spread to " + CsvLocationSpread);
+            Logger.LogMessage("Writing mob spread to " + _csvLocationSpread);
 
-            using (var f = File.OpenWrite(CsvLocationSpread))
+            using (var f = File.OpenWrite(_csvLocationSpread))
             using (var w = new StreamWriter(f))
             {
                 w.WriteLine($"MapNo, {string.Join(", ", Enum.GetNames(typeof(Cycle.Type)))}");
@@ -388,7 +473,7 @@ namespace KK_MobAdder
             try
             {
                 var currentMap = GetCurrentMapNo();
-                if (lastLoadedMapNo == currentMap) return;
+                if (_lastLoadedMapNo == currentMap) return;
 
                 StartCoroutine(OnSceneChange(currentMap, arg0.name));
             }
@@ -421,10 +506,10 @@ namespace KK_MobAdder
             yield return null;
 
             // Clean up previous spawns
-            foreach (var mob in _spawnedMobs) Destroy(mob);
+            foreach (var mob in _spawnedMobs) Destroy(mob.Object);
             _spawnedMobs.Clear();
 
-            lastLoadedMapNo = currentMap;
+            _lastLoadedMapNo = currentMap;
 
             if (currentMap < 0) yield break;
 
