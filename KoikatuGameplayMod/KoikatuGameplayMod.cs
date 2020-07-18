@@ -10,12 +10,15 @@ using UnityEngine;
 namespace KoikatuGameplayMod
 {
     [BepInPlugin(GUID, "Koikatu Gameplay Tweaks and Improvements", Version)]
-    [BepInDependency(KoikatuAPI.GUID)]
+    [BepInProcess(GameProcessName)]
+    [BepInProcess(GameProcessNameSteam)]
     [BepInDependency(KoikatuAPI.GUID, "1.12")]
     public class KoikatuGameplayMod : BaseUnityPlugin
     {
         public const string GUID = "marco-gameplaymod";
         internal const string Version = "1.4.2";
+        private const string GameProcessName = "Koikatu";
+        private const string GameProcessNameSteam = "Koikatsu Party";
 
         public static ConfigEntry<bool> ForceInsert { get; set; }
         public static ConfigEntry<bool> ForceInsertAnger { get; set; }
