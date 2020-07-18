@@ -184,6 +184,11 @@ namespace KK_MobAdder
                     {
                         result = r;
                         r.transform.parent.gameObject.SetActive(true);
+
+                        // Change to map layer to fix appearing on top of everything in talk scenes
+                        r.gameObject.layer = 11;
+                        r.receiveShadows = false;
+                        r.shadowCastingMode = ShadowCastingMode.Off;
                     }
                     else
                     {
