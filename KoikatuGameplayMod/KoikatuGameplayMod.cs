@@ -130,31 +130,12 @@ namespace KoikatuGameplayMod
         {
             if (!DecreaseLewd.Value) return;
 
-            var flags = hSprite.flags;
-            var count = flags.count;
             var heroine = Utilities.GetTargetHeroine(hSprite);
             if (heroine == null) return;
 
-            if (flags.GetOrgCount() == 0)
-            {
-                var massageTotal = (int)(count.selectAreas.Sum() / 4 + (+count.kiss + count.houshiOutside + count.houshiInside) * 10);
-                if (massageTotal <= 5)
-                    heroine.lewdness = Math.Max(0, heroine.lewdness - 30);
-                else
-                    heroine.lewdness = Math.Min(100, heroine.lewdness + massageTotal);
-            }
-            else if (count.aibuOrg > 0 && count.sonyuOrg + count.sonyuAnalOrg == 0)
-            {
-                heroine.lewdness = Math.Min(100, heroine.lewdness - (count.aibuOrg - 1) * 20);
-            }
-            else
-            {
-                int cumCount = count.sonyuCondomInside + count.sonyuInside + count.sonyuOutside + count.sonyuAnalCondomInside + count.sonyuAnalInside + count.sonyuAnalOutside;
-                if (cumCount > 0)
-                    heroine.lewdness = Math.Max(0, heroine.lewdness - cumCount * 20);
-
-                heroine.lewdness = Math.Max(0, heroine.lewdness - count.aibuOrg * 20);
-            }
+            var orgCount = hSprite.flags.GetOrgCount();
+            if (orgCount == 0) orgCount = -hSprite.flags.GetInsideAndOutsideCount(); // Increase lewdness if girl didn't org but guy did
+            heroine.lewdness = Mathf.Clamp(heroine.lewdness - orgCount * 40, 0, 100);
         }
     }
 }
