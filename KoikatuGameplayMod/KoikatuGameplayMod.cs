@@ -6,6 +6,8 @@ using HarmonyLib;
 using KKAPI;
 using Manager;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using Scene = Manager.Scene;
 
 namespace KoikatuGameplayMod
 {
@@ -64,12 +66,24 @@ namespace KoikatuGameplayMod
             FastTravelCostHooks.ApplyHooks(i);
             if (AdjustBreastSizeQuestion.Value)
                 BustSizeQuestionHooks.ApplyHooks(i);
-            
+
             _gameMgr = Game.Instance;
             _sceneMgr = Scene.Instance;
 
-            // todo replace with scene load?
-            InvokeRepeating(nameof(SlowUpdate), 2f, 0.5f);
+            SceneManager.sceneLoaded += (arg0, mode) =>
+            {
+                if (arg0.name != "MyRoom" || Singleton<Scene>.Instance.LoadSceneName == "H")
+                {
+                    _inNightMenu = false;
+                }
+                else
+                {
+                    if (!_inNightMenu && !_firstNightMenu)
+                        OnNightStarted();
+                    _inNightMenu = true;
+                    _firstNightMenu = false;
+                }
+            };
         }
 
         // Start as false to prevent firing after loading
@@ -108,24 +122,6 @@ namespace KoikatuGameplayMod
                         heroine.countNamaInsert = Mathf.Min(heroine.countNamaInsert, 2);
                     else
                         heroine.countNamaInsert = Mathf.Min(heroine.countNamaInsert, 4);
-                }
-            }
-        }
-
-        private void SlowUpdate()
-        {
-            if (!_gameMgr.saveData.isOpening && !_sceneMgr.IsNowLoading)
-            {
-                if (_sceneMgr.NowSceneNames.Any(x => x.Equals("NightMenu", StringComparison.Ordinal)))
-                {
-                    if (!_inNightMenu && !_firstNightMenu)
-                        OnNightStarted();
-                    _inNightMenu = true;
-                    _firstNightMenu = false;
-                }
-                else
-                {
-                    _inNightMenu = false;
                 }
             }
         }
