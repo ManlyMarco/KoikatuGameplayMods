@@ -3,13 +3,13 @@ using UnityEngine;
 
 namespace KoikatuGameplayMod
 {
-    internal static class ExitFirstHHooks
+    internal static class HSceneHooks
     {
         private static HSceneProc _hproc;
 
         public static void ApplyHooks(Harmony instance)
         {
-            instance.PatchAll(typeof(ExitFirstHHooks));
+            instance.PatchAll(typeof(HSceneHooks));
         }
 
         #region Keep first time status if chara is still a virgin

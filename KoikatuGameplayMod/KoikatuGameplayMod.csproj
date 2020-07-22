@@ -32,7 +32,7 @@
   <ItemGroup>
     <Compile Include="Hooks\BustSizeQuestionHooks.cs" />
     <Compile Include="Hooks\ClassCharaLimitUnlockHooks.cs" />
-    <Compile Include="Hooks\ExitFirstHHooks.cs" />
+    <Compile Include="Hooks\HSceneHooks.cs" />
     <Compile Include="Hooks\FastTravelCostHooks.cs" />
     <Compile Include="Hooks\ForceInsertHooks.cs" />
     <Compile Include="KoikatuGameplayMod.cs" />

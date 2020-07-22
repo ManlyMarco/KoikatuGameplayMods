@@ -57,7 +57,7 @@ namespace KoikatuGameplayMod
 
             // H Scene functions
             ForceInsertHooks.ApplyHooks(i);
-            ExitFirstHHooks.ApplyHooks(i);
+            HSceneHooks.ApplyHooks(i);
             if (DisableTrapVagInsert.Value)
                 TrapNoVagInsertHooks.ApplyHooks(i);
 
