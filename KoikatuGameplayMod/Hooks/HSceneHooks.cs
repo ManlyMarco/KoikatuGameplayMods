@@ -1,12 +1,13 @@
-﻿using HarmonyLib;
+﻿using System;
+using System.Collections.Generic;
+using System.Reflection.Emit;
+using HarmonyLib;
 using UnityEngine;
 
 namespace KoikatuGameplayMod
 {
     internal static class HSceneHooks
     {
-        private static HSceneProc _hproc;
-
         public static void ApplyHooks(Harmony instance)
         {
             instance.PatchAll(typeof(HSceneHooks));
@@ -74,21 +75,28 @@ namespace KoikatuGameplayMod
 
         #endregion
 
-        [HarmonyPrefix]
-        [HarmonyPatch(typeof(ChaFileStatus), nameof(ChaFileStatus.visibleBodyAlways), MethodType.Setter)]
-        public static void MaleVisibleOverride(ChaFileStatus __instance, ref bool value)
+        [HarmonyTranspiler]
+        [HarmonyPatch(typeof(HHoushi), nameof(HHoushi.Proc))]
+        [HarmonyPatch(typeof(HSonyu), nameof(HSonyu.Proc))]
+        public static IEnumerable<CodeInstruction> MaleVisibleOverrideTpl(IEnumerable<CodeInstruction> instructions)
         {
-            // Make sure to only work in h scenes
-            // Prevent expensive FindObjectOfType with extra checks beforehand
-            if (value || !KoikatuGameplayMod.DontHidePlayerWhenTouching.Value) return;
-            if (Manager.Scene.Instance.AddSceneName != "HProc") return;
-            if (_hproc == null) _hproc = Object.FindObjectOfType<HSceneProc>();
-            if (_hproc != null)
+            var target = AccessTools.Method(typeof(HActionBase), "IsBodyTouch") ?? throw new ArgumentNullException("HActionBase.IsBodyTouch)");
+            var replacement = AccessTools.Method(typeof(HSceneHooks), nameof(HSceneHooks.IsBodyTouchOverride)) ?? throw new ArgumentNullException("HSceneHooks.CanHide");
+            
+            foreach (var codeInstruction in instructions)
             {
-                var m = Traverse.Create(_hproc).Field<ChaControl>("male").Value;
-                if (m.fileStatus == __instance)
-                    value = true;
+                yield return codeInstruction;
+
+                if (codeInstruction.operand == target)
+                {
+                    yield return new CodeInstruction(OpCodes.Call, replacement);
+                }
             }
+        }
+
+        public static bool IsBodyTouchOverride(bool isTouch)
+        {
+            return isTouch && !KoikatuGameplayMod.DontHidePlayerWhenTouching.Value;
         }
     }
 }
