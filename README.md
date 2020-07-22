@@ -9,11 +9,16 @@ Plugin that tweaks and (hopefully) improves Koikatu gameplay.
 - Everyone's levdness drops naturally, needs to be built back up.
 - Stats slowly fall, need to be worked on even after maxxing.
 - Fast travel with F3 now costs time.
+- Prevent hiding of player body when touching in H scenes.
 
 **Warning:** Setting the character limit above 38 requires a large amount of RAM and will extend loading times. To load 99 characters the game will need approximately 10GB of free RAM (depending on the characters used).
+**Warning:** Compatibility with kPlug is shaky at best. You might be able to get both plugins to work at the same time but I can't check the compatibility and I'm unable to fix any compatibility issues that aren't caused by issues in this plugin.
 
-### Requirements
-Works under BepInEx with Harmony. Needs latest BepisPlugins - universal ConfigurationManager is used for mod settings.
+### How to install
+1. Make sure you have at least BepInEx 5.1 and latest BepisPlugins and KKAPI.
+2. Download the latest release.
+3. Extract the archive into your game directory. The plugin .dll should end up inside your BepInEx\plugins directory.
+4. Check if there are no warnings on game startup, GameplayMod options should appear in plugin settings. You can turn off the functions you don't need.
 
 ![preview](https://user-images.githubusercontent.com/39247311/50426454-0c860a00-088e-11e9-85d0-493db814cc48.png)
 
@@ -43,7 +48,7 @@ Plugin that allows using of the orthographic (parallel projection) camera mode. 
 - Place the .dll inside your `BepInEx\plugins` folder.
 - To toggle between perspective (normal) and orthographic camera mode press the I key (can be changed in settings) and then use your mouse scroll wheel to zoom in and out.
 
-![Preview](https://user-images.githubusercontent.com/39247311/55674510-07395200-58b6-11e9-8b85-d15f8fab54fa.png)
+![preview](https://user-images.githubusercontent.com/39247311/59981520-dd661080-9604-11e9-9b2b-eefbd1a1a66b.png)
 
 # KK_MobAdder
 This plugin adds random mob characters across maps in story mode in order to make it feel less vacant. The mobs have simple animations, no annoying sounds and don't move from their spots - they are purely for decoration.
@@ -69,7 +74,7 @@ Works under BepInEx with Harmony. Needs latest BepisPlugins - universal Configur
 ![Preview](https://user-images.githubusercontent.com/39247311/55674510-07395200-58b6-11e9-8b85-d15f8fab54fa.png)
 
 # Compiling
-Simply clone this repository to your drive and use the free version of Visual Studio 2019 for C# to compile it. Keep in mind that you might need to fix references by pointing at some of your game files. Check the following links for useful tutorials. If you are having trouble or want to try to make your own plugin/mod, feel free to ask for help in modding channels of either the [Koikatsu](https://discord.gg/hevygx6) or [IllusionSoft](https://discord.gg/F3bDEFE) Discord servers.
+Simply clone this repository to your drive and use the free version of Visual Studio 2019 for C# to compile it. Hit build and all necessary dependencies should be automatically downloaded. Check the following links for useful tutorials. If you are having trouble or want to try to make your own plugin/mod, feel free to ask for help in modding channels of either the [Koikatsu](https://discord.gg/hevygx6) or [IllusionSoft](https://discord.gg/F3bDEFE) Discord servers.
 - https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository
 - https://docs.microsoft.com/en-us/visualstudio/get-started/csharp/?view=vs-2019
 - https://docs.microsoft.com/en-us/visualstudio/ide/troubleshooting-broken-references?view=vs-2019
