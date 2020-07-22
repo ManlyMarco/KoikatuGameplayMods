@@ -11,9 +11,13 @@ Plugin that tweaks and (hopefully) improves Koikatu gameplay.
 - Fast travel with F3 now costs time.
 
 **Warning:** Setting the character limit above 38 requires a large amount of RAM and will extend loading times. To load 99 characters the game will need approximately 10GB of free RAM (depending on the characters used).
+**Warning:** Compatibility with kPlug is shaky at best. You might be able to get both plugins to work at the same time but I can't check the compatibility and I'm unable to fix any compatibility issues that aren't caused by issues in this plugin.
 
-### Requirements
-Works under BepInEx with Harmony. Needs latest BepisPlugins - universal ConfigurationManager is used for mod settings.
+### How to install
+1. Make sure you have at least BepInEx 5.1 and latest BepisPlugins and KKAPI.
+2. Download the latest release.
+3. Extract the archive into your game directory. The plugin .dll should end up inside your BepInEx\plugins directory.
+4. Check if there are no warnings on game startup, GameplayMod options should appear in plugin settings. You can turn off the functions you don't need.
 
 ![preview](https://user-images.githubusercontent.com/39247311/50426454-0c860a00-088e-11e9-85d0-493db814cc48.png)
 
