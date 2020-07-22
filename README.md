@@ -73,7 +73,7 @@ Works under BepInEx with Harmony. Needs latest BepisPlugins - universal Configur
 ![Preview](https://user-images.githubusercontent.com/39247311/55674510-07395200-58b6-11e9-8b85-d15f8fab54fa.png)
 
 # Compiling
-Simply clone this repository to your drive and use the free version of Visual Studio 2019 for C# to compile it. Keep in mind that you might need to fix references by pointing at some of your game files. Check the following links for useful tutorials. If you are having trouble or want to try to make your own plugin/mod, feel free to ask for help in modding channels of either the [Koikatsu](https://discord.gg/hevygx6) or [IllusionSoft](https://discord.gg/F3bDEFE) Discord servers.
+Simply clone this repository to your drive and use the free version of Visual Studio 2019 for C# to compile it. Hit build and all necessary dependencies should be automatically downloaded. Check the following links for useful tutorials. If you are having trouble or want to try to make your own plugin/mod, feel free to ask for help in modding channels of either the [Koikatsu](https://discord.gg/hevygx6) or [IllusionSoft](https://discord.gg/F3bDEFE) Discord servers.
 - https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository
 - https://docs.microsoft.com/en-us/visualstudio/get-started/csharp/?view=vs-2019
 - https://docs.microsoft.com/en-us/visualstudio/ide/troubleshooting-broken-references?view=vs-2019
