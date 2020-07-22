@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Linq;
 using BepInEx;
 using BepInEx.Configuration;
 using HarmonyLib;
@@ -7,6 +6,7 @@ using KKAPI;
 using Manager;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Random = UnityEngine.Random;
 using Scene = Manager.Scene;
 
 namespace KoikatuGameplayMod
@@ -24,36 +24,34 @@ namespace KoikatuGameplayMod
 
         public static ConfigEntry<bool> ForceInsert { get; set; }
         public static ConfigEntry<bool> ForceInsertAnger { get; set; }
-        public static ConfigEntry<bool> DecreaseLewd { get; set; }
+        public static ConfigEntry<bool> ChangeLewdAfterH { get; set; }
         public static ConfigEntry<bool> DisableTrapVagInsert { get; set; }
 
         public static ConfigEntry<bool> StatDecay { get; set; }
-        public static ConfigEntry<bool> LewdDecay { get; set; }
+        public static ConfigEntry<bool> ChangeLewdDaily { get; set; }
         public static ConfigEntry<bool> ResetNoCondom { get; set; }
         public static ConfigEntry<int> FastTravelTimePenalty { get; set; }
         public static ConfigEntry<bool> AdjustBreastSizeQuestion { get; set; }
 
-        private Game _gameMgr;
-        private Scene _sceneMgr;
 
         private void Start()
         {
             var hScene = "H Scene tweaks";
             ForceInsert = Config.Bind(hScene, "Allow force insert", true, "Can insert raw even if it's denied.\nTo force insert - click on the blue insert button right after being denied, after coming outside, or after making her come multiple times. Other contitions might apply.");
-            ForceInsertAnger = Config.Bind(hScene, "Force insert causes anger", true, "If you cum inside on or force insert too many times the girl will get angry with you.\nWhen enabled girl's expression changes during H (if forced).");
-            DecreaseLewd = Config.Bind(hScene, "Decrease lewdness after H", false, "Decreases girl's H bar after an H scene.");
+            ForceInsertAnger = Config.Bind(hScene, "Force insert causes anger", true, "If you cum inside on or force insert too many times the heroine will get angry with you.\nWhen enabled heroine's expression changes during H (if forced).");
+            ChangeLewdAfterH = Config.Bind(hScene, "Change lewdness after H", false, "Decreases heroine's H bar after an H scene if satisfied, increases the bar if not.");
             DisableTrapVagInsert = Config.Bind(hScene, "Disable vaginal insert for traps/men", true, "Only works if you use UncensorSelector to give a female card a penis but no vagina in maker. Some positions don't have the anal option so you won't be able to insert at all in them.\nChanges take effect after game restart.");
 
-            ResetNoCondom = Config.Bind(hScene, "Make experienced girls ask for condom", true, "If enabled, sometimes a girl will refuse raw insert on dangerous day until the second insert (once per day).\nIf disabled the default game logic is used (girl will never refuse if you did raw 5 times or more in total.)");
+            ResetNoCondom = Config.Bind(hScene, "Make experienced girls ask for condom", true, "If enabled, sometimes a heroine will refuse raw insert on dangerous day until the second insert (once per day).\nIf disabled the default game logic is used (girl will never refuse if you did raw 5 times or more in total.)");
             var mainGame = "Main game";
             FastTravelTimePenalty = Config.Bind(mainGame, "Fast travel (F3) time cost", 50, new ConfigDescription("Value is in seconds. One period has 500 seconds.", new AcceptableValueRange<int>(0, 100)));
             StatDecay = Config.Bind(mainGame, "Player stats slowly decay overnight", true, "Player's stats slowly decrease every day to keep the training points relevant.");
-            LewdDecay = Config.Bind(mainGame, "Girl lewdness decays overnight", false, "H bar of all heroines decreases overnight.");
-            AdjustBreastSizeQuestion = Config.Bind(mainGame, "Adjust preferred breast size question", true, "Lowers the breast size needed for 'Average' and 'Large' breast options when a girl asks you what size you prefer.\nChanges take effect after game restart.");
+            ChangeLewdDaily = Config.Bind(mainGame, "Change lewdness overnight", false, "H bar of all heroines either increases or decreases overnight depending on their status.");
+            AdjustBreastSizeQuestion = Config.Bind(mainGame, "Adjust preferred breast size question", true, "Lowers the breast size needed for 'Average' and 'Large' breast options when a heroine asks you what size you prefer.\nChanges take effect after game restart.");
 
             var i = new Harmony(GUID);
             Utilities.ApplyHooks(i);
-            Utilities.HSceneEndClicked += UpdateGirlLewdness;
+            Utilities.HSceneEndClicked += UpdateLewdAfterH;
 
             // H Scene functions
             ForceInsertHooks.ApplyHooks(i);
@@ -67,8 +65,6 @@ namespace KoikatuGameplayMod
             if (AdjustBreastSizeQuestion.Value)
                 BustSizeQuestionHooks.ApplyHooks(i);
 
-            _gameMgr = Game.Instance;
-            _sceneMgr = Scene.Instance;
 
             SceneManager.sceneLoaded += (arg0, mode) =>
             {
@@ -79,7 +75,11 @@ namespace KoikatuGameplayMod
                 else
                 {
                     if (!_inNightMenu && !_firstNightMenu)
-                        OnNightStarted();
+                    {
+                        try { OnNightStarted(); }
+                        catch (Exception ex) { UnityEngine.Debug.LogException(ex); }
+                    }
+
                     _inNightMenu = true;
                     _firstNightMenu = false;
                 }
@@ -89,8 +89,9 @@ namespace KoikatuGameplayMod
         // Start as false to prevent firing after loading
         private bool _inNightMenu, _firstNightMenu = true;
 
-        private void OnNightStarted()
+        private static void OnNightStarted()
         {
+            var gameMgr = Game.Instance;
             if (StatDecay.Value)
             {
                 void LowerStat(ref int stat)
@@ -100,20 +101,34 @@ namespace KoikatuGameplayMod
                     if (stat < 0) stat = 0;
                 }
 
-                LowerStat(ref _gameMgr.Player.intellect);
-                LowerStat(ref _gameMgr.Player.hentai);
-                LowerStat(ref _gameMgr.Player.physical);
+                LowerStat(ref gameMgr.Player.intellect);
+                LowerStat(ref gameMgr.Player.hentai);
+                LowerStat(ref gameMgr.Player.physical);
             }
 
-            if (LewdDecay.Value)
+            if (ChangeLewdDaily.Value)
             {
-                foreach (var heroine in _gameMgr.HeroineList)
-                    heroine.lewdness = Math.Max(0, heroine.lewdness - 50);
+                foreach (var heroine in gameMgr.HeroineList)
+                {
+                    var totalChange = (int)(20 * (Random.value - 0.3f));
+                    if (heroine.favor > 10) totalChange += 5 + heroine.favor / 8;
+                    if (heroine.parameter.attribute.bitch || heroine.parameter.attribute.likeGirls) totalChange += 10;
+                    if (heroine.parameter.attribute.friendly || heroine.parameter.attribute.undo) totalChange += 5;
+                    if (heroine.parameter.attribute.kireizuki || heroine.parameter.attribute.majime) totalChange -= 5;
+                    // club member
+                    if (heroine.isStaff) totalChange += 10;
+
+                    heroine.lewdness = Mathf.Clamp(heroine.lewdness + totalChange, 0, 100);
+
+                    // self relief
+                    if (!heroine.isGirlfriend && heroine.lewdness > 85 && Random.value > 0.9f)
+                        heroine.lewdness = 0;
+                }
             }
 
             if (ResetNoCondom.Value)
             {
-                foreach (var heroine in _gameMgr.HeroineList)
+                foreach (var heroine in gameMgr.HeroineList)
                 {
                     if (heroine.parameter.attribute.bitch) continue;
 
@@ -126,9 +141,9 @@ namespace KoikatuGameplayMod
             }
         }
 
-        private static void UpdateGirlLewdness(HSprite hSprite)
+        private static void UpdateLewdAfterH(HSprite hSprite)
         {
-            if (!DecreaseLewd.Value) return;
+            if (!ChangeLewdAfterH.Value) return;
 
             var heroine = Utilities.GetTargetHeroine(hSprite);
             if (heroine == null) return;
