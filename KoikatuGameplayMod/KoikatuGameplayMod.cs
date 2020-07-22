@@ -26,6 +26,7 @@ namespace KoikatuGameplayMod
         public static ConfigEntry<bool> ForceInsertAnger { get; set; }
         public static ConfigEntry<bool> ChangeLewdAfterH { get; set; }
         public static ConfigEntry<bool> DisableTrapVagInsert { get; set; }
+        public static ConfigEntry<bool> DontHidePlayerWhenTouching { get; set; }
 
         public static ConfigEntry<bool> StatDecay { get; set; }
         public static ConfigEntry<bool> ChangeLewdDaily { get; set; }
@@ -41,6 +42,7 @@ namespace KoikatuGameplayMod
             ForceInsertAnger = Config.Bind(hScene, "Force insert causes anger", true, "If you cum inside on or force insert too many times the heroine will get angry with you.\nWhen enabled heroine's expression changes during H (if forced).");
             ChangeLewdAfterH = Config.Bind(hScene, "Change lewdness after H", false, "Decreases heroine's H bar after an H scene if satisfied, increases the bar if not.");
             DisableTrapVagInsert = Config.Bind(hScene, "Disable vaginal insert for traps/men", true, "Only works if you use UncensorSelector to give a female card a penis but no vagina in maker. Some positions don't have the anal option so you won't be able to insert at all in them.\nChanges take effect after game restart.");
+            DontHidePlayerWhenTouching = Config.Bind(hScene, "Do not hide player when touching", true, "Prevent hiding of the player model when touching in H scenes.");
 
             ResetNoCondom = Config.Bind(hScene, "Make experienced girls ask for condom", true, "If enabled, sometimes a heroine will refuse raw insert on dangerous day until the second insert (once per day).\nIf disabled the default game logic is used (girl will never refuse if you did raw 5 times or more in total.)");
             var mainGame = "Main game";

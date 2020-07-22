@@ -5,10 +5,14 @@ namespace KoikatuGameplayMod
 {
     internal static class ExitFirstHHooks
     {
+        private static HSceneProc _hproc;
+
         public static void ApplyHooks(Harmony instance)
         {
             instance.PatchAll(typeof(ExitFirstHHooks));
         }
+
+        #region Keep first time status if chara is still a virgin
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(HSceneProc), "NewHeroineEndProc")]
@@ -32,6 +36,10 @@ namespace KoikatuGameplayMod
                     heroine.hCount = 0;
             }
         }
+
+        #endregion
+
+        #region Allow to exit first hscene early
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(HSceneProc), "Start")]
@@ -62,6 +70,25 @@ namespace KoikatuGameplayMod
             // Restore original hcount
             if (__state)
                 __instance.flags.lstHeroine[0].hCount = 0;
+        }
+
+        #endregion
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(ChaFileStatus), nameof(ChaFileStatus.visibleBodyAlways), MethodType.Setter)]
+        public static void MaleVisibleOverride(ChaFileStatus __instance, ref bool value)
+        {
+            // Make sure to only work in h scenes
+            // Prevent expensive FindObjectOfType with extra checks beforehand
+            if (value || !KoikatuGameplayMod.DontHidePlayerWhenTouching.Value) return;
+            if (Manager.Scene.Instance.AddSceneName != "HProc") return;
+            if (_hproc == null) _hproc = Object.FindObjectOfType<HSceneProc>();
+            if (_hproc != null)
+            {
+                var m = Traverse.Create(_hproc).Field<ChaControl>("male").Value;
+                if (m.fileStatus == __instance)
+                    value = true;
+            }
         }
     }
 }
