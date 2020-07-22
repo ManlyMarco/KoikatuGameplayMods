@@ -9,6 +9,7 @@ Plugin that tweaks and (hopefully) improves Koikatu gameplay.
 - Everyone's levdness drops naturally, needs to be built back up.
 - Stats slowly fall, need to be worked on even after maxxing.
 - Fast travel with F3 now costs time.
+- Prevent hiding of player body when touching in H scenes.
 
 **Warning:** Setting the character limit above 38 requires a large amount of RAM and will extend loading times. To load 99 characters the game will need approximately 10GB of free RAM (depending on the characters used).
 **Warning:** Compatibility with kPlug is shaky at best. You might be able to get both plugins to work at the same time but I can't check the compatibility and I'm unable to fix any compatibility issues that aren't caused by issues in this plugin.
