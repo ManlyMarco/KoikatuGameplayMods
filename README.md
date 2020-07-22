@@ -47,7 +47,7 @@ Plugin that allows using of the orthographic (parallel projection) camera mode. 
 - Place the .dll inside your `BepInEx\plugins` folder.
 - To toggle between perspective (normal) and orthographic camera mode press the I key (can be changed in settings) and then use your mouse scroll wheel to zoom in and out.
 
-![Preview](https://user-images.githubusercontent.com/39247311/55674510-07395200-58b6-11e9-8b85-d15f8fab54fa.png)
+![preview](https://user-images.githubusercontent.com/39247311/59981520-dd661080-9604-11e9-9b2b-eefbd1a1a66b.png)
 
 # KK_MobAdder
 This plugin adds random mob characters across maps in story mode in order to make it feel less vacant. The mobs have simple animations, no annoying sounds and don't move from their spots - they are purely for decoration.
