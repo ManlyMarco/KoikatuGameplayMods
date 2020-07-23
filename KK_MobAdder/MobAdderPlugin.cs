@@ -21,6 +21,7 @@ namespace KK_MobAdder
     {
         public const string GUID = "KK_MobAdder";
         public const string Version = "2.0";
+
         private const string GameProcessName = "Koikatu";
         private const string GameProcessNameSteam = "Koikatsu Party";
 
