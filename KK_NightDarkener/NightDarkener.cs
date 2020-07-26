@@ -1,27 +1,27 @@
-﻿using System.ComponentModel;
-using System.Linq;
+﻿using System.Linq;
 using BepInEx;
-using Harmony;
+using BepInEx.Configuration;
+using HarmonyLib;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace KK_NightDarkener
 {
     [BepInPlugin(GUID, "Night Darkener", Version)]
+    [BepInProcess(GameProcessName)]
+    [BepInProcess(GameProcessNameSteam)]
     public class NightDarkener : BaseUnityPlugin
     {
         public const string GUID = "Marco.NightDarkener";
         internal const string Version = "1.1.1";
-        
-        [DisplayName("Enable dark fog at night")]
-        [Description("Horror game effect.\nChanges take effect next time you load a night map.")]
-        public static ConfigWrapper<bool> UseFog { get; private set; }
 
-        [DisplayName("Exposure at night")]
-        [Description("The lower the exposure, the darker the game will be.\nChanges take effect next time you load a night map.")]
-        [AcceptableValueRange(0f, 1f)]
-        public static ConfigWrapper<float> Exposure { get; private set; }
-        
+        private const string GameProcessName = "Koikatu";
+        private const string GameProcessNameSteam = "Koikatsu Party";
+
+        public static ConfigEntry<bool> UseFog { get; private set; }
+
+        public static ConfigEntry<float> Exposure { get; private set; }
+
         private static void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
         {
             var proc = FindObjectOfType<HSceneProc>();
@@ -59,17 +59,10 @@ namespace KK_NightDarkener
 
         private void Start()
         {
-            if (Application.productName == "CharaStudio")
-            {
-                BepInEx.Bootstrap.Chainloader.Plugins.Remove(this);
-                Destroy(this);
-                return;
-            }
+            UseFog = Config.Bind("General", "Enable dark fog at night", false, "Horror game effect.\nChanges take effect next time you load a night map.");
+            Exposure = Config.Bind("General", "Exposure at night", 0.3f, new ConfigDescription("The lower the exposure, the darker the game will be.\nChanges take effect next time you load a night map.", new AcceptableValueRange<float>(0, 1)));
 
-            UseFog = new ConfigWrapper<bool>("UseFog", this);
-            Exposure = new ConfigWrapper<float>("NightExposure", this, 0.3f);
-
-            HarmonyInstance.Create(GUID).PatchAll(typeof(NightDarkener));
+            Harmony.CreateAndPatchAll(typeof(NightDarkener));
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
         }
 
