@@ -1,8 +1,6 @@
-﻿using System;
-using System.Linq;
-using System.Reflection;
+﻿using System.Linq;
+using ActionGame;
 using HarmonyLib;
-using UniRx;
 
 namespace KoikatuGameplayMod
 {
@@ -14,29 +12,14 @@ namespace KoikatuGameplayMod
         }
 
         [HarmonyPostfix]
-        [HarmonyPatch(typeof(MapSelectMenuScene), "Start", new Type[] { })]
+        [HarmonyPatch(typeof(ActionMap), nameof(ActionMap.PlayerMapWarp))]
         public static void MapSelectMenuSceneRegisterCallback(MapSelectMenuScene __instance)
         {
-            var f = typeof(MapSelectMenuScene).GetField("enterButton",
-                BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public);
-
-            var b = f.GetValue(__instance) as UnityEngine.UI.Button;
-
-            // Add a time penalty for using F3 fast travel
-            b.OnClickAsObservable().Subscribe(unit =>
+            if (KoikatuGameplayMod.FastTravelTimePenalty.Value > 0)
             {
-                if (__instance.result == MapSelectMenuScene.ResultType.EnterMapMove)
-                {
-                    var cycle = UnityEngine.Object.FindObjectsOfType<ActionGame.Cycle>().FirstOrDefault();
-                    if (cycle != null)
-                    {
-                        var newVal = Math.Min(cycle.timer + KoikatuGameplayMod.FastTravelTimePenalty.Value, ActionGame.Cycle.TIME_LIMIT - 10);
-                        typeof(ActionGame.Cycle)
-                            .GetField("_timer", BindingFlags.Instance | BindingFlags.NonPublic)
-                            .SetValue(cycle, newVal);
-                    }
-                }
-            });
+                var cycle = UnityEngine.Object.FindObjectsOfType<Cycle>().FirstOrDefault();
+                if (cycle != null) cycle.AddTimer(KoikatuGameplayMod.FastTravelTimePenalty.Value / 500f);
+            }
         }
     }
 }
