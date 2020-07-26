@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("KoikatuGameplayMod")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("MarC0")]
+[assembly: AssemblyCompany("https://github.com/ManlyMarco/KoikatuGameplayMods")]
 [assembly: AssemblyProduct("KoikatuGameplayMod")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
@@ -31,5 +31,4 @@ using System.Runtime.InteropServices;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion("1.0.0.0")]
-[assembly: AssemblyFileVersion(KoikatuGameplayMod.KoikatuGameplayMod.Version)]
+[assembly: AssemblyVersion(KoikatuGameplayMod.KoikatuGameplayMod.Version)]

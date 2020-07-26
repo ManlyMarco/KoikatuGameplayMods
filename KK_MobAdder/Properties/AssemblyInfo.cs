@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 [assembly: AssemblyTitle("KK_MobAdder")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
-[assembly: AssemblyCompany("https://github.com/ManlyMarco/Koikatu-Gameplay-Mod")]
+[assembly: AssemblyCompany("https://github.com/ManlyMarco/KoikatuGameplayMods")]
 [assembly: AssemblyProduct("KK_MobAdder")]
 [assembly: AssemblyCopyright("Copyright ©  2020")]
 [assembly: AssemblyTrademark("")]

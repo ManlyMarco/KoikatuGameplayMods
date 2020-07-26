@@ -7,7 +7,7 @@ using KK_Pregnancy;
 // associated with an assembly.
 [assembly: AssemblyTitle("KK_Pregnancy")]
 [assembly: AssemblyDescription("Adds pregnancy to the gameplay and character creation")]
-[assembly: AssemblyCompany("ManlyMarco")]
+[assembly: AssemblyCompany("https://github.com/ManlyMarco/KoikatuGameplayMods")]
 [assembly: AssemblyProduct("KK_Pregnancy")]
 [assembly: AssemblyCopyright("Copyright ©  2019")]
 
