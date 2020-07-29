@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections;
+using System.Diagnostics;
 using System.Linq;
 using ActionGame.Chara;
 using BepInEx;
@@ -44,9 +45,9 @@ namespace KK_WarpToCharacters
             Harmony.CreateAndPatchAll(typeof(WarpToCharactersPlugin));
         }
 
-        [HarmonyPostfix]
+        [HarmonyPrefix]
         [HarmonyPatch(typeof(ChaStatusScene), "Start")]
-        private static void CreateButtons(ChaStatusScene __instance, ChaStatusComponent ___cmpMale)
+        private static void CreateButtonsPre(ChaStatusComponent ___cmpFix, ChaStatusComponent ___cmpTeacher, ChaStatusComponent ___cmpFemale)
         {
             try
             {
@@ -60,33 +61,58 @@ namespace KK_WarpToCharacters
 
                 if (_actionScene == null) _actionScene = FindObjectOfType<ActionScene>();
 
-                foreach (var chaStatusComponent in __instance.gameObject.GetComponentsInChildren<ChaStatusComponent>())
+                foreach (var chaStatusComponent in new[] { ___cmpFix, ___cmpFemale, ___cmpTeacher })
                 {
-                    if (chaStatusComponent == ___cmpMale) continue;
-
                     var cardTr = chaStatusComponent.cmpStudentCard.transform;
+                    // Check if the button isn't already spawned
                     if (cardTr.Find(ButtonName)) continue;
 
                     // Always do this to prevent old versions from creating its own buttons if installed
                     var go = new GameObject(ButtonName);
                     go.transform.SetParent(cardTr, false);
 
-                    // Do not show the button if character is on the same map as player
-                    var npc = GetCharaNpc(chaStatusComponent);
-                    if (npc == null || npc.mapNo == _actionScene.Player.mapNo) continue;
-
                     var image = go.AddComponent<Image>();
                     image.sprite = _spriteMoveIcon;
 
                     var button = go.AddComponent<Button>();
                     button.targetGraphic = image;
-
                     var rt = go.GetComponent<RectTransform>();
                     rt.anchorMin = rt.anchorMax = new Vector2(0.97f, 0.73f);
                     rt.offsetMin = new Vector2(-40, -40);
                     rt.offsetMax = Vector2.zero;
+                }
+            }
+            catch (Exception e)
+            {
+                UnityEngine.Debug.LogException(e);
+            }
+        }
 
-                    button.onClick.AddListener(() => WarpToNpc(npc));
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(ChaStatusScene), "Start")]
+        private static void CreateButtons(ChaStatusScene __instance, ChaStatusComponent ___cmpMale)
+        {
+            try
+            {
+                foreach (var chaStatusComponent in __instance.gameObject.GetComponentsInChildren<ChaStatusComponent>())
+                {
+                    if (chaStatusComponent == ___cmpMale) continue;
+
+                    var cardTr = chaStatusComponent.cmpStudentCard.transform;
+                    var go = cardTr.Find(ButtonName)?.gameObject;
+                    if (go == null) continue;
+
+                    // Do not show the button if character is on the same map as player
+                    var npc = GetCharaNpc(chaStatusComponent);
+                    if (npc == null || npc.mapNo == _actionScene.Player.mapNo)
+                    {
+                        go.SetActive(false);
+                        continue;
+                    }
+
+                    var button = go.GetComponent<Button>();
+                    if (button != null) button.onClick.AddListener(() => WarpToNpc(npc));
                 }
             }
             catch (Exception e)
