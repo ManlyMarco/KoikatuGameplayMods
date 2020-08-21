@@ -21,7 +21,7 @@ namespace KK_Pregnancy
             private static Sprite _safeSprite;
             private static Sprite _unknownSprite;
 
-            private static readonly List<KeyValuePair<SaveData.Heroine, Rect>> _currentHeroine = new List<KeyValuePair<SaveData.Heroine, Rect>>();
+            private static readonly List<KeyValuePair<SaveData.Heroine, RectTransform>> _currentHeroine = new List<KeyValuePair<SaveData.Heroine, RectTransform>>();
 
             internal static void Init(Harmony hi, Sprite unknownSprite, Sprite pregSprite, Sprite safeSprite, Sprite riskySprite)
             {
@@ -111,7 +111,7 @@ namespace KK_Pregnancy
                 if (_currentHeroine.Count == 0) return;
 
                 var pos = new Vector2(Input.mousePosition.x, -(Input.mousePosition.y - Screen.height));
-                var heroine = _currentHeroine.FirstOrDefault(x => x.Value.Contains(pos)).Key;
+                var heroine = _currentHeroine.FirstOrDefault(x => GetOccupiedScreenRect(x).Contains(pos)).Key;
                 if (heroine == null) return;
 
                 var status = heroine.GetHeroineStatus();
@@ -222,13 +222,7 @@ namespace KK_Pregnancy
 
                     var image = existing.GetComponent<Image>();
 
-                    var worldCorners = new Vector3[4];
-                    image.GetComponent<RectTransform>().GetWorldCorners(worldCorners);
-                    _currentHeroine.Add(new KeyValuePair<SaveData.Heroine, Rect>(heroine, new Rect(
-                        worldCorners[0].x,
-                        Screen.height - worldCorners[2].y,
-                        worldCorners[2].x - worldCorners[0].x,
-                        worldCorners[2].y - worldCorners[0].y)));
+                    _currentHeroine.Add(new KeyValuePair<SaveData.Heroine, RectTransform>(heroine, image.GetComponent<RectTransform>()));
 
                     switch (heroine.GetHeroineStatus())
                     {
@@ -248,6 +242,18 @@ namespace KK_Pregnancy
                             throw new ArgumentOutOfRangeException();
                     }
                 }
+            }
+
+            private static readonly Vector3[] _worldCornersBuffer = new Vector3[4];
+            private static Rect GetOccupiedScreenRect(KeyValuePair<SaveData.Heroine, RectTransform> x)
+            {
+                x.Value.GetWorldCorners(_worldCornersBuffer);
+                var screenPos = new Rect(
+                    _worldCornersBuffer[0].x,
+                    Screen.height - _worldCornersBuffer[2].y,
+                    _worldCornersBuffer[2].x - _worldCornersBuffer[0].x,
+                    _worldCornersBuffer[2].y - _worldCornersBuffer[0].y);
+                return screenPos;
             }
         }
     }
