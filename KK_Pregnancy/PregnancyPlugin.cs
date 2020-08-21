@@ -11,11 +11,11 @@ namespace KK_Pregnancy
 {
     [BepInPlugin(GUID, GUID, Version)]
     [BepInDependency(KKABMX_Core.GUID, "4.1")]
-    [BepInDependency(KoikatuAPI.GUID, "1.10")]
+    [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
     public partial class PregnancyPlugin : BaseUnityPlugin
     {
         public const string GUID = "KK_Pregnancy";
-        public const string Version = "2.0";
+        public const string Version = "2.1";
 
         public static ConfigEntry<bool> ConceptionEnabled { get; private set; }
         public static ConfigEntry<bool> AnalConceptionEnabled { get; private set; }
