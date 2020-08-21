@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using KKABMX.Core;
 using KKAPI.Maker;
@@ -11,7 +12,7 @@ namespace KK_Pregnancy
     {
         private readonly PregnancyCharaController _controller;
 
-        private readonly Dictionary<string, BoneModifierData> _pregnancyFullValues = new Dictionary<string, BoneModifierData>
+        private static readonly Dictionary<string, BoneModifierData> _bellyFullValues = new Dictionary<string, BoneModifierData>
         {
             // Belly
             {"cf_s_spine01"  , new BoneModifierData(new Vector3(1.62f, 1.50f, 1.90f), 1f, new Vector3( 0.00f, 0.00f , 0.05f), new Vector3( 10f, 0f, 0f))},
@@ -24,6 +25,10 @@ namespace KK_Pregnancy
             {"cf_d_sk_01_00" , new BoneModifierData(new Vector3(1.00f, 1.00f, 1.00f), 1f, new Vector3( 0.03f,-0.02f , 0.12f), new Vector3(-10f, 0f, 0f))},
             {"cf_d_sk_06_00" , new BoneModifierData(new Vector3(1.00f, 1.00f, 1.00f), 1f, new Vector3(-0.03f, 0.00f , 0.05f), new Vector3(  0f, 0f, 0f))},
             {"cf_d_sk_02_00" , new BoneModifierData(new Vector3(1.00f, 1.00f, 1.00f), 1f, new Vector3( 0.03f, 0.00f , 0.05f), new Vector3(  0f, 0f, 0f))},
+        };
+
+        private static readonly Dictionary<string, BoneModifierData> _pregnancyFullValues = new Dictionary<string, BoneModifierData>
+        {
             // Breasts
             {"cf_d_bust01_L" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
             {"cf_d_bust01_R" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
@@ -47,6 +52,8 @@ namespace KK_Pregnancy
             {"cf_s_leg02_R"  , new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
         };
 
+        private static readonly IEnumerable<string> _affectedBoneNames = _bellyFullValues.Keys.Concat(_pregnancyFullValues.Keys).ToArray();
+
         public PregnancyBoneEffect(PregnancyCharaController controller)
         {
             _controller = controller;
@@ -54,37 +61,56 @@ namespace KK_Pregnancy
 
         public override IEnumerable<string> GetAffectedBones(BoneController origin)
         {
-            if (_controller.Data.IsPregnant || MakerAPI.InsideMaker || StudioAPI.InsideStudio)
-                return _pregnancyFullValues.Keys;
+            if (_controller.Data.IsPregnant || MakerAPI.InsideMaker || StudioAPI.InsideStudio || PregnancyGameController.InsideHScene)
+                return _affectedBoneNames;
 
             return Enumerable.Empty<string>();
         }
 
         public override BoneModifierData GetEffect(string bone, BoneController origin, ChaFileDefine.CoordinateType coordinate)
         {
-            if (_controller.Data.IsPregnant)
+            var isPregnant = _controller.Data.IsPregnant;
+            if (isPregnant)
             {
                 if (_pregnancyFullValues.TryGetValue(bone, out var mod))
                 {
-                    var bellySize = _controller.GetBellySizePercent();
-                    return new BoneModifierData(
-                        new Vector3(
-                            Mathf.Lerp(1f, mod.ScaleModifier.x, bellySize),
-                            Mathf.Lerp(1f, mod.ScaleModifier.y, bellySize),
-                            Mathf.Lerp(1f, mod.ScaleModifier.z, bellySize)),
-                        Mathf.Lerp(1f, mod.LengthModifier, bellySize),
-                        new Vector3(
-                            Mathf.Lerp(0f, mod.PositionModifier.x, bellySize),
-                            Mathf.Lerp(0f, mod.PositionModifier.y, bellySize),
-                            Mathf.Lerp(0f, mod.PositionModifier.z, bellySize)),
-                        new Vector3(
-                            Mathf.Lerp(0f, mod.RotationModifier.x, bellySize),
-                            Mathf.Lerp(0f, mod.RotationModifier.y, bellySize),
-                            Mathf.Lerp(0f, mod.RotationModifier.z, bellySize)));
+                    var prEffect = _controller.GetPregnancyEffectPercent();
+                    return LerpModifier(mod, prEffect);
+                }
+            }
+
+            if (isPregnant || _controller.IsInflated)
+            {
+                if (_bellyFullValues.TryGetValue(bone, out var mod))
+                {
+                    var prEffect = _controller.GetPregnancyEffectPercent();
+                    var infEffect = _controller.GetInflationEffectPercent() + prEffect / 2;
+
+                    var bellySize = Mathf.Max(prEffect, infEffect);
+
+                    return LerpModifier(mod, bellySize);
                 }
             }
 
             return null;
+        }
+
+        private static BoneModifierData LerpModifier(BoneModifierData mod, float bellySize)
+        {
+            return new BoneModifierData(
+                new Vector3(
+                    Mathf.Lerp(1f, mod.ScaleModifier.x, bellySize),
+                    Mathf.Lerp(1f, mod.ScaleModifier.y, bellySize),
+                    Mathf.Lerp(1f, mod.ScaleModifier.z, bellySize)),
+                Mathf.Lerp(1f, mod.LengthModifier, bellySize),
+                new Vector3(
+                    Mathf.Lerp(0f, mod.PositionModifier.x, bellySize),
+                    Mathf.Lerp(0f, mod.PositionModifier.y, bellySize),
+                    Mathf.Lerp(0f, mod.PositionModifier.z, bellySize)),
+                new Vector3(
+                    Mathf.Lerp(0f, mod.RotationModifier.x, bellySize),
+                    Mathf.Lerp(0f, mod.RotationModifier.y, bellySize),
+                    Mathf.Lerp(0f, mod.RotationModifier.z, bellySize)));
         }
     }
 }

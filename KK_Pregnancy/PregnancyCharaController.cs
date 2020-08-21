@@ -18,13 +18,15 @@ namespace KK_Pregnancy
             _boneEffect = new PregnancyBoneEffect(this);
         }
 
-        public float GetBellySizePercent()
+        /// <summary>
+        /// 0-1
+        /// </summary>
+        public float GetPregnancyEffectPercent()
         {
             // Don't show any effect at week 1 since it begins right after winning a child lottery
             return Mathf.Clamp01((Data.Week - 1f) / (PregnancyData.LeaveSchoolWeek - 1f));
         }
 
-        // todo depends on personality
         public bool CanGetDangerousDays()
         {
             return Data.Week <= 1;
@@ -136,5 +138,57 @@ namespace KK_Pregnancy
             1,
             1
         };
+
+        #region Inflation
+
+        public static readonly int MaxInflationAmount = 15;
+
+        private float _inflationChange;
+        private int _inflationAmount;
+
+        public int InflationAmount
+        {
+            get => _inflationAmount;
+            set => _inflationAmount = Mathf.Clamp(value, 0, MaxInflationAmount);
+        }
+
+        public bool IsInflated => _inflationAmount > 0;
+
+        /// <summary>
+        /// 0-1
+        /// </summary>
+        public float GetInflationEffectPercent()
+        {
+            // Don't show any effect at first since there's still space
+            return Mathf.Clamp01((InflationAmount + _inflationChange - 1f) / (MaxInflationAmount - 1f));
+        }
+
+        public void AddInflation(int amount)
+        {
+            var orig = InflationAmount;
+            InflationAmount += amount;
+            var change = InflationAmount - orig;
+            _inflationChange -= change;
+        }
+
+        public void DrainInflation(int amount)
+        {
+            var orig = InflationAmount;
+            InflationAmount -= amount;
+            var change = orig - InflationAmount;
+            _inflationChange += change;
+        }
+
+        protected override void Update()
+        {
+            base.Update();
+
+            if (_inflationChange > 0)
+                _inflationChange = Mathf.Max(0, _inflationChange - Time.deltaTime / 2);
+            else if (_inflationChange < 0)
+                _inflationChange = Mathf.Min(0, _inflationChange + Time.deltaTime / 2);
+        }
+
+        #endregion
     }
 }

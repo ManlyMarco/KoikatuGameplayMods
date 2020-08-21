@@ -108,6 +108,47 @@ namespace KK_Pregnancy
             }
 
             #endregion
+
+            #region Inflation
+
+            // todo separate anal/vag?
+            [HarmonyPrefix]
+            [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuInside))]
+            [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuAnalInside))]
+            [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddKuwaeFinish))]
+            public static void OnFinishInside(HFlag __instance)
+            {
+                // Finish raw vaginal
+                //todo add delays? could wait for animation change
+                var heroine = GetLeadHeroine(__instance);
+                var controller = GetEffectController(heroine);
+                controller.AddInflation(1);
+            }
+
+            [HarmonyPrefix]
+            [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuTare))]
+            [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuAnalTare))]
+            public static void OnDrain(HFlag __instance)
+            {
+                // Finish raw vaginal
+                //todo add delays? could wait for animation change
+                var heroine = GetLeadHeroine(__instance);
+                var controller = GetEffectController(heroine);
+                controller.DrainInflation(5);
+            }
+
+            private static PregnancyCharaController GetEffectController(SaveData.Heroine heroine)
+            {
+                return heroine?.chaCtrl != null ? heroine.chaCtrl.GetComponent<PregnancyCharaController>() : null;
+            }
+
+            private static SaveData.Heroine GetLeadHeroine(HFlag hflag)
+            {
+                var id = hflag.mode == HFlag.EMode.houshi3P || hflag.mode == HFlag.EMode.sonyu3P ? hflag.nowAnimationInfo.id % 2 : 0;
+                return hflag.lstHeroine[id];
+            }
+
+            #endregion
         }
     }
 }

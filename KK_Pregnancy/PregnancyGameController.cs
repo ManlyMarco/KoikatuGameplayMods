@@ -19,20 +19,22 @@ namespace KK_Pregnancy
             // Use Sunday for weekly stuff because it is always triggered (all other days can get skipped)
             if (day == Cycle.Week.Holiday)
             {
-                ProcessNewWeekStart();
-                RefreshControllers();
+                // At start of each week increase pregnancy week counters of all pregnant characters
+                ApplyToAllDatas((heroine, data) => AddPregnancyWeek(data));
             }
         }
 
+        internal static bool InsideHScene { get; private set; }
+
         protected override void OnStartH(HSceneProc proc, bool freeH)
         {
-            base.OnStartH(proc, freeH);
-
+            InsideHScene = true;
             proc.gameObject.AddComponent<LactationController>();
         }
 
         protected override void OnEndH(HSceneProc proc, bool freeH)
         {
+            InsideHScene = false;
             Destroy(proc.GetComponent<LactationController>());
 
             // Figure out if conception happened at end of h scene
@@ -71,94 +73,76 @@ namespace KK_Pregnancy
 
         protected override void OnGameSave(GameSaveLoadEventArgs args)
         {
-            ProcessNewlyStartedPregnancies();
-            RefreshControllers();
+            ProcessPendingChanges();
         }
 
         protected override void OnPeriodChange(Cycle.Type period)
         {
-            if (ProcessNewlyStartedPregnancies())
-                RefreshControllers();
+            ProcessPendingChanges();
         }
 
-        private static bool ProcessNewlyStartedPregnancies()
+        private static void ProcessPendingChanges()
         {
-            if (_startedPregnancies.Count == 0) return false;
-            foreach (var startedPregnancy in _startedPregnancies.Where(x => x != null))
+            ApplyToAllDatas((heroine, data) =>
             {
-                foreach (var chaFile in startedPregnancy.GetRelatedChaFiles())
-                    StartPregnancy(chaFile);
-            }
+                if (_startedPregnancies.Contains(heroine) && !data.IsPregnant)
+                {
+                    data.StartPregnancy();
+                    return true;
+                }
+                return false;
+            });
             _startedPregnancies.Clear();
-            return true;
         }
 
-        private static void ProcessNewWeekStart()
+        private static void ApplyToAllDatas(Func<SaveData.Heroine, PregnancyData, bool> action)
         {
-            // At start of each week increase pregnancy week counters of all pregnant characters
             foreach (var heroine in Game.Instance.HeroineList)
             {
                 foreach (var chaFile in heroine.GetRelatedChaFiles())
-                    AddPregnancyWeek(chaFile);
+                {
+                    var data = ExtendedSave.GetExtendedDataById(chaFile, PregnancyPlugin.GUID);
+                    var pd = PregnancyData.Load(data) ?? new PregnancyData();
+                    if (action(heroine, pd))
+                        ExtendedSave.SetExtendedDataById(chaFile, PregnancyPlugin.GUID, pd.Save());
+                }
             }
-        }
 
-        private static void RefreshControllers()
-        {
             // If controller exists then update its state so it gets any pregnancy week updates
             foreach (var controller in FindObjectsOfType<PregnancyCharaController>())
                 controller.ReadData();
         }
 
-        private static void StartPregnancy(ChaFileControl chaFile)
+        private static bool AddPregnancyWeek(PregnancyData pd)
         {
-            var data = ExtendedSave.GetExtendedDataById(chaFile, PregnancyPlugin.GUID);
-            var pd = PregnancyData.Load(data);
+            if (pd == null || !pd.GameplayEnabled) return false;
 
-            // If week is 0 the character is not pregnant
-            if (pd.GameplayEnabled && !pd.IsPregnant)
+            if (pd.IsPregnant)
             {
-                pd.StartPregnancy();
-                ExtendedSave.SetExtendedDataById(chaFile, PregnancyPlugin.GUID, pd.Save());
-            }
-        }
-
-        private static void AddPregnancyWeek(ChaFileControl chaFile)
-        {
-            var data = ExtendedSave.GetExtendedDataById(chaFile, PregnancyPlugin.GUID);
-            if (data == null) return;
-
-            var pd = PregnancyData.Load(data);
-
-            if (pd.GameplayEnabled)
-            {
-                if (pd.IsPregnant)
+                if (pd.Week < PregnancyData.LeaveSchoolWeek)
                 {
-                    if (pd.Week < PregnancyData.LeaveSchoolWeek)
-                    {
-                        // Advance through in-school at full configured speed
-                        var weekChange = PregnancyPlugin.PregnancyProgressionSpeed.Value;
-                        pd.Week = Mathf.Min(PregnancyData.LeaveSchoolWeek, pd.Week + weekChange);
-                    }
-                    else if (pd.Week < PregnancyData.ReturnToSchoolWeek)
-                    {
-                        // Make sure at least one week is spent out of school
-                        var weekChange = Mathf.Min(PregnancyData.ReturnToSchoolWeek - PregnancyData.LeaveSchoolWeek - 1, PregnancyPlugin.PregnancyProgressionSpeed.Value);
-                        pd.Week = pd.Week + weekChange;
-                    }
-
-                    if (pd.Week >= PregnancyData.ReturnToSchoolWeek)
-                        pd.Week = 0;
-
-                    //Logger.Log(LogLevel.Debug, $"Preg - pregnancy week for {chaFile.parameter.fullname} is now {week}");
+                    // Advance through in-school at full configured speed
+                    var weekChange = PregnancyPlugin.PregnancyProgressionSpeed.Value;
+                    pd.Week = Mathf.Min(PregnancyData.LeaveSchoolWeek, pd.Week + weekChange);
                 }
-                else if(pd.PregnancyCount > 0)
+                else if (pd.Week < PregnancyData.ReturnToSchoolWeek)
                 {
-                    pd.WeeksSinceLastPregnancy++;
+                    // Make sure at least one week is spent out of school
+                    var weekChange = Mathf.Min(PregnancyData.ReturnToSchoolWeek - PregnancyData.LeaveSchoolWeek - 1, PregnancyPlugin.PregnancyProgressionSpeed.Value);
+                    pd.Week = pd.Week + weekChange;
                 }
 
-                ExtendedSave.SetExtendedDataById(chaFile, PregnancyPlugin.GUID, pd.Save());
+                if (pd.Week >= PregnancyData.ReturnToSchoolWeek)
+                    pd.Week = 0;
+
+                //Logger.Log(LogLevel.Debug, $"Preg - pregnancy week for {chaFile.parameter.fullname} is now {week}");
             }
+            else if (pd.PregnancyCount > 0)
+            {
+                pd.WeeksSinceLastPregnancy++;
+            }
+
+            return true;
         }
     }
 }
