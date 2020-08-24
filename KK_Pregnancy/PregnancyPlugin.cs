@@ -23,6 +23,11 @@ namespace KK_Pregnancy
         public static ConfigEntry<int> PregnancyProgressionSpeed { get; private set; }
         public static ConfigEntry<bool> HSceneMenstrIconOverride { get; private set; }
 
+        public static ConfigEntry<bool> InflationEnable { get; private set; }
+        public static ConfigEntry<bool> InflationOpenClothAtMax { get; private set; }
+        public static ConfigEntry<int> InflationMaxCount { get; private set; }
+        //public static ConfigEntry<int> InflationDrainSpeed { get; private set; }
+
         internal static new ManualLogSource Logger { get; private set; }
 
         private void Start()
@@ -48,6 +53,11 @@ namespace KK_Pregnancy
             HSceneMenstrIconOverride = Config.Bind("General", "Use custom safe/risky icons in H Scenes", true,
                 "Replaces the standard safe/risky indicators with custom indicators that can also show pregnancy and unknown status. " +
                 "If the status is unknown you will have to listen for the voice cues instead.\nChanges take effect after game restart.");
+
+            InflationEnable = Config.Bind("Inflation", "Enable inflation", true, "Turn on the inflation effect.");
+            InflationOpenClothAtMax = Config.Bind("Inflation", "Open clothes at max inflation", true, "If clothes are fully on, open them when inflation reaches the max value (they 'burst' open).");
+            InflationMaxCount = Config.Bind("Inflation", "Cum count until full", 8, new ConfigDescription("How many times you have to let out inside to reach the maximum belly size.",
+                new AcceptableValueRange<int>(2, 15)));
 
             CharacterApi.RegisterExtraBehaviour<PregnancyCharaController>(GUID);
             GameAPI.RegisterExtraBehaviour<PregnancyGameController>(GUID);

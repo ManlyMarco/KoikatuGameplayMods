@@ -141,26 +141,23 @@ namespace KK_Pregnancy
 
         #region Inflation
 
-        public static readonly int MaxInflationAmount = 15;
-
         private float _inflationChange;
         private int _inflationAmount;
 
         public int InflationAmount
         {
             get => _inflationAmount;
-            set => _inflationAmount = Mathf.Clamp(value, 0, MaxInflationAmount);
+            set => _inflationAmount = Mathf.Clamp(value, 0, PregnancyPlugin.InflationMaxCount.Value);
         }
 
-        public bool IsInflated => _inflationAmount > 0;
+        public bool IsInflated => InflationAmount + _inflationChange > 0.01f;
 
         /// <summary>
         /// 0-1
         /// </summary>
         public float GetInflationEffectPercent()
         {
-            // Don't show any effect at first since there's still space
-            return Mathf.Clamp01((InflationAmount + _inflationChange - 1f) / (MaxInflationAmount - 1f));
+            return Mathf.Clamp01((InflationAmount + _inflationChange) / PregnancyPlugin.InflationMaxCount.Value);
         }
 
         public void AddInflation(int amount)
@@ -183,10 +180,36 @@ namespace KK_Pregnancy
         {
             base.Update();
 
-            if (_inflationChange > 0)
-                _inflationChange = Mathf.Max(0, _inflationChange - Time.deltaTime / 2);
-            else if (_inflationChange < 0)
-                _inflationChange = Mathf.Min(0, _inflationChange + Time.deltaTime / 2);
+            float GetInflationChange()
+            {
+                //var inflationChange = Time.deltaTime / 2 + Time.deltaTime * _inflationChange / 3;
+                return Mathf.Max(0.1f * Time.deltaTime, Mathf.Abs(Time.deltaTime * _inflationChange / 4));
+            }
+
+            if (PregnancyPlugin.InflationEnable.Value)
+            {
+                if (_inflationChange > 0.05f)
+                {
+                    _inflationChange = Mathf.Max(0, _inflationChange - GetInflationChange());
+                }
+                else if (_inflationChange < -0.05f)
+                {
+                    _inflationChange = Mathf.Min(0, _inflationChange + GetInflationChange());
+
+                    if (PregnancyPlugin.InflationOpenClothAtMax.Value &&
+                        InflationAmount >= PregnancyPlugin.InflationMaxCount.Value)
+                    {
+                        // 0 is fully on
+                        if (ChaControl.fileStatus.clothesState[(int)ChaFileDefine.ClothesKind.top] == 0)
+                            ChaControl.SetClothesStateNext((int)ChaFileDefine.ClothesKind.top);
+                    }
+                }
+            }
+            else
+            {
+                _inflationChange = 0;
+                _inflationAmount = 0;
+            }
         }
 
         #endregion

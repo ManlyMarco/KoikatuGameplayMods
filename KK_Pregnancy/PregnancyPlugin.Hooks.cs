@@ -6,6 +6,7 @@ using ExtensibleSaveFormat;
 using HarmonyLib;
 using KKAPI.MainGame;
 using Manager;
+using UnityEngine;
 
 namespace KK_Pregnancy
 {
@@ -118,8 +119,6 @@ namespace KK_Pregnancy
             [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddKuwaeFinish))]
             public static void OnFinishInside(HFlag __instance)
             {
-                // Finish raw vaginal
-                //todo add delays? could wait for animation change
                 var heroine = GetLeadHeroine(__instance);
                 var controller = GetEffectController(heroine);
                 controller.AddInflation(1);
@@ -130,11 +129,9 @@ namespace KK_Pregnancy
             [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuAnalTare))]
             public static void OnDrain(HFlag __instance)
             {
-                // Finish raw vaginal
-                //todo add delays? could wait for animation change
                 var heroine = GetLeadHeroine(__instance);
                 var controller = GetEffectController(heroine);
-                controller.DrainInflation(5);
+                controller.DrainInflation(Mathf.Max(3, Mathf.CeilToInt(InflationMaxCount.Value / 2.2f)));
             }
 
             private static PregnancyCharaController GetEffectController(SaveData.Heroine heroine)
