@@ -116,7 +116,7 @@ namespace KK_Pregnancy
             [HarmonyPrefix]
             [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuInside))]
             [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuAnalInside))]
-            [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddKuwaeFinish))]
+            [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddHoushiDrink))]
             public static void OnFinishInside(HFlag __instance)
             {
                 var heroine = GetLeadHeroine(__instance);
