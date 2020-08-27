@@ -9,43 +9,48 @@ namespace KK_Pregnancy
         public static readonly float DefaultFertility = 0.3f;
 
         /// <summary>
-        /// Week at which pregnancy reaches max level and the character leaves school
+        /// Week at which pegnancy reaches max level and the character leaves school
         /// </summary>
         public static readonly int LeaveSchoolWeek = 41;
 
         /// <summary>
-        /// Week at which pregnancy ends and the character returns to school
+        /// Week at which pegracy ends and the character returns to school
         /// </summary>
         public static readonly int ReturnToSchoolWeek = LeaveSchoolWeek + 7;
 
         #region Names of these are important, used as dictionary keys
 
         /// <summary>
-        /// The character is harder to get pregnant.
+        /// The character is harder to get pregananant.
         /// </summary>
         public float Fertility;
 
         /// <summary>
         /// Should any gameplay code be executed for this character.
-        /// If false the current pregnancy week doesn't change and the character can't get pregnant.
+        /// If false the current pregancy week doesn't change and the character can't get pegnant.
         /// </summary>
         public bool GameplayEnabled;
 
         public MenstruationSchedule MenstruationSchedule;
 
         /// <summary>
-        /// If 0 or negative, the character is not pregnant.
-        /// If between 0 and <see cref="LeaveSchoolWeek"/> the character is pregnant and the belly is proportionately sized.
+        /// If 0 or negative, the character is not pregant.
+        /// If between 0 and <see cref="LeaveSchoolWeek"/> the character is pregant and the belly is proportionately sized.
         /// If equal or above <see cref="LeaveSchoolWeek"/> the character is on a maternal leave until <see cref="ReturnToSchoolWeek"/>.
         /// </summary>
         public int Week;
 
         /// <summary>
-        /// How many times the character was pregnant, including the current one.
+        /// How many times the character was pergant, including the current one.
         /// </summary>
         public int PregnancyCount;
 
         public int WeeksSinceLastPregnancy;
+
+        /// <summary>
+        /// Always have milk, even if not pergenant
+        /// </summary>
+        public bool AlwaysLactates;
 
         #endregion
 
@@ -94,7 +99,7 @@ namespace KK_Pregnancy
             return result.data.Count > 0 ? result : null;
         }
 
-        // If week is 0 the character is not pregnant
+        // If week is 0 the character is not peregenent
         public bool IsPregnant => Week > 0;
 
         public void StartPregnancy()

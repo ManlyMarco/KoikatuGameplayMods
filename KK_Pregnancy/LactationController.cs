@@ -127,6 +127,7 @@ namespace KK_Pregnancy
             {
                 if (controller == null) return 0;
                 var data = controller.Data;
+                if (data.AlwaysLactates) return 1;
                 // Gradually increase
                 if (data.IsPregnant) return Mathf.Clamp01(data.Week / 40f);
                 // Gradually decrease after pregnancy finishes
