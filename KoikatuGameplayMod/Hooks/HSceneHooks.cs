@@ -14,6 +14,7 @@ namespace KoikatuGameplayMod
         }
 
         #region Keep first time status if chara is still a virgin
+        //Not needed and has no effect in free H or official VR
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(HSceneProc), "NewHeroineEndProc")]
@@ -41,6 +42,7 @@ namespace KoikatuGameplayMod
         #endregion
 
         #region Allow to exit first hscene early
+        //Not needed and has no effect in free H or official VR
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(HSceneProc), "Start")]

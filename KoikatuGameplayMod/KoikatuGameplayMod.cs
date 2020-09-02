@@ -14,6 +14,7 @@ namespace KoikatuGameplayMod
     [BepInPlugin(GUID, "Koikatu Gameplay Tweaks and Improvements", Version)]
     [BepInProcess(GameProcessName)]
     [BepInProcess(GameProcessNameSteam)]
+    [BepInProcess(GameProcessNameVR)]
     [BepInDependency(KoikatuAPI.GUID, "1.12")]
     public class KoikatuGameplayMod : BaseUnityPlugin
     {
@@ -21,6 +22,7 @@ namespace KoikatuGameplayMod
         public const string Version = "2.0";
         private const string GameProcessName = "Koikatu";
         private const string GameProcessNameSteam = "Koikatsu Party";
+        internal const string GameProcessNameVR = "KoikatuVR";
 
         public static ConfigEntry<bool> ForceInsert { get; set; }
         public static ConfigEntry<bool> ForceInsertAnger { get; set; }
@@ -70,7 +72,7 @@ namespace KoikatuGameplayMod
 
             SceneManager.sceneLoaded += (arg0, mode) =>
             {
-                if (arg0.name != "MyRoom" || Singleton<Scene>.Instance.LoadSceneName == "H")
+                if (arg0.name != "MyRoom" || Singleton<Scene>.Instance.LoadSceneName == "H" || Application.productName == GameProcessNameVR)
                 {
                     _inNightMenu = false;
                 }
