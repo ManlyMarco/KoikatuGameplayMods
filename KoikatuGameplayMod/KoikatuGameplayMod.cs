@@ -16,6 +16,7 @@ namespace KoikatuGameplayMod
     [BepInProcess(GameProcessNameSteam)]
     [BepInProcess(VRProcessName)]
     [BepInProcess(VRProcessNameSteam)]
+    [BepInIncompatibility("fulmene.experiencelogic")]
     [BepInDependency(KoikatuAPI.GUID, "1.12")]
     public class KoikatuGameplayMod : BaseUnityPlugin
     {
