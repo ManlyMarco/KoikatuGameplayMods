@@ -29,13 +29,12 @@ namespace KoikatuGameplayMod
         public static ConfigEntry<bool> ChangeLewdAfterH { get; set; }
         public static ConfigEntry<bool> DisableTrapVagInsert { get; set; }
         public static ConfigEntry<bool> DontHidePlayerWhenTouching { get; set; }
-
         public static ConfigEntry<bool> StatDecay { get; set; }
         public static ConfigEntry<bool> ChangeLewdDaily { get; set; }
         public static ConfigEntry<bool> ResetNoCondom { get; set; }
+        public static ConfigEntry<bool> AdjustExperiencedStateLogic { get; set; }
         public static ConfigEntry<int> FastTravelTimePenalty { get; set; }
         public static ConfigEntry<bool> AdjustBreastSizeQuestion { get; set; }
-
 
         private void Start()
         {
@@ -45,8 +44,9 @@ namespace KoikatuGameplayMod
             ChangeLewdAfterH = Config.Bind(hScene, "Change lewdness after H", false, "Decreases heroine's H bar after an H scene if satisfied, increases the bar if not.");
             DisableTrapVagInsert = Config.Bind(hScene, "Disable vaginal insert for traps/men", true, "Only works if you use UncensorSelector to give a female card a penis but no vagina in maker. Some positions don't have the anal option so you won't be able to insert at all in them.\nChanges take effect after game restart.");
             DontHidePlayerWhenTouching = Config.Bind(hScene, "Do not hide player when touching", true, "Prevent hiding of the player model when touching in H scenes.");
-
             ResetNoCondom = Config.Bind(hScene, "Make experienced girls ask for condom", true, "If enabled, sometimes a heroine will refuse raw insert on dangerous day until the second insert (once per day).\nIf disabled the default game logic is used (girl will never refuse if you did raw 5 times or more in total.)");
+            AdjustExperiencedStateLogic = Config.Bind(hScene, "Can be experienced from only one hole", true, "Make it so you only need to max the girls' either vaginal caress/piston or anal caress/piston to achieve experienced state. By default you have to max out both front and rear to get the experienced status.");
+
             var mainGame = "Main game";
             FastTravelTimePenalty = Config.Bind(mainGame, "Fast travel (F3) time cost", 50, new ConfigDescription("Value is in seconds. One period has 500 seconds.", new AcceptableValueRange<int>(0, 100)));
             StatDecay = Config.Bind(mainGame, "Player stats slowly decay overnight", true, "Player's stats slowly decrease every day to keep the training points relevant.");
@@ -62,13 +62,14 @@ namespace KoikatuGameplayMod
             HSceneHooks.ApplyHooks(i);
             if (DisableTrapVagInsert.Value)
                 TrapNoVagInsertHooks.ApplyHooks(i);
+            if (AdjustExperiencedStateLogic.Value)
+                ExperienceLogicHooks.ApplyHooks(i);
 
             // Main game functions
             ClassCharaLimitUnlockHooks.ApplyHooks(i);
             FastTravelCostHooks.ApplyHooks(i);
             if (AdjustBreastSizeQuestion.Value)
                 BustSizeQuestionHooks.ApplyHooks(i);
-
 
             SceneManager.sceneLoaded += (arg0, mode) =>
             {

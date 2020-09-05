@@ -32,6 +32,7 @@
   <ItemGroup>
     <Compile Include="Hooks\BustSizeQuestionHooks.cs" />
     <Compile Include="Hooks\ClassCharaLimitUnlockHooks.cs" />
+    <Compile Include="Hooks\ExperienceLogicHooks.cs" />
     <Compile Include="Hooks\HSceneHooks.cs" />
     <Compile Include="Hooks\FastTravelCostHooks.cs" />
     <Compile Include="Hooks\ForceInsertHooks.cs" />
