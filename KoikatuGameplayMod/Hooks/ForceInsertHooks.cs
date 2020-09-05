@@ -19,7 +19,7 @@ namespace KoikatuGameplayMod
         [HarmonyPatch(typeof(HSprite), nameof(HSprite.OnInsertAnalClick), new Type[] { })]
         public static void OnInsertAnalClickPre(HSprite __instance)
         {
-            if ((Application.productName != KoikatuGameplayMod.GameProcessNameVR && !Input.GetMouseButtonUp(0)) || !__instance.IsSpriteAciotn())
+            if ((!KoikatuGameplayMod.IsInsideVR && !Input.GetMouseButtonUp(0)) || !__instance.IsSpriteAciotn())
                 return;
 
             if (__instance.flags.isAnalInsertOK)
@@ -40,7 +40,7 @@ namespace KoikatuGameplayMod
         [HarmonyPatch(typeof(HSprite), nameof(HSprite.OnInsertAnalNoVoiceClick), new Type[] { })]
         public static void OnInsertAnalNoVoiceClickPre(HSprite __instance)
         {
-            if ((Application.productName != KoikatuGameplayMod.GameProcessNameVR && !Input.GetMouseButtonUp(0)) || !__instance.IsSpriteAciotn())
+            if ((!KoikatuGameplayMod.IsInsideVR && !Input.GetMouseButtonUp(0)) || !__instance.IsSpriteAciotn())
                 return;
 
             if (__instance.flags.isAnalInsertOK)
@@ -82,7 +82,7 @@ namespace KoikatuGameplayMod
         [HarmonyPatch(typeof(HSprite), nameof(HSprite.OnInsertNoVoiceClick), new Type[] { })]
         public static void OnInsertNoVoiceClickPre(HSprite __instance)
         {
-            if ((Application.productName != KoikatuGameplayMod.GameProcessNameVR && !Input.GetMouseButtonUp(0)) || !__instance.IsSpriteAciotn())
+            if ((!KoikatuGameplayMod.IsInsideVR && !Input.GetMouseButtonUp(0)) || !__instance.IsSpriteAciotn())
                 return;
 
             if (__instance.flags.isInsertOK[Utilities.GetTargetHeroineId(__instance)])
@@ -107,7 +107,7 @@ namespace KoikatuGameplayMod
         [HarmonyPatch(typeof(HSprite), nameof(HSprite.OnInsertClick), new Type[] { })]
         public static void OnInsertClickPre(HSprite __instance)
         {
-            if ((Application.productName != KoikatuGameplayMod.GameProcessNameVR && !Input.GetMouseButtonUp(0)) || !__instance.IsSpriteAciotn())
+            if ((!KoikatuGameplayMod.IsInsideVR && !Input.GetMouseButtonUp(0)) || !__instance.IsSpriteAciotn())
                 return;
 
             if (__instance.flags.isInsertOK[Utilities.GetTargetHeroineId(__instance)])
