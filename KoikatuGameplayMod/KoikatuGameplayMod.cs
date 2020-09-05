@@ -21,7 +21,7 @@ namespace KoikatuGameplayMod
     public class KoikatuGameplayMod : BaseUnityPlugin
     {
         public const string GUID = "marco-gameplaymod";
-        public const string Version = "2.0";
+        public const string Version = "2.1";
         private const string GameProcessName = "Koikatu";
         private const string GameProcessNameSteam = "Koikatsu Party";
         private const string VRProcessName = "KoikatuVR";
