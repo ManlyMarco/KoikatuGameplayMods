@@ -14,6 +14,8 @@ namespace KoikatuGameplayMod
         }
 
         #region Keep first time status if chara is still a virgin
+        //These hooks are for H in story mode. In free H they still run but have no effect. 
+        //Since free H is the only mode available in official VR, we don't need to patch the VRHScene class (the VR equivalent of HSceneProc).
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(HSceneProc), "NewHeroineEndProc")]
@@ -41,6 +43,8 @@ namespace KoikatuGameplayMod
         #endregion
 
         #region Allow to exit first hscene early
+        //These hooks are for H in story mode. In free H they still run but have no effect. 
+        //Since free H is the only mode available in official VR, we don't need to patch the VRHScene class (the VR equivalent of HSceneProc).
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(HSceneProc), "Start")]
