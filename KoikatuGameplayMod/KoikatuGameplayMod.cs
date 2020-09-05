@@ -17,7 +17,7 @@ namespace KoikatuGameplayMod
     [BepInProcess(VRProcessName)]
     [BepInProcess(VRProcessNameSteam)]
     [BepInIncompatibility("fulmene.experiencelogic")]
-    [BepInDependency(KoikatuAPI.GUID, "1.12")]
+    [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
     public class KoikatuGameplayMod : BaseUnityPlugin
     {
         public const string GUID = "marco-gameplaymod";

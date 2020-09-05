@@ -5,6 +5,7 @@ using System.Reflection.Emit;
 using BepInEx;
 using BepInEx.Harmony;
 using HarmonyLib;
+using KKAPI;
 using KKAPI.MainGame;
 using KKAPI.Studio;
 using KKAPI.Utilities;
@@ -13,7 +14,7 @@ using UnityEngine;
 namespace KK_MoanSoftly
 {
     [BepInPlugin(GUID, "Moan softly when I H you", Version)]
-    [BepInDependency(KKAPI.KoikatuAPI.GUID, "1.6")]
+    [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
     public class MoanSoftly : BaseUnityPlugin
     {
         public const string GUID = "KK_MoanSoftly";

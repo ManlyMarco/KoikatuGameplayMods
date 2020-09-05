@@ -16,7 +16,7 @@ namespace KK_MobAdder
     [BepInPlugin(GUID, "Add mobs to roam mode", Version)]
     [BepInProcess(GameProcessName)]
     [BepInProcess(GameProcessNameSteam)]
-    [BepInDependency(KoikatuAPI.GUID, "1.10")]
+    [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
     public class MobAdderPlugin : BaseUnityPlugin
     {
         public const string GUID = "KK_MobAdder";

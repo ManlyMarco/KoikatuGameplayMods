@@ -22,7 +22,7 @@ namespace KK_WarpToCharacters
     [BepInProcess(GameProcessName)]
     [BepInProcess(GameProcessNameSteam)]
     [BepInPlugin(GUID, "WarpToCharacters", Version)]
-    [BepInDependency(KoikatuAPI.GUID, "1.10")]
+    [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
     public sealed class WarpToCharactersPlugin : BaseUnityPlugin
     {
         public const string GUID = "WarpToCharacters";
