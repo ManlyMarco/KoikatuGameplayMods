@@ -82,7 +82,7 @@ namespace KoikatuGameplayMod
 
                 SceneManager.sceneLoaded += (arg0, mode) =>
                 {
-                    if (arg0.name != "MyRoom" || Singleton<Scene>.Instance.LoadSceneName == "H" || Application.productName == VRProcessName)
+                    if (arg0.name != "MyRoom" || Singleton<Scene>.Instance.LoadSceneName == "H")
                     {
                         _inNightMenu = false;
                     }
