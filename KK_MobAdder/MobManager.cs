@@ -497,6 +497,16 @@ namespace KK_MobAdder
 
             if (mapNo < 0) yield break;
 
+            var actScene = Game.Instance.actScene;
+
+            // Do not spawn mobs in story events since they get in the way or appear when story says there shouldn't be anyone
+            if (actScene.isEventNow && actScene.AdvScene != null && actScene.AdvScene.Scenario != null && actScene.AdvScene.Scenario.currentHeroine != null)
+            {
+                var currentHeroine = actScene.AdvScene.Scenario.currentHeroine;
+                // fixCharaID below 0 is for story mode only heroines and (I think?) teachers
+                if (currentHeroine.fixCharaID < 0) yield break;
+            }
+
             if (!Manager.Config.AddData.mobVisible || MobAdderPlugin.MobAmountModifier.Value <= 0) yield break;
 
             if (_mobPositionData.TryGetValue(mapNo, out var list))
@@ -509,7 +519,7 @@ namespace KK_MobAdder
                 MobAdderPlugin.Logger.LogDebug($"Spawning {list.Count} mobs on map {mapName}");
 
                 var amount = 1f;
-                var cycle = Game.Instance.actScene.Cycle;
+                var cycle = actScene.Cycle;
                 if (_mobSpreadData.TryGetValue(mapNo, out var spreads))
                     amount = spreads[(int)cycle.nowType];
 
