@@ -4,7 +4,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using ActionGame;
-using HarmonyLib;
 using Illusion.Component.Correct;
 using KKAPI.Utilities;
 using Manager;
@@ -80,10 +79,28 @@ namespace KK_MobAdder
             new Dictionary<int, List<KeyValuePair<Vector3, Quaternion>>>();
         private static readonly Dictionary<int, float[]> _mobSpreadData = new Dictionary<int, float[]>();
         private static readonly MaterialPropertyBlock _mobColorProperty = new MaterialPropertyBlock();
-        private static GameObject _mobTemplate;
         private static readonly List<SpawnedMobInfo> _spawnedMobs = new List<SpawnedMobInfo>();
-        private static List<GameObject> _uniformSilhouettes;
-        private static List<GameObject> _gymSilhouettes;
+        
+        private static List<GameObject> _swimsuitSilhouetteTemplates;
+        private static List<GameObject> _uniformSilhouetteTemplates;
+        private static List<GameObject> _gymSilhouetteTemplates;
+
+        /// <summary>
+        /// Dictionary with mob type spreads per map
+        /// key is map id (0 is default), value is array of 0-1f values for each of mob types.
+        /// Values are: swimsuit, uniform, gym
+        /// Values must add up to 1f or slightly more
+        /// </summary>
+        private static readonly Dictionary<int, float[]> _silhouetteTypeProbabilities = new Dictionary<int, float[]>
+        {
+            {0,  new []{0.0f, 0.9f, 0.1f}},
+            {31, new []{0.0f, 0.1f, 0.9f}},
+            {32, new []{0.0f, 0.1f, 0.9f}},
+            {34, new []{0.0f, 0.2f, 0.8f}},
+            {37, new []{0.3f, 0.2f, 0.5f}},
+            {38, new []{0.05f, 0.75f, 0.2f}},
+            {47, new []{0.0f, 0.75f, 0.25f}},
+        };
 
         public static void GatherMobsAroundPoint(Vector3 centerPoint)
         {
@@ -132,14 +149,33 @@ namespace KK_MobAdder
 
         public static GameObject SpawnMob(Vector3 position, Quaternion rotation, bool log, int no)
         {
-            var template = _uniformSilhouettes.Concat(_gymSilhouettes).AddItem(_mobTemplate).GetRandomElement();
+            // First figure out what template to use -----------
+            if (!_silhouetteTypeProbabilities.TryGetValue(no, out var probabilities))
+                probabilities = _silhouetteTypeProbabilities[0]; // default data
 
-            var copy = Object.Instantiate(template, Game.Instance.actScene.Map.mapRoot.transform);
+            var random = Random.value;
+            var total = 0f;
+            GameObject selectedTemplate = null;
+            var templateArrs = new[] { _swimsuitSilhouetteTemplates, _uniformSilhouetteTemplates, _gymSilhouetteTemplates };
+            for (int i = 0; i < probabilities.Length; i++)
+            {
+                total += probabilities[i];
+                if (total >= random)
+                {
+                    var arr = templateArrs[i];
+                    selectedTemplate = arr.GetRandomElement();
+                }
+            }
+            // Shouldn't happen if probabilities add up to 1f, but just to be safe
+            if (selectedTemplate == null) selectedTemplate = templateArrs.Last().GetRandomElement();
+
+            // Spawn a copy of the selected template ----------
+            var copy = Object.Instantiate(selectedTemplate, Game.Instance.actScene.Map.mapRoot.transform);
 
             copy.transform.SetPositionAndRotation(position, rotation);
             copy.SetActive(true);
 
-            var anim = copy.GetComponentInChildren<Animator>(); //copy.transform.Find("p_cf_body_bone_low").GetComponent<Animator>();
+            var anim = copy.GetComponentInChildren<Animator>();
             var stateName = _charaStateNames[Random.Range(0, _charaStateNames.Length - 1)];
             anim.Play(stateName);
 
@@ -231,7 +267,7 @@ namespace KK_MobAdder
             SetupNavmeshObstacle(top);
 
             top.SetActive(false);
-            _mobTemplate = top;
+            _swimsuitSilhouetteTemplates = new List<GameObject> { top }; //todo more kinds? with hair?
 
             // Allow for Object.Destroy calls to finish since we're making copies of some of the object below
             yield return null;
@@ -247,22 +283,22 @@ namespace KK_MobAdder
             var names = sab.GetAllAssetNames();
 
             var uniformNames = names.Where(x => x.Contains("uniform_")).ToList();
-            _uniformSilhouettes = new List<GameObject>();
+            _uniformSilhouetteTemplates = new List<GameObject>();
             foreach (var uniformName in uniformNames)
             {
                 var newTop = CreteSilhouetteFromBundle(sab, uniformName, silhouetteMaterial, animObjCopy, ctrl);
-                _uniformSilhouettes.Add(newTop);
+                _uniformSilhouetteTemplates.Add(newTop);
             }
 
             var gymNames = names.Where(x => x.Contains("gym_")).ToList();
-            _gymSilhouettes = new List<GameObject>();
+            _gymSilhouetteTemplates = new List<GameObject>();
             foreach (var gymName in gymNames)
             {
                 var newTop = CreteSilhouetteFromBundle(sab, gymName, silhouetteMaterial, animObjCopy, ctrl);
-                _gymSilhouettes.Add(newTop);
+                _gymSilhouetteTemplates.Add(newTop);
             }
 
-            MobAdderPlugin.Logger.LogInfo($"Loaded {_uniformSilhouettes.Count} uniform silhouettes and {_gymSilhouettes.Count} gym silhouettes");
+            MobAdderPlugin.Logger.LogInfo($"Loaded {_uniformSilhouetteTemplates.Count} uniform silhouettes and {_gymSilhouetteTemplates.Count} gym silhouettes");
 
             var unused = names.Except(uniformNames).Except(gymNames).ToArray();
             if (unused.Any()) MobAdderPlugin.Logger.LogWarning("Unused assets in the silhouette asset bundle: " + string.Join("; ", unused));
@@ -511,7 +547,7 @@ namespace KK_MobAdder
 
             if (_mobPositionData.TryGetValue(mapNo, out var list))
             {
-                if (_mobTemplate == null)
+                if (_swimsuitSilhouetteTemplates == null)
                     yield return CreateTemplates();
 
                 _mobColorProperty.SetColor(ChaShader._Color, Manager.Config.AddData.mobColor);
