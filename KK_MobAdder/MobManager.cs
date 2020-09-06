@@ -4,7 +4,9 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using ActionGame;
+using HarmonyLib;
 using Illusion.Component.Correct;
+using KKAPI.Utilities;
 using Manager;
 using StrayTech;
 using UnityEngine;
@@ -80,6 +82,8 @@ namespace KK_MobAdder
         private static readonly MaterialPropertyBlock _mobColorProperty = new MaterialPropertyBlock();
         private static GameObject _mobTemplate;
         private static readonly List<SpawnedMobInfo> _spawnedMobs = new List<SpawnedMobInfo>();
+        private static List<GameObject> _uniformSilhouettes;
+        private static List<GameObject> _gymSilhouettes;
 
         public static void GatherMobsAroundPoint(Vector3 centerPoint)
         {
@@ -128,7 +132,9 @@ namespace KK_MobAdder
 
         public static GameObject SpawnMob(Vector3 position, Quaternion rotation, bool log, int no)
         {
-            var copy = Object.Instantiate(_mobTemplate, Game.Instance.actScene.Map.mapRoot.transform);
+            var template = _uniformSilhouettes.Concat(_gymSilhouettes).AddItem(_mobTemplate).GetRandomElement();
+
+            var copy = Object.Instantiate(template, Game.Instance.actScene.Map.mapRoot.transform);
 
             copy.transform.SetPositionAndRotation(position, rotation);
             copy.SetActive(true);
@@ -151,35 +157,15 @@ namespace KK_MobAdder
             return copy;
         }
 
-        public static GameObject CreateTemplate()
+        public static IEnumerator CreateTemplates()
         {
+            // ---------- First load the built-in silhouette and other necessary assets ---------- //
+
             var top = new GameObject("silhouette_template");
             Object.DontDestroyOnLoad(top);
 
-            SkinnedMeshRenderer PrepareRenderers(GameObject obj)
-            {
-                SkinnedMeshRenderer result = null;
-                foreach (var r in obj.GetComponentsInChildren<SkinnedMeshRenderer>(true))
-                    if (r.transform.name == "n_body_silhouette")
-                    {
-                        result = r;
-                        r.transform.parent.gameObject.SetActive(true);
-
-                        // Change to map layer to fix appearing on top of everything in talk scenes
-                        r.gameObject.layer = 11;
-                        r.receiveShadows = false;
-                        r.shadowCastingMode = ShadowCastingMode.Off;
-                    }
-                    else
-                    {
-                        Object.Destroy(r.gameObject);
-                    }
-
-                return result;
-            }
-
             var modelObj = CommonLib.LoadAsset<GameObject>("chara/oo_base.unity3d", "p_cm_body_00_low", true, "abdata");
-            var modelRend = PrepareRenderers(modelObj);
+            var modelRend = PrepareSilhouetteRenderer(modelObj);
             GameObject animObj;
             if (modelRend != null)
             {
@@ -190,7 +176,7 @@ namespace KK_MobAdder
                 // The fallback is needed for KK Party, posibly pre-darkness KK
                 Object.Destroy(modelObj);
                 modelObj = CommonLib.LoadAsset<GameObject>("chara/oo_base.unity3d", "p_cm_body_00", true, "abdata");
-                modelRend = PrepareRenderers(modelObj);
+                modelRend = PrepareSilhouetteRenderer(modelObj);
                 if (modelRend == null)
                 {
                     Object.Destroy(modelObj);
@@ -199,10 +185,6 @@ namespace KK_MobAdder
 
                 animObj = CommonLib.LoadAsset<GameObject>("chara/oo_base.unity3d", "p_cf_body_bone", true, "abdata");
             }
-
-            modelObj.transform.SetParent(top.transform);
-            animObj.transform.SetParent(top.transform);
-
             var animCmp = animObj.GetComponent<Animator>();
             foreach (var c in animObj.GetComponentsInChildren(typeof(Component), true))
             {
@@ -216,6 +198,14 @@ namespace KK_MobAdder
                 else
                     Object.DestroyImmediate(c);
             }
+
+            var animObjCopy = Object.Instantiate(animObj);
+
+            modelObj.transform.SetParent(top.transform);
+            animObj.transform.SetParent(top.transform);
+
+            RemoveCloneTagsFromName(modelObj);
+            RemoveCloneTagsFromName(animObj);
 
             // Replace mesh bones with animator bones
             var animBones = animCmp.GetComponentsInChildren<Transform>(true);
@@ -238,15 +228,133 @@ namespace KK_MobAdder
 
             animBundle.Unload(false);
 
+            SetupNavmeshObstacle(top);
+
+            top.SetActive(false);
+            _mobTemplate = top;
+
+            // Allow for Object.Destroy calls to finish since we're making copies of some of the object below
+            yield return null;
+
+            // ---------- Next load custom silhouette models from our asset bundle ---------- //
+
+            var silhouetteMaterial = modelRend.material;
+
+            var res = ResourceUtils.GetEmbeddedResource("silhouettes", typeof(MobAdderPlugin).Assembly);
+            var sab = AssetBundle.LoadFromMemory(res);
+            //var sab = AssetBundle.LoadFromFile(@"E:\Unity projects\kk test\Assets\AssetBundles\test");
+
+            var names = sab.GetAllAssetNames();
+
+            var uniformNames = names.Where(x => x.Contains("uniform_")).ToList();
+            _uniformSilhouettes = new List<GameObject>();
+            foreach (var uniformName in uniformNames)
+            {
+                var newTop = CreteSilhouetteFromBundle(sab, uniformName, silhouetteMaterial, animObjCopy, ctrl);
+                _uniformSilhouettes.Add(newTop);
+            }
+
+            var gymNames = names.Where(x => x.Contains("gym_")).ToList();
+            _gymSilhouettes = new List<GameObject>();
+            foreach (var gymName in gymNames)
+            {
+                var newTop = CreteSilhouetteFromBundle(sab, gymName, silhouetteMaterial, animObjCopy, ctrl);
+                _gymSilhouettes.Add(newTop);
+            }
+
+            MobAdderPlugin.Logger.LogInfo($"Loaded {_uniformSilhouettes.Count} uniform silhouettes and {_gymSilhouettes.Count} gym silhouettes");
+
+            var unused = names.Except(uniformNames).Except(gymNames).ToArray();
+            if (unused.Any()) MobAdderPlugin.Logger.LogWarning("Unused assets in the silhouette asset bundle: " + string.Join("; ", unused));
+
+            sab.Unload(false);
+
+            // Allow for templates to finish creating before allowing spawning them
+            yield return null;
+        }
+
+        private static void SetupNavmeshObstacle(GameObject top)
+        {
             // Add colliders so characters avoid them and player can't walk through
             var obst = top.AddComponent<NavMeshObstacle>();
             obst.carving = true;
             obst.shape = NavMeshObstacleShape.Capsule;
             obst.radius = 0.35f;
+        }
 
-            top.SetActive(false);
+        private static SkinnedMeshRenderer PrepareSilhouetteRenderer(GameObject obj)
+        {
+            SkinnedMeshRenderer result = null;
+            foreach (var r in obj.GetComponentsInChildren<SkinnedMeshRenderer>(true))
+                if (r.transform.name == "n_body_silhouette")
+                {
+                    result = r;
+                    r.transform.parent.gameObject.SetActive(true);
 
-            return top;
+                    // Change to map layer to fix appearing on top of everything in talk scenes
+                    r.gameObject.layer = 11;
+                    r.receiveShadows = false;
+                    r.shadowCastingMode = ShadowCastingMode.Off;
+                    r.lightProbeUsage = LightProbeUsage.Off;
+                    r.reflectionProbeUsage = ReflectionProbeUsage.Off;
+                }
+                else
+                {
+                    Object.Destroy(r.gameObject);
+                }
+
+            return result;
+        }
+
+        private static void RemoveCloneTagsFromName(GameObject go)
+        {
+            go.name = go.name.Replace("(Clone)", "");
+        }
+
+        private static GameObject CreteSilhouetteFromBundle(AssetBundle assetBundle, string assetName,
+            Material silhouetteMaterial, GameObject animatorObjectTemplate, RuntimeAnimatorController animationControllerTemplate)
+        {
+            var newTop = new GameObject("silhouette_template_" + assetName.Substring(assetName.LastIndexOf('/') + 1));
+
+            // Create a copy of the asset and prepare it ----------
+            var uniform = assetBundle.LoadAsset<GameObject>(assetName);
+            var copy = Object.Instantiate(uniform);
+
+            var newRend = PrepareSilhouetteRenderer(copy);
+            newRend.material = silhouetteMaterial;
+            for (var i = 0; i < newRend.materials.Length; i++)
+                newRend.materials[i] = silhouetteMaterial;
+
+            // Create a copy of the animator and prepare it ----------
+            var newAnimObj = Object.Instantiate(animatorObjectTemplate, newTop.transform);
+            RemoveCloneTagsFromName(newAnimObj);
+            var newAnimator = newAnimObj.gameObject.GetComponentInChildren<Animator>();
+            newAnimator.runtimeAnimatorController = Object.Instantiate(animationControllerTemplate);
+
+            // Replace mesh bones with animator bones ----------
+            var newAnimBones = newAnimObj.GetComponentsInChildren<Transform>(true);
+            var newModelBones = newRend.bones.ToArray();
+            for (var i = 0; i < newModelBones.Length; i++)
+            {
+                var replacement = newAnimBones.FirstOrDefault(x => x.name == newModelBones[i].name);
+                newModelBones[i] = replacement;
+                //Console.WriteLine("could not find bone in animator: " + newModelBones[i].name);
+            }
+            newRend.rootBone = newAnimBones.First(x => x.name == "cf_j_root");
+            newRend.bones = newModelBones;
+
+            var bodRoot = copy.FindChild("p_cm_body_00");
+            bodRoot.transform.SetParent(newTop.transform, false);
+
+            // Clean up and misc ----------
+            Object.Destroy(uniform);
+            Object.Destroy(copy);
+
+            SetupNavmeshObstacle(newTop);
+
+            newTop.SetActive(false);
+            Object.DontDestroyOnLoad(newTop);
+            return newTop;
         }
 
         public static void ReadCsv()
@@ -394,11 +502,7 @@ namespace KK_MobAdder
             if (_mobPositionData.TryGetValue(mapNo, out var list))
             {
                 if (_mobTemplate == null)
-                {
-                    _mobTemplate = CreateTemplate();
-                    // Allow for template to finish creating
-                    yield return null;
-                }
+                    yield return CreateTemplates();
 
                 _mobColorProperty.SetColor(ChaShader._Color, Manager.Config.AddData.mobColor);
 
@@ -413,8 +517,7 @@ namespace KK_MobAdder
                     amount *= 0.3f;
 
                 // Choose a different amount of mobs based on the time of day and some random spread
-                var mobCount =
-                    (int)(list.Count * amount * Random.Range(0.5f, 1.2f) * MobAdderPlugin.MobAmountModifier.Value);
+                var mobCount = (int)(list.Count * amount * Random.Range(0.5f, 1.2f) * MobAdderPlugin.MobAmountModifier.Value);
                 if (mobCount > 0)
                 {
                     // Choose random mob positions
