@@ -80,7 +80,7 @@ namespace KK_MobAdder
         private static readonly Dictionary<int, float[]> _mobSpreadData = new Dictionary<int, float[]>();
         private static readonly MaterialPropertyBlock _mobColorProperty = new MaterialPropertyBlock();
         private static readonly List<SpawnedMobInfo> _spawnedMobs = new List<SpawnedMobInfo>();
-        
+
         private static List<GameObject> _swimsuitSilhouetteTemplates;
         private static List<GameObject> _uniformSilhouetteTemplates;
         private static List<GameObject> _gymSilhouetteTemplates;
@@ -181,6 +181,10 @@ namespace KK_MobAdder
 
             var hBone = copy.transform.Find("p_cf_body_bone/cf_j_root/cf_n_height");
             hBone.localScale = new Vector3(Random.Range(0.825f, 0.975f), Random.Range(0.825f, 0.975f), Random.Range(0.825f, 0.975f));
+            var neckBone = copy.transform.FindChildDeep("cf_j_neck");
+            neckBone.transform.localScale *= Random.Range(0.9f, 1.05f);
+            var spineBone = copy.transform.FindChildDeep("cf_j_spine01");
+            spineBone .transform.localScale *= Random.Range(0.95f, 1.05f);
 
             copy.GetComponentInChildren<Renderer>().SetPropertyBlock(_mobColorProperty);
 
