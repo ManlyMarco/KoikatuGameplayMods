@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections;
-using System.Diagnostics;
 using System.Linq;
 using ActionGame.Chara;
 using BepInEx;
@@ -35,7 +34,7 @@ namespace KK_WarpToCharacters
 
         private static new ManualLogSource Logger;
 
-        private static Sprite _spriteMoveIcon;
+        private static GameObject _template;
         private static ActionScene _actionScene;
 
         public void Start()
@@ -51,28 +50,17 @@ namespace KK_WarpToCharacters
         {
             try
             {
-                if (_spriteMoveIcon == null)
-                {
-                    var texture2D = ResourceUtils.GetEmbeddedResource("button.png").LoadTexture(TextureFormat.DXT5);
-                    _spriteMoveIcon = Sprite.Create(texture2D, new Rect(0f, 0f, texture2D.width, texture2D.height),
-                        new Vector2(0.5f, 0.5f), 100f, 0U, SpriteMeshType.FullRect);
-                    DontDestroyOnLoad(_spriteMoveIcon);
-                }
-
                 if (_actionScene == null) _actionScene = FindObjectOfType<ActionScene>();
 
-                foreach (var chaStatusComponent in new[] { ___cmpFix, ___cmpFemale, ___cmpTeacher })
+                if (_template == null)
                 {
-                    var cardTr = chaStatusComponent.cmpStudentCard.transform;
-                    // Check if the button isn't already spawned
-                    if (cardTr.Find(ButtonName)) continue;
-
-                    // Always do this to prevent old versions from creating its own buttons if installed
-                    var go = new GameObject(ButtonName);
-                    go.transform.SetParent(cardTr, false);
+                    var go = new GameObject(ButtonName + "_template");
+                    go.transform.SetParent(_actionScene.transform, false);
 
                     var image = go.AddComponent<Image>();
-                    image.sprite = _spriteMoveIcon;
+                    var texture2D = ResourceUtils.GetEmbeddedResource("button.png").LoadTexture(TextureFormat.DXT5);
+                    var spriteMoveIcon = Sprite.Create(texture2D, new Rect(0f, 0f, texture2D.width, texture2D.height), new Vector2(0.5f, 0.5f), 100f, 0U, SpriteMeshType.FullRect);
+                    image.sprite = spriteMoveIcon;
 
                     var button = go.AddComponent<Button>();
                     button.targetGraphic = image;
@@ -80,6 +68,19 @@ namespace KK_WarpToCharacters
                     rt.anchorMin = rt.anchorMax = new Vector2(0.97f, 0.73f);
                     rt.offsetMin = new Vector2(-40, -40);
                     rt.offsetMax = Vector2.zero;
+
+                    go.SetActive(false);
+                    _template = go;
+                }
+
+                foreach (var chaStatusComponent in new[] { ___cmpFix, ___cmpFemale, ___cmpTeacher })
+                {
+                    var cardTr = chaStatusComponent.cmpStudentCard.transform;
+                    // Check if the button isn't already spawned
+                    if (cardTr.Find(ButtonName)) continue;
+
+                    // Do this in prefix to prevent old IPA version from creating its own buttons if installed
+                    GameObject.Instantiate(_template, cardTr, false).name = ButtonName;
                 }
             }
             catch (Exception e)
@@ -113,6 +114,7 @@ namespace KK_WarpToCharacters
 
                     var button = go.GetComponent<Button>();
                     if (button != null) button.onClick.AddListener(() => WarpToNpc(npc));
+                    go.SetActive(true);
                 }
             }
             catch (Exception e)
@@ -132,7 +134,7 @@ namespace KK_WarpToCharacters
             if (heroineNpc != null)
                 return heroineNpc;
 
-            Logger.LogError("Could not find Npc belonging to " + heroine.parameter.fullname);
+            Logger.LogError("Could not find NPC belonging to " + heroine.parameter.fullname);
             return null;
         }
 
