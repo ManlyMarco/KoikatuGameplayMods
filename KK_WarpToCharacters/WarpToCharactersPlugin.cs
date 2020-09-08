@@ -25,7 +25,7 @@ namespace KK_WarpToCharacters
     public sealed class WarpToCharactersPlugin : BaseUnityPlugin
     {
         public const string GUID = "WarpToCharacters";
-        public const string Version = "1.0";
+        public const string Version = "1.1";
 
         private const string GameProcessName = "Koikatu";
         private const string GameProcessNameSteam = "Koikatsu Party";
