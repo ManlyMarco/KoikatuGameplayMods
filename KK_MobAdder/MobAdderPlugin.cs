@@ -20,7 +20,7 @@ namespace KK_MobAdder
     public class MobAdderPlugin : BaseUnityPlugin
     {
         public const string GUID = "KK_MobAdder";
-        public const string Version = "2.0";
+        public const string Version = "3.0";
 
         private const string GameProcessName = "Koikatu";
         private const string GameProcessNameSteam = "Koikatsu Party";
