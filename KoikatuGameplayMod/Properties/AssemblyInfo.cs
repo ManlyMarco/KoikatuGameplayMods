@@ -5,13 +5,10 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("KoikatuGameplayMod")]
-[assembly: AssemblyDescription("")]
-[assembly: AssemblyConfiguration("")]
+[assembly: AssemblyDescription("Tweak and improve gameplay, fully configurable in plugin settings")]
 [assembly: AssemblyCompany("https://github.com/ManlyMarco/KoikatuGameplayMods")]
 [assembly: AssemblyProduct("KoikatuGameplayMod")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
-[assembly: AssemblyTrademark("")]
-[assembly: AssemblyCulture("")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
 // to COM components.  If you need to access a type in this assembly from
