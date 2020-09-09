@@ -98,7 +98,7 @@ namespace KK_MobAdder
             {32, new []{0.0f, 0.1f, 0.9f}},
             {34, new []{0.0f, 0.2f, 0.8f}},
             {37, new []{0.3f, 0.2f, 0.5f}},
-            {38, new []{0.05f, 0.75f, 0.2f}},
+            {38, new []{0.0f, 0.8f, 0.2f}},
             {47, new []{0.0f, 0.75f, 0.25f}},
         };
 
@@ -154,20 +154,20 @@ namespace KK_MobAdder
                 probabilities = _silhouetteTypeProbabilities[0]; // default data
 
             var random = Random.value;
-            var total = 0f;
-            GameObject selectedTemplate = null;
-            var templateArrs = new[] { _swimsuitSilhouetteTemplates, _uniformSilhouetteTemplates, _gymSilhouetteTemplates };
-            for (int i = 0; i < probabilities.Length; i++)
+
+            List<GameObject> selectedTemplates;
+            if (random < probabilities[0])
+                selectedTemplates = _swimsuitSilhouetteTemplates;
+            else if (random < probabilities[1] + probabilities[0])
+                selectedTemplates = _uniformSilhouetteTemplates;
+            else if (random < probabilities[2] + probabilities[1] + probabilities[0])
+                selectedTemplates = _gymSilhouetteTemplates;
+            else
             {
-                total += probabilities[i];
-                if (total >= random)
-                {
-                    var arr = templateArrs[i];
-                    selectedTemplate = arr.GetRandomElement();
-                }
+                // Shouldn't happen if probabilities add up to 1f, but just to be safe
+                selectedTemplates = _uniformSilhouetteTemplates;
             }
-            // Shouldn't happen if probabilities add up to 1f, but just to be safe
-            if (selectedTemplate == null) selectedTemplate = templateArrs.Last().GetRandomElement();
+            var selectedTemplate = selectedTemplates.GetRandomElement();
 
             // Spawn a copy of the selected template ----------
             var copy = Object.Instantiate(selectedTemplate, Game.Instance.actScene.Map.mapRoot.transform);
@@ -180,17 +180,19 @@ namespace KK_MobAdder
             anim.Play(stateName);
 
             var hBone = copy.transform.Find("p_cf_body_bone/cf_j_root/cf_n_height");
-            hBone.localScale = new Vector3(Random.Range(0.825f, 0.975f), Random.Range(0.825f, 0.975f), Random.Range(0.825f, 0.975f));
+            hBone.localScale *= Random.Range(0.85f, 1f);
             var neckBone = copy.transform.FindChildDeep("cf_j_neck");
-            neckBone.transform.localScale *= Random.Range(0.9f, 1.05f);
+            neckBone.transform.localScale *= Random.Range(0.85f, 0.95f);
             var spineBone = copy.transform.FindChildDeep("cf_j_spine01");
-            spineBone .transform.localScale *= Random.Range(0.95f, 1.05f);
+            spineBone.transform.localScale *= Random.Range(0.95f, 1.05f);
 
             copy.GetComponentInChildren<Renderer>().SetPropertyBlock(_mobColorProperty);
 
             if (log)
+            {
                 MobAdderPlugin.Logger.LogMessage(
                     $"Added a mob: mapno:{no} anim:{stateName} scale:{hBone.localScale} pos:{position} rot:{rotation}");
+            }
 
             _spawnedMobs.Add(new SpawnedMobInfo(copy, position, rotation));
 
