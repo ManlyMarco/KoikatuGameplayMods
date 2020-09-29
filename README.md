@@ -1,3 +1,24 @@
+# Introduction
+This repository contains a random assortment of plugins that modify the gameplay of Koikatu!
+
+## How to download
+Go to [releases](https://github.com/ManlyMarco/KoikatuGameplayMods/releases) and look for the latest release of the plugin you want. You can also compile it from source (instructions below).
+
+## How to install
+Almost all plugins are installed in the same way. If there are any extra steps needed they will be added to the plugin descriptions below.
+1. Make sure you have at least BepInEx 5.1 and latest BepisPlugins and KKAPI.
+2. Download the latest release of the plugin you want.
+3. Extract the archive into your game directory. The plugin .dll should end up inside your BepInEx\plugins directory.
+4. Check if there are no warnings on game startup, if the plugin has settings it should appear in plugin settings.
+
+## Compiling
+Simply clone this repository to your drive and use the free version of Visual Studio 2019 for C# to compile it. Hit build and all necessary dependencies should be automatically downloaded. Check the following links for useful tutorials. If you are having trouble or want to try to make your own plugin/mod, feel free to ask for help in modding channels of either the [Koikatsu](https://discord.gg/hevygx6) or [IllusionSoft](https://discord.gg/F3bDEFE) Discord servers.
+- https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository
+- https://docs.microsoft.com/en-us/visualstudio/get-started/csharp/?view=vs-2019
+- https://docs.microsoft.com/en-us/visualstudio/ide/troubleshooting-broken-references?view=vs-2019
+
+## Specific plugin descriptions
+
 # Koikatu Gameplay Mod
 Plugin that tweaks and (hopefully) improves Koikatu gameplay.
 
@@ -14,12 +35,6 @@ Plugin that tweaks and (hopefully) improves Koikatu gameplay.
 **Warning:** Setting the character limit above 38 requires a large amount of RAM and will extend loading times. To load 99 characters the game will need approximately 10GB of free RAM (depending on the characters used).
 **Warning:** Compatibility with kPlug is shaky at best. You might be able to get both plugins to work at the same time but I can't check the compatibility and I'm unable to fix any compatibility issues that aren't caused by issues in this plugin.
 
-### How to install
-1. Make sure you have at least BepInEx 5.1 and latest BepisPlugins and KKAPI.
-2. Download the latest release.
-3. Extract the archive into your game directory. The plugin .dll should end up inside your BepInEx\plugins directory.
-4. Check if there are no warnings on game startup, GameplayMod options should appear in plugin settings. You can turn off the functions you don't need.
-
 ![preview](https://user-images.githubusercontent.com/39247311/50426454-0c860a00-088e-11e9-85d0-493db814cc48.png)
 
 # KK_Pregnancy / Pregnancy mod
@@ -32,49 +47,33 @@ The plugin can be configured in plugin settings and per-character in female char
 
 Because the pregnant effect is made by manipulating bones, there are some limitations and potential issues. On some characters the effect might look bad, especially if they use many ABMX sliders around the belly area. Clothes that use skirt bones (skirts, dresses, etc.) can look glitchy, which is sadly unavoidable without tweaking each character manually in maker. Clothes that stick close to the body will work best.
 
-### How to install
-1. Make sure you have at least BepInEx 5.0 and latest BepisPlugins, KKAPI and KKABMX.
-2. Download the latest [release](https://github.com/ManlyMarco/Koikatu-Gameplay-Mod/releases).
-3. Extract the archive into your game directory. The plugin .dll should end up inside of your BepInEx\plugins directory.
-4. Check if there are no warnings on game startup, Pregnancy options should appear in plugin settings and in female chara maker.
-
 ![preview](https://user-images.githubusercontent.com/39247311/60744379-f8764000-9f75-11e9-886b-be5e74448258.png)
 
 # KK_OrthographicCamera
 Plugin that allows using of the orthographic (parallel projection) camera mode. Works in both Studio and main game/maker. (This is the effect that is used in isometric games like for example Diablo 2 and Fallout 2)
 
-### How to use
-- Needs BepInEx v5.x
-- Place the .dll inside your `BepInEx\plugins` folder.
-- To toggle between perspective (normal) and orthographic camera mode press the I key (can be changed in settings) and then use your mouse scroll wheel to zoom in and out.
+To toggle between perspective (normal) and orthographic camera mode press the I key (can be changed in settings) and then use your mouse scroll wheel to zoom in and out.
 
 ![preview](https://user-images.githubusercontent.com/39247311/59981520-dd661080-9604-11e9-9b2b-eefbd1a1a66b.png)
 
 # KK_MobAdder
 This plugin adds random mob characters across maps in story mode in order to make it feel less vacant. The mobs have simple animations, no annoying sounds and don't move from their spots - they are purely for decoration.
 
-### Requirements
-1. Make sure you have at least BepInEx 5.0, as well as latest BepisPlugins and KKAPI.
-2. Download the release binaries.
-3. Extract the archive into your game directory. The plugin .dll should end up inside of your BepInEx\plugins directory.
-4. Check if there are no warnings on game startup, mobs should appear when you start a new day in story mode.
+**Notes:**
+- You can disable the mobs and change their color from the game's settings screen, look for mob settings near the bottom (the same settings that control mobs on the train map). You need to reenter the current map to see the change.
+- The amount of spawned mobs varies by time of the day and location. It can be adjusted in plugin settings, and by editing the included spread.csv file if you want to fine-tune it.
+- You can add more mob spawn points if you want to. Go to plugin settings and assign both of the plugin's hotkeys, check their descriptions as well. If you add a bunch of spawn points please consider sharing your positions.csv file so everyone can benefit!
 
 ![Preview](https://user-images.githubusercontent.com/39247311/77672415-2cbce100-6f89-11ea-8351-63a1465dcc0e.png)
 
 # KK_NightDarkener
-Plugin that darkens the night scenes to something slightly more realistic. Configurable, can go down to horror levels of darkness.
-
-Needs BepInEx and BepisPlugins, to install copy the dll to your BepInEx directory.
+Plugin that darkens the map in Free H scenes set at night to something slightly more realistic. Configurable, can go down to horror levels of darkness.
 
 Inspired by PHmod44_KK_Dark_Map_Ver mod, thanks to HCM06 for bringing it up.
 
-### Requirements
-Works under BepInEx with Harmony. Needs latest BepisPlugins - universal ConfigurationManager is used for mod settings.
-
 ![Preview](https://user-images.githubusercontent.com/39247311/55674510-07395200-58b6-11e9-8b85-d15f8fab54fa.png)
 
-# Compiling
-Simply clone this repository to your drive and use the free version of Visual Studio 2019 for C# to compile it. Hit build and all necessary dependencies should be automatically downloaded. Check the following links for useful tutorials. If you are having trouble or want to try to make your own plugin/mod, feel free to ask for help in modding channels of either the [Koikatsu](https://discord.gg/hevygx6) or [IllusionSoft](https://discord.gg/F3bDEFE) Discord servers.
-- https://help.github.com/en/github/creating-cloning-and-archiving-repositories/cloning-a-repository
-- https://docs.microsoft.com/en-us/visualstudio/get-started/csharp/?view=vs-2019
-- https://docs.microsoft.com/en-us/visualstudio/ide/troubleshooting-broken-references?view=vs-2019
+# KK_WarpToCharacters
+This plugin adds a "warp to this character" button to the character roster in roaming mode (press middle mouse button and select the clipboard icon from the menu). You can also warp to the next story event (it will appear at the top center).
+
+This plugin is a replacement/upgrade for KK_MoveMapFromCharaList. Compared to its precedesor, this plugin warps the player right next to the target, has a nicer icon that only appears if characters are on a different map than the player, and uses BepInEx5 instead of IPA.
