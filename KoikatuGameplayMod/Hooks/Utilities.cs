@@ -42,15 +42,5 @@ namespace KoikatuGameplayMod
         {
             return (__instance.flags.mode == HFlag.EMode.houshi3P || __instance.flags.mode == HFlag.EMode.sonyu3P) ? (__instance.flags.nowAnimationInfo.id % 2) : 0;
         }
-
-        public static void ForceAllowInsert(HSprite instance)
-        {
-            instance.flags.isDebug = true;
-        }
-
-        public static void ResetForceAllowInsert(HSprite __instance)
-        {
-            __instance.flags.isDebug = false;
-        }
     }
 }
