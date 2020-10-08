@@ -44,9 +44,9 @@ namespace KK_WarpToCharacters
             Harmony.CreateAndPatchAll(typeof(WarpToCharactersPlugin));
         }
 
-        [HarmonyPrefix]
+        [HarmonyPostfix]
         [HarmonyPatch(typeof(ChaStatusScene), "Start")]
-        private static void CreateButtonsPre(ChaStatusComponent ___cmpFix, ChaStatusComponent ___cmpTeacher, ChaStatusComponent ___cmpFemale)
+        private static void CreateButtons(ChaStatusScene __instance, ChaStatusComponent ___cmpMale)
         {
             try
             {
@@ -71,46 +71,26 @@ namespace KK_WarpToCharacters
 
                     go.SetActive(false);
                     _template = go;
+                    DontDestroyOnLoad(go);
                 }
 
-                foreach (var chaStatusComponent in new[] { ___cmpFix, ___cmpFemale, ___cmpTeacher })
-                {
-                    var cardTr = chaStatusComponent.cmpStudentCard.transform;
-                    // Check if the button isn't already spawned
-                    if (cardTr.Find(ButtonName)) continue;
-
-                    // Do this in prefix to prevent old IPA version from creating its own buttons if installed
-                    GameObject.Instantiate(_template, cardTr, false).name = ButtonName;
-                }
-            }
-            catch (Exception e)
-            {
-                UnityEngine.Debug.LogException(e);
-            }
-        }
-
-
-        [HarmonyPostfix]
-        [HarmonyPatch(typeof(ChaStatusScene), "Start")]
-        private static void CreateButtons(ChaStatusScene __instance, ChaStatusComponent ___cmpMale)
-        {
-            try
-            {
                 foreach (var chaStatusComponent in __instance.gameObject.GetComponentsInChildren<ChaStatusComponent>())
                 {
                     if (chaStatusComponent == ___cmpMale) continue;
 
-                    var cardTr = chaStatusComponent.cmpStudentCard.transform;
-                    var go = cardTr.Find(ButtonName)?.gameObject;
-                    if (go == null) continue;
+                    //var go = cardTr.Find(ButtonName)?.gameObject;
+                    //if (go == null) continue;
 
                     // Do not show the button if character is on the same map as player
                     var npc = GetCharaNpc(chaStatusComponent);
                     if (npc == null || npc.mapNo == _actionScene.Player.mapNo)
                     {
-                        go.SetActive(false);
                         continue;
                     }
+                    
+                    var cardTr = chaStatusComponent.cmpStudentCard.transform;
+                    var go = GameObject.Instantiate(_template, cardTr, false);
+                    go.name = ButtonName;
 
                     var button = go.GetComponent<Button>();
                     if (button != null) button.onClick.AddListener(() => WarpToNpc(npc));
