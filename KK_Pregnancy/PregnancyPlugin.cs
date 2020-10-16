@@ -19,11 +19,13 @@ namespace KK_Pregnancy
 
         public static ConfigEntry<bool> ConceptionEnabled { get; private set; }
         public static ConfigEntry<bool> AnalConceptionEnabled { get; private set; }
+        public static ConfigEntry<bool> ConceptionOverrideEnabled { get; private set; }
         public static ConfigEntry<bool> ShowPregnancyIconEarly { get; private set; }
         public static ConfigEntry<int> PregnancyProgressionSpeed { get; private set; }
         public static ConfigEntry<bool> HSceneMenstrIconOverride { get; private set; }
 
         public static ConfigEntry<bool> InflationEnable { get; private set; }
+        public static ConfigEntry<int> InflationSpeed { get; private set; }
         public static ConfigEntry<bool> InflationOpenClothAtMax { get; private set; }
         public static ConfigEntry<int> InflationMaxCount { get; private set; }
         //public static ConfigEntry<int> InflationDrainSpeed { get; private set; }
@@ -46,6 +48,9 @@ namespace KK_Pregnancy
             AnalConceptionEnabled = Config.Bind("General", "Enable anal conception", false,
                 "Allows characters to get pregnant from anal sex. Doesn't affect already pregnant characters.");
 
+            ConceptionOverrideEnabled = Config.Bind("General", "Override conception for all", false,
+                "Allows any character to get pregnant. Even if pregnancy has not been enabled in character creater.  Doesn't affect already pregnant characters.");
+
             ShowPregnancyIconEarly = Config.Bind("General", "Show pregnancy icon early", false,
                 "By default pregnancy status icon in class roster is shown after a few days or weeks (the character had a chance to do the test or noticed something is wrong).\n" +
                 "Turning this on will always make the icon show up at the end of the current day.");
@@ -55,7 +60,13 @@ namespace KK_Pregnancy
                 "If the status is unknown you will have to listen for the voice cues instead.\nChanges take effect after game restart.");
 
             InflationEnable = Config.Bind("Inflation", "Enable inflation", true, "Turn on the inflation effect.");
+
+            InflationSpeed = Config.Bind("Inflation", "Inflation speed", 1, 
+                new ConfigDescription("How quickly the belly will inflate/deflate. \n\n1x, 2x, 3x",
+                new AcceptableValueList<int>(1, 2, 3)));
+
             InflationOpenClothAtMax = Config.Bind("Inflation", "Open clothes at max inflation", true, "If clothes are fully on, open them when inflation reaches the max value (they 'burst' open).");
+
             InflationMaxCount = Config.Bind("Inflation", "Cum count until full", 8, new ConfigDescription("How many times you have to let out inside to reach the maximum belly size.",
                 new AcceptableValueRange<int>(2, 15)));
 
