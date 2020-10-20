@@ -114,7 +114,8 @@ namespace KK_Pregnancy
                 var heroine = _currentHeroine.FirstOrDefault(x => GetOccupiedScreenRect(x).Contains(pos)).Key;
                 if (heroine == null) return;
 
-                var status = heroine.GetHeroineStatus();
+                var pregData = heroine.GetPregnancyData();
+                var status = heroine.GetHeroineStatus(pregData);
 
                 var windowHeight = status == HeroineStatus.Unknown ? 100 : status == HeroineStatus.Pregnant ? 180 : 370;
                 var screenRect = new Rect((int)pos.x + 30, (int)pos.y - windowHeight / 2, 180, windowHeight);
@@ -134,12 +135,12 @@ namespace KK_Pregnancy
                                 break;
 
                             case HeroineStatus.Pregnant:
-                                GUILayout.Label($"This character is pregnant (on week {heroine.GetPregnancyData(data => data.Week)} / 40).");
+                                GUILayout.Label($"This character is pregnant (on week {pregData.Week} / 40).");
                                 GUILayout.FlexibleSpace();
                                 GUILayout.Label("The character's body will slowly change, and at the end they will temporarily leave.");
 
                                 GUILayout.FlexibleSpace();
-                                var previousPregcount = Mathf.Max(0, heroine.GetPregnancyData(data => data.PregnancyCount) - 1);
+                                var previousPregcount = Mathf.Max(0, pregData.PregnancyCount - 1);
                                 GUILayout.Label($"This character was pregnant {previousPregcount} times before.");
                                 break;
 
@@ -163,17 +164,16 @@ namespace KK_Pregnancy
                                     GUILayout.Label($"{adjustedDay}: {(adjustedSafe ? "Safe" : "Risky")}");
                                 }
 
-                                var pregcount = heroine.GetPregnancyData(data => data.PregnancyCount);
-                                if (pregcount > 0)
+                                if (pregData.PregnancyCount > 0)
                                 {
                                     GUILayout.FlexibleSpace();
-                                    GUILayout.Label($"This character was pregnant {pregcount} times.");
+                                    GUILayout.Label($"This character was pregnant {pregData.PregnancyCount} times.");
                                 }
-                                var timeSincePreg = heroine.GetPregnancyData(data => data.WeeksSinceLastPregnancy);
-                                if (timeSincePreg > 0)
+
+                                if (pregData.WeeksSinceLastPregnancy > 0)
                                 {
                                     GUILayout.FlexibleSpace();
-                                    GUILayout.Label($"Last pregnancy was {timeSincePreg} weeks ago.");
+                                    GUILayout.Label($"Last pregnancy was {pregData.WeeksSinceLastPregnancy} weeks ago.");
                                 }
                                 break;
 
@@ -224,7 +224,7 @@ namespace KK_Pregnancy
 
                     _currentHeroine.Add(new KeyValuePair<SaveData.Heroine, RectTransform>(heroine, image.GetComponent<RectTransform>()));
 
-                    switch (heroine.GetHeroineStatus())
+                    switch (heroine.GetHeroineStatus(heroine.GetPregnancyData()))
                     {
                         case HeroineStatus.Unknown:
                             image.sprite = _unknownSprite;

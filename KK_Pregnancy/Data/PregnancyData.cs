@@ -23,15 +23,15 @@ namespace KK_Pregnancy
         /// <summary>
         /// The character is harder to get pregananant.
         /// </summary>
-        public float Fertility;
+        public float Fertility = 0.3f;
 
         /// <summary>
         /// Should any gameplay code be executed for this character.
         /// If false the current pregancy week doesn't change and the character can't get pegnant.
         /// </summary>
-        public bool GameplayEnabled;
+        public bool GameplayEnabled = true;
 
-        public MenstruationSchedule MenstruationSchedule;
+        public MenstruationSchedule MenstruationSchedule = MenstruationSchedule.Default;
 
         /// <summary>
         /// If 0 or negative, the character is not pregant.
@@ -54,12 +54,17 @@ namespace KK_Pregnancy
 
         #endregion
 
+        #region Save/Load
+
+        private static readonly PregnancyData _default = new PregnancyData();
+        private static readonly FieldInfo[] _serializedFields = typeof(PregnancyData).GetFields(BindingFlags.Public | BindingFlags.Instance);
+
         public static PregnancyData Load(PluginData data)
         {
             if (data?.data == null) return null;
 
             var result = new PregnancyData();
-            foreach (var fieldInfo in typeof(PregnancyData).GetFields(BindingFlags.Public | BindingFlags.Instance))
+            foreach (var fieldInfo in _serializedFields)
             {
                 if (data.data.TryGetValue(fieldInfo.Name, out var val))
                 {
@@ -87,17 +92,19 @@ namespace KK_Pregnancy
         public PluginData Save()
         {
             var result = new PluginData { version = 1 };
-            foreach (var fieldInfo in typeof(PregnancyData).GetFields())
+            foreach (var fieldInfo in _serializedFields)
             {
                 var value = fieldInfo.GetValue(this);
                 // Check if any value is different than default, if not then don't save any data
-                var defaultValue = fieldInfo.FieldType.IsValueType ? Activator.CreateInstance(fieldInfo.FieldType) : null;
+                var defaultValue = fieldInfo.GetValue(_default);
                 if (!Equals(defaultValue, value))
                     result.data.Add(fieldInfo.Name, value);
             }
 
             return result.data.Count > 0 ? result : null;
         }
+
+        #endregion
 
         // If week is 0 the character is not peregenent
         public bool IsPregnant => Week > 0;

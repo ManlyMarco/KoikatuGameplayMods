@@ -12,28 +12,40 @@ namespace KK_Pregnancy
 
         /// <param name="c">ChaFile to test</param>
         ///// <param name="afterWasDiscovered">The girl knows about it / tested it</param>
-        public static T GetPregnancyData<T>(this ChaFileControl c, Func<PregnancyData, T> selector)
+        public static PregnancyData GetPregnancyData(this ChaFileControl c)
         {
-            if (c == null) return default(T);
+            if (c == null) return null;
 
             var d = ExtendedSave.GetExtendedDataById(c, PregnancyPlugin.GUID);
-            if (d == null) return default(T);
+            if (d == null) return null;
 
-            return selector(PregnancyData.Load(d));
+            return PregnancyData.Load(d);
         }
 
         /// <param name="heroine">Heroine to test</param>
         ///// <param name="afterWasDiscovered">The girl knows about it / tested it</param>
-        public static T GetPregnancyData<T>(this SaveData.Heroine heroine, Func<PregnancyData, T> selector)
+        public static PregnancyData GetPregnancyData(this SaveData.Heroine heroine)
         {
-            if (heroine == null) return default(T);
+            if (heroine == null) return new PregnancyData();
 
-            return heroine.GetRelatedChaFiles().Max(control => GetPregnancyData(control, selector));
+            // Figure out which data to take if there are multiple
+            // probably not necessary? null check should be enough? 
+            return heroine.GetRelatedChaFiles()
+                .Select(GetPregnancyData)
+                .Where(x => x != null)
+                .OrderByDescending(x => x.PregnancyCount)
+                .ThenByDescending(x => x.WeeksSinceLastPregnancy)
+                .ThenByDescending(x => x.Week)
+                .ThenByDescending(x => x.MenstruationSchedule)
+                .ThenByDescending(x => x.GameplayEnabled)
+                .FirstOrDefault() ?? new PregnancyData();
         }
 
-        public static HeroineStatus GetHeroineStatus(this SaveData.Heroine heroine)
+        public static HeroineStatus GetHeroineStatus(this SaveData.Heroine heroine, PregnancyData pregData = null)
         {
             if (heroine == null) return HeroineStatus.Unknown;
+
+            if (pregData == null) pregData = heroine.GetPregnancyData();
 
             // Check if she wants to tell
             if (heroine.intimacy >= 80 ||
@@ -42,7 +54,7 @@ namespace KK_Pregnancy
                 (heroine.isGirlfriend || heroine.favor >= 90) &&
                 (!heroine.isVirgin || heroine.hCount >= 2 || heroine.intimacy >= 40))
             {
-                var pregnancyWeek = heroine.GetPregnancyData(data => data.Week);
+                var pregnancyWeek = pregData.Week;
                 if (pregnancyWeek > 0 && pregnancyWeek < PregnancyData.LeaveSchoolWeek) //todo add an extra state for the leave
                 {
                     if (PregnancyPlugin.ShowPregnancyIconEarly.Value) return HeroineStatus.Pregnant;
