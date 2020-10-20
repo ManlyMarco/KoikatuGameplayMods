@@ -98,7 +98,9 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\leave.png" />
+  </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\pregnant.png" />
     <EmbeddedResource Include="Resources\risky.png" />
