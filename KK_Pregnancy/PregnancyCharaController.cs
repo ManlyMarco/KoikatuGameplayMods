@@ -23,6 +23,7 @@ namespace KK_Pregnancy
         /// </summary>
         public float GetPregnancyEffectPercent()
         {
+            if (Data.Week > PregnancyData.LeaveSchoolWeek) return 0;
             // Don't show any effect at week 1 since it begins right after winning a child lottery
             return Mathf.Clamp01((Data.Week - 1f) / (PregnancyData.LeaveSchoolWeek - 1f));
         }
