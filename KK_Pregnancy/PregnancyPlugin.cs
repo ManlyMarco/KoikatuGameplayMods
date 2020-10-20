@@ -15,7 +15,7 @@ namespace KK_Pregnancy
     public partial class PregnancyPlugin : BaseUnityPlugin
     {
         public const string GUID = "KK_Pregnancy";
-        public const string Version = "2.1.2";
+        public const string Version = "2.2";
 
         public static ConfigEntry<bool> ConceptionEnabled { get; private set; }
         public static ConfigEntry<bool> AnalConceptionEnabled { get; private set; }
