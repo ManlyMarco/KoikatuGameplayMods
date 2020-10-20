@@ -5,6 +5,7 @@
         Unknown,
         Safe,
         Risky,
-        Pregnant
+        Pregnant,
+        OnLeave
     }
 }

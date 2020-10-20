@@ -14,9 +14,9 @@ namespace KK_Pregnancy
             private static Sprite _pregSprite;
             private static Sprite _safeSprite;
             private static Sprite _riskySprite;
+            private static Sprite _leaveSprite;
 
-            public static void Init(Harmony hi, Sprite unknownSprite, Sprite pregSprite, Sprite safeSprite,
-                Sprite riskySprite)
+            public static void Init(Harmony hi, Sprite unknownSprite, Sprite pregSprite, Sprite safeSprite, Sprite riskySprite, Sprite leaveSprite)
             {
                 if (PregnancyPlugin.HSceneMenstrIconOverride.Value)
                 {
@@ -24,6 +24,7 @@ namespace KK_Pregnancy
                     _pregSprite = pregSprite ? pregSprite : throw new ArgumentNullException(nameof(pregSprite));
                     _riskySprite = riskySprite ? riskySprite : throw new ArgumentNullException(nameof(riskySprite));
                     _safeSprite = safeSprite ? safeSprite : throw new ArgumentNullException(nameof(safeSprite));
+                    _leaveSprite = leaveSprite ? leaveSprite : throw new ArgumentNullException(nameof(leaveSprite));
                     hi.PatchAll(typeof(HSceneMenstrIconOverride));
                 }
             }
@@ -53,6 +54,7 @@ namespace KK_Pregnancy
                         AddNewState(_pregSprite);
                         AddNewState(_safeSprite);
                         AddNewState(_riskySprite);
+                        AddNewState(_leaveSprite);
                     }
 
                     var heroineStatus = __instance.GetLeadingHeroine().GetHeroineStatus();
@@ -69,6 +71,9 @@ namespace KK_Pregnancy
                             break;
                         case HeroineStatus.Risky:
                             __instance.categoryMenstruation.SetActiveToggle(5);
+                            break;
+                        case HeroineStatus.OnLeave:
+                            __instance.categoryMenstruation.SetActiveToggle(6);
                             break;
                     }
                 }

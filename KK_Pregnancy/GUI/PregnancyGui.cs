@@ -40,9 +40,10 @@ namespace KK_Pregnancy
                 var riskySprite = LoadIcon("risky.png");
                 var safeSprite = LoadIcon("safe.png");
                 var unknownSprite = LoadIcon("unknown.png");
+                var leaveSprite = LoadIcon("leave.png");
 
-                StatusIcons.Init(hi, unknownSprite, pregSprite, safeSprite, riskySprite);
-                HSceneMenstrIconOverride.Init(hi, unknownSprite, pregSprite, safeSprite, riskySprite);
+                StatusIcons.Init(hi, unknownSprite, pregSprite, safeSprite, riskySprite, leaveSprite);
+                HSceneMenstrIconOverride.Init(hi, unknownSprite, pregSprite, safeSprite, riskySprite, leaveSprite);
             }
         }
 

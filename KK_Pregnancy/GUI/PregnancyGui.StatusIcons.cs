@@ -20,15 +20,17 @@ namespace KK_Pregnancy
             private static Sprite _riskySprite;
             private static Sprite _safeSprite;
             private static Sprite _unknownSprite;
+            private static Sprite _leaveSprite;
 
             private static readonly List<KeyValuePair<SaveData.Heroine, RectTransform>> _currentHeroine = new List<KeyValuePair<SaveData.Heroine, RectTransform>>();
 
-            internal static void Init(Harmony hi, Sprite unknownSprite, Sprite pregSprite, Sprite safeSprite, Sprite riskySprite)
+            internal static void Init(Harmony hi, Sprite unknownSprite, Sprite pregSprite, Sprite safeSprite, Sprite riskySprite, Sprite leaveSprite)
             {
                 _unknownSprite = unknownSprite ? unknownSprite : throw new ArgumentNullException(nameof(unknownSprite));
                 _pregSprite = pregSprite ? pregSprite : throw new ArgumentNullException(nameof(pregSprite));
                 _riskySprite = riskySprite ? riskySprite : throw new ArgumentNullException(nameof(riskySprite));
                 _safeSprite = safeSprite ? safeSprite : throw new ArgumentNullException(nameof(safeSprite));
+                _leaveSprite = leaveSprite ? leaveSprite : throw new ArgumentNullException(nameof(leaveSprite));
 
                 SceneManager.sceneLoaded += SceneManager_sceneLoaded;
                 SceneManager.sceneUnloaded += s =>
@@ -117,7 +119,7 @@ namespace KK_Pregnancy
                 var pregData = heroine.GetPregnancyData();
                 var status = heroine.GetHeroineStatus(pregData);
 
-                var windowHeight = status == HeroineStatus.Unknown ? 100 : status == HeroineStatus.Pregnant ? 180 : 370;
+                var windowHeight = status == HeroineStatus.Unknown ? 100 : status == HeroineStatus.Pregnant || status == HeroineStatus.OnLeave ? 180 : 370;
                 var screenRect = new Rect((int)pos.x + 30, (int)pos.y - windowHeight / 2, 180, windowHeight);
                 IMGUIUtils.DrawSolidBox(screenRect);
                 GUILayout.BeginArea(screenRect, GUI.skin.box);
@@ -132,6 +134,12 @@ namespace KK_Pregnancy
                                 GUILayout.Label("This character didn't tell you their risky day schedule yet.");
                                 GUILayout.FlexibleSpace();
                                 GUILayout.Label("Become closer to learn it!");
+                                break;
+
+                            case HeroineStatus.OnLeave:
+                                GUILayout.Label("This character is on a maternal leave and will not appear until it is over.");
+                                GUILayout.FlexibleSpace();
+                                GUILayout.Label("Consider using a rubber next time!");
                                 break;
 
                             case HeroineStatus.Pregnant:
@@ -228,6 +236,9 @@ namespace KK_Pregnancy
                     {
                         case HeroineStatus.Unknown:
                             image.sprite = _unknownSprite;
+                            break;
+                        case HeroineStatus.OnLeave:
+                            image.sprite = _leaveSprite;
                             break;
                         case HeroineStatus.Safe:
                             image.sprite = _safeSprite;
