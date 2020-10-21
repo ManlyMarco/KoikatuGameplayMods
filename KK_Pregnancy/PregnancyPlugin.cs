@@ -45,10 +45,10 @@ namespace KK_Pregnancy
             ConceptionEnabled = Config.Bind("General", "Enable conception", true,
                 "Allows characters to get pregnant from vaginal sex. Doesn't affect already pregnant characters.");
 
-            FertilityOverride = Config.Bind<float>("General", "Fertility override", 0.3f,
-                new ConfigDescription("Overrides default character fertility values with the one selected. \n\n" +
-                    "30%, 50%, 75%, 100% chance to get pregnant after HScene",
-                new AcceptableValueList<float>(0.3f, 0.5f, 0.75f, 1f)));
+            FertilityOverride = Config.Bind<float>("General", "Global fertility level", 0f,
+                new ConfigDescription("Sets a global fertility level that will be used when greater than the characters default fertility value. \n\n" +
+                    "30%, 50%, 75%, 100% chance to get pregnant after HScene\n 0% will revert to using characters default fertility value.",
+                new AcceptableValueList<float>(0f, 0.3f, 0.5f, 0.75f, 1f)));
 
             AnalConceptionEnabled = Config.Bind("General", "Enable anal conception", false,
                 "Allows characters to get pregnant from anal sex. Doesn't affect already pregnant characters.");
