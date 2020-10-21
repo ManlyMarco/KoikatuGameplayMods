@@ -18,6 +18,7 @@ namespace KK_Pregnancy
         public const string Version = "2.2";
 
         public static ConfigEntry<bool> ConceptionEnabled { get; private set; }
+        public static ConfigEntry<float> FertilityOverride { get; private set; }
         public static ConfigEntry<bool> AnalConceptionEnabled { get; private set; }
         public static ConfigEntry<bool> ShowPregnancyIconEarly { get; private set; }
         public static ConfigEntry<int> PregnancyProgressionSpeed { get; private set; }
@@ -43,6 +44,11 @@ namespace KK_Pregnancy
 
             ConceptionEnabled = Config.Bind("General", "Enable conception", true,
                 "Allows characters to get pregnant from vaginal sex. Doesn't affect already pregnant characters.");
+
+            FertilityOverride = Config.Bind<float>("General", "Fertility override", 0.3f,
+                new ConfigDescription("Overrides default character fertility values with the one selected. \n\n" +
+                    "30%, 50%, 75%, 100% chance to get pregnant after HScene",
+                new AcceptableValueList<float>(0.3f, 0.5f, 0.75f, 1f)));
 
             AnalConceptionEnabled = Config.Bind("General", "Enable anal conception", false,
                 "Allows characters to get pregnant from anal sex. Doesn't affect already pregnant characters.");
