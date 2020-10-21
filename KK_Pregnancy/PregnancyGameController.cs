@@ -45,7 +45,7 @@ namespace KK_Pregnancy
             var isDangerousDay = HFlag.GetMenstruation(heroine.MenstruationDay) == HFlag.MenstruationType.危険日;
             if (!isDangerousDay) return;
 
-            var cameInside = (PregnancyPlugin.ConceptionEnabled.Value || PregnancyPlugin.ConceptionOverrideEnabled.Value) && proc.flags.count.sonyuInside > 0;
+            var cameInside = PregnancyPlugin.ConceptionEnabled.Value && proc.flags.count.sonyuInside > 0;
             var cameInsideAnal = PregnancyPlugin.AnalConceptionEnabled.Value && proc.flags.count.sonyuAnalInside > 0;
             if (cameInside || cameInsideAnal)
             {
@@ -53,7 +53,7 @@ namespace KK_Pregnancy
                 if (controller == null) throw new ArgumentNullException(nameof(controller));
 
                 //Allow pregnancy if enabled, or overridden, and is not currently pregnant
-                if ((!PregnancyPlugin.ConceptionOverrideEnabled.Value && !controller.Data.GameplayEnabled) || controller.Data.IsPregnant) return;
+                if (!controller.Data.GameplayEnabled || controller.Data.IsPregnant) return;
 
                 var winThreshold = Mathf.RoundToInt(controller.Data.Fertility * 100);
                 var childLottery = Random.Range(1, 100);

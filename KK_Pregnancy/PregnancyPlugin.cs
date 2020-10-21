@@ -19,7 +19,6 @@ namespace KK_Pregnancy
 
         public static ConfigEntry<bool> ConceptionEnabled { get; private set; }
         public static ConfigEntry<bool> AnalConceptionEnabled { get; private set; }
-        public static ConfigEntry<bool> ConceptionOverrideEnabled { get; private set; }
         public static ConfigEntry<bool> ShowPregnancyIconEarly { get; private set; }
         public static ConfigEntry<int> PregnancyProgressionSpeed { get; private set; }
         public static ConfigEntry<bool> HSceneMenstrIconOverride { get; private set; }
@@ -47,9 +46,6 @@ namespace KK_Pregnancy
 
             AnalConceptionEnabled = Config.Bind("General", "Enable anal conception", false,
                 "Allows characters to get pregnant from anal sex. Doesn't affect already pregnant characters.");
-
-            ConceptionOverrideEnabled = Config.Bind("General", "Override conception for all", false,
-                "Allows any character to get pregnant. Even if pregnancy has not been enabled in character creater.  Doesn't affect already pregnant characters.");
 
             ShowPregnancyIconEarly = Config.Bind("General", "Show pregnancy icon early", false,
                 "By default pregnancy status icon in class roster is shown after a few days or weeks (the character had a chance to do the test or noticed something is wrong).\n" +
