@@ -25,7 +25,7 @@ namespace KK_WarpToCharacters
     public sealed class WarpToCharactersPlugin : BaseUnityPlugin
     {
         public const string GUID = "WarpToCharacters";
-        public const string Version = "1.1";
+        public const string Version = "1.1.1";
 
         private const string GameProcessName = "Koikatu";
         private const string GameProcessNameSteam = "Koikatsu Party";
@@ -77,9 +77,6 @@ namespace KK_WarpToCharacters
                 foreach (var chaStatusComponent in __instance.gameObject.GetComponentsInChildren<ChaStatusComponent>())
                 {
                     if (chaStatusComponent == ___cmpMale) continue;
-
-                    //var go = cardTr.Find(ButtonName)?.gameObject;
-                    //if (go == null) continue;
 
                     // Do not show the button if character is on the same map as player
                     var npc = GetCharaNpc(chaStatusComponent);
