@@ -55,7 +55,7 @@ namespace KK_Pregnancy
                 //Allow pregnancy if enabled, or overridden, and is not currently pregnant
                 if (!controller.Data.GameplayEnabled || controller.Data.IsPregnant) return;
 
-                var fertility = (PregnancyPlugin.FertilityOverride.Value > controller.Data.Fertility) ? PregnancyPlugin.FertilityOverride.Value : controller.Data.Fertility;
+                var fertility = Mathf.Max(PregnancyPlugin.FertilityOverride.Value, controller.Data.Fertility);
 
                 var winThreshold = Mathf.RoundToInt(fertility * 100);
                 var childLottery = Random.Range(1, 100);

@@ -28,7 +28,6 @@ namespace KK_Pregnancy
         public static ConfigEntry<int> InflationSpeed { get; private set; }
         public static ConfigEntry<bool> InflationOpenClothAtMax { get; private set; }
         public static ConfigEntry<int> InflationMaxCount { get; private set; }
-        //public static ConfigEntry<int> InflationDrainSpeed { get; private set; }
 
         internal static new ManualLogSource Logger { get; private set; }
 
@@ -45,9 +44,10 @@ namespace KK_Pregnancy
             ConceptionEnabled = Config.Bind("General", "Enable conception", true,
                 "Allows characters to get pregnant from vaginal sex. Doesn't affect already pregnant characters.");
 
-            FertilityOverride = Config.Bind<float>("General", "Global fertility level", 0f,
-                new ConfigDescription("Sets a global fertility level that will be used when greater than the characters default fertility value. \n\n" +
-                    "30%, 50%, 75%, 100% chance to get pregnant after HScene\n 0% will revert to using characters default fertility value.",
+            FertilityOverride = Config.Bind("General", "Minimum fertility level", 0f,
+                new ConfigDescription("If a character has a lower fertility level than this set, this level will be used instead. \n\n" +
+                    "0 - The value saved in the character card is used (30% by default)\n" +
+                    "30%, 50%, 75%, 100% - If the character card's saved value is lower, it will be raised to this level in HScenes.",
                 new AcceptableValueList<float>(0f, 0.3f, 0.5f, 0.75f, 1f)));
 
             AnalConceptionEnabled = Config.Bind("General", "Enable anal conception", false,
@@ -63,14 +63,14 @@ namespace KK_Pregnancy
 
             InflationEnable = Config.Bind("Inflation", "Enable inflation", true, "Turn on the inflation effect.");
 
-            InflationSpeed = Config.Bind("Inflation", "Inflation speed", 1, 
-                new ConfigDescription("How quickly the belly will inflate/deflate. \n\n1x, 2x, 3x",
-                new AcceptableValueList<int>(1, 2, 3)));
+            InflationSpeed = Config.Bind("Inflation", "Inflation speed modifier", 1, 
+                new ConfigDescription("How quickly the belly will inflate/deflate compared to normal (1x, 2x, 3x as fast).", new AcceptableValueList<int>(1, 2, 3)));
 
-            InflationOpenClothAtMax = Config.Bind("Inflation", "Open clothes at max inflation", true, "If clothes are fully on, open them when inflation reaches the max value (they 'burst' open).");
+            InflationOpenClothAtMax = Config.Bind("Inflation", "Open clothes at max inflation", true, 
+                "If clothes are fully on, open them when inflation reaches the max value (they 'burst' open).");
 
-            InflationMaxCount = Config.Bind("Inflation", "Cum count until full", 8, new ConfigDescription("How many times you have to let out inside to reach the maximum belly size.",
-                new AcceptableValueRange<int>(2, 15)));
+            InflationMaxCount = Config.Bind("Inflation", "Cum count until full", 8, 
+                new ConfigDescription("How many times you have to let out inside to reach the maximum belly size.", new AcceptableValueRange<int>(2, 15)));
 
             CharacterApi.RegisterExtraBehaviour<PregnancyCharaController>(GUID);
             GameAPI.RegisterExtraBehaviour<PregnancyGameController>(GUID);
