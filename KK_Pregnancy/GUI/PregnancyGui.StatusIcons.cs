@@ -22,6 +22,8 @@ namespace KK_Pregnancy
             private static Sprite _unknownSprite;
             private static Sprite _leaveSprite;
 
+            private const string ICON_NAME = "Pregnancy_Icon"; 
+
             private static readonly List<KeyValuePair<SaveData.Heroine, RectTransform>> _currentHeroine = new List<KeyValuePair<SaveData.Heroine, RectTransform>>();
 
             internal static void Init(Harmony hi, Sprite unknownSprite, Sprite pregSprite, Sprite safeSprite, Sprite riskySprite, Sprite leaveSprite)
@@ -100,6 +102,28 @@ namespace KK_Pregnancy
 
                     _pluginInstance.StartCoroutine(CreatePregnancyIconCo());
                 }
+            }
+
+            /// <summary>
+            ///     Handle char icon for quick status popup
+            /// </summary>
+            [HarmonyPostfix]
+            [HarmonyPatch(typeof(ParamUI), "SetHeroine", typeof(SaveData.Heroine))]
+            private static void ParamUI_SetHeroine(ParamUI __instance, SaveData.Heroine _heroine) {
+                var objFemaleRoot = Traverse.Create(__instance).Field("objFemaleRoot").GetValue<GameObject>();
+                if (objFemaleRoot == null) return;
+
+                SpawnGUI();
+
+                IEnumerator HeroineCanvasPreviewUpdateCo()
+                {
+                    yield return new WaitForEndOfFrame();
+
+                    _currentHeroine.Clear();                    
+                    SetQuickStatusIcon(objFemaleRoot, _heroine, -214f, -26f);                    
+                }
+
+                _pluginInstance.StartCoroutine(HeroineCanvasPreviewUpdateCo());
             }
 
             private static void SpawnGUI()
@@ -204,9 +228,8 @@ namespace KK_Pregnancy
             /// <param name="xOffset">Offset from the lovers icon</param>
             private static void SetHeart(GameObject heartObj, SaveData.Heroine heroine, float xOffset)
             {
-                const string name = "Pregnancy_Icon";
                 var owner = heartObj.transform.parent;
-                var existing = owner.Find(name);
+                var existing = owner.Find(ICON_NAME);
 
                 if (heroine == null)
                 {
@@ -218,7 +241,7 @@ namespace KK_Pregnancy
                     if (existing == null)
                     {
                         var copy = Instantiate(heartObj, owner);
-                        copy.name = name;
+                        copy.name = ICON_NAME;
                         copy.SetActive(true);
 
                         var rt = copy.GetComponent<RectTransform>();
@@ -228,30 +251,73 @@ namespace KK_Pregnancy
                         existing = copy.transform;
                     }
 
-                    var image = existing.GetComponent<Image>();
+                    AddPregIcon(existing, heroine);
+                }
+            }
 
-                    _currentHeroine.Add(new KeyValuePair<SaveData.Heroine, RectTransform>(heroine, image.GetComponent<RectTransform>()));
+            /// <summary>
+            ///     Enable/disable pregnancy icon on quick status container
+            /// </summary>
+            /// <param name="characterImageObj">The heroine image object</param>
+            /// <param name="heroine">Is the preg icon shown</param>
+            /// <param name="xOffset">Offset from the character image</param>
+            /// <param name="yOffset">Offset from the character image</param>
+            private static void SetQuickStatusIcon(GameObject characterImageObj, SaveData.Heroine heroine, float xOffset, float yOffset) {                            
+                var existing = characterImageObj.transform.Find(ICON_NAME);
 
-                    switch (heroine.GetHeroineStatus(heroine.GetPregnancyData()))
+                if (heroine == null)
+                {
+                    if (existing != null)
+                        Destroy(existing.gameObject);
+                }
+                else
+                {
+                    if (existing == null)
                     {
-                        case HeroineStatus.Unknown:
-                            image.sprite = _unknownSprite;
-                            break;
-                        case HeroineStatus.OnLeave:
-                            image.sprite = _leaveSprite;
-                            break;
-                        case HeroineStatus.Safe:
-                            image.sprite = _safeSprite;
-                            break;
-                        case HeroineStatus.Risky:
-                            image.sprite = _riskySprite;
-                            break;
-                        case HeroineStatus.Pregnant:
-                            image.sprite = _pregSprite;
-                            break;
-                        default:
-                            throw new ArgumentOutOfRangeException();
+                        var newChildIcon = new GameObject();
+                        newChildIcon.AddComponent<RectTransform>();                
+                        newChildIcon.AddComponent<Image>();   
+
+                        var copy = Instantiate(newChildIcon, characterImageObj.transform);
+                        copy.name = ICON_NAME;
+                        copy.SetActive(true);
+
+                        var charRt = characterImageObj.GetComponent<RectTransform>();
+                        var rt = copy.GetComponent<RectTransform>();
+                        rt.anchoredPosition = new Vector2(charRt.anchoredPosition.x + xOffset, charRt.anchoredPosition.y + yOffset);
+                        rt.sizeDelta = new Vector2(48, 48);
+
+                        existing = copy.transform;
                     }
+
+                    AddPregIcon(existing, heroine);
+                }
+            }
+
+            private static void AddPregIcon(Transform pregIconTransform, SaveData.Heroine heroine) {
+                var image = pregIconTransform.GetComponent<Image>();
+
+                _currentHeroine.Add(new KeyValuePair<SaveData.Heroine, RectTransform>(heroine, image.GetComponent<RectTransform>()));
+
+                switch (heroine.GetHeroineStatus(heroine.GetPregnancyData()))
+                {
+                    case HeroineStatus.Unknown:
+                        image.sprite = _unknownSprite;
+                        break;
+                    case HeroineStatus.OnLeave:
+                        image.sprite = _leaveSprite;
+                        break;
+                    case HeroineStatus.Safe:
+                        image.sprite = _safeSprite;
+                        break;
+                    case HeroineStatus.Risky:
+                        image.sprite = _riskySprite;
+                        break;
+                    case HeroineStatus.Pregnant:
+                        image.sprite = _pregSprite;
+                        break;
+                    default:
+                        throw new ArgumentOutOfRangeException();
                 }
             }
 
