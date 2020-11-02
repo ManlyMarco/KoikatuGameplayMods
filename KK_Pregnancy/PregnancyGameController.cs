@@ -52,6 +52,7 @@ namespace KK_Pregnancy
                 var controller = heroine.chaCtrl.GetComponent<PregnancyCharaController>();
                 if (controller == null) throw new ArgumentNullException(nameof(controller));
 
+                //Allow pregnancy if enabled, or overridden, and is not currently pregnant
                 if (!controller.Data.GameplayEnabled || controller.Data.IsPregnant) return;
 
                 var fertility = Mathf.Max(PregnancyPlugin.FertilityOverride.Value, controller.Data.Fertility);
