@@ -19,6 +19,12 @@ namespace KK_Pregnancy
 
         private void Start()
         {
+            if(!PregnancyPlugin.LactationEnabled.Value)
+            {
+                enabled = false;
+                return;
+            }
+
             _proc = FindObjectOfType<HSceneProc>();
 
             var lstFemale = (List<ChaControl>)AccessTools.Field(typeof(HSceneProc), "lstFemale").GetValue(_proc);
@@ -78,11 +84,16 @@ namespace KK_Pregnancy
             // Regenerate milk over time
             foreach (var charaData in _charas)
             {
-                // Fully fill in 60 seconds * x
-                var change = Time.deltaTime / (60f * 5f);
-                // Slower recharge if there isn't much of it
-                change *= charaData.MaxMilk;
-                charaData.CurrentMilk = Mathf.Min(charaData.CurrentMilk + change, charaData.MaxMilk);
+                if (PregnancyPlugin.LactationFillTime.Value == 0)
+                {
+                    charaData.CurrentMilk = charaData.MaxMilk;
+                }
+                else
+                {
+                    // Fully fill in 60 seconds * x
+                    var change = Time.deltaTime / (60f * PregnancyPlugin.LactationFillTime.Value);
+                    charaData.CurrentMilk = Mathf.Min(charaData.CurrentMilk + change * charaData.MaxMilk, charaData.MaxMilk);
+                }
             }
         }
 
@@ -126,6 +137,7 @@ namespace KK_Pregnancy
             private static float GetMilkAmount(PregnancyCharaController controller)
             {
                 if (controller == null) return 0;
+                if (PregnancyPlugin.LactationForceMaxCapacity.Value) return 1;
                 var data = controller.Data;
                 if (data.AlwaysLactates) return 1;
                 // Gradually increase

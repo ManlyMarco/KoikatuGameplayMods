@@ -29,6 +29,10 @@ namespace KK_Pregnancy
         public static ConfigEntry<bool> InflationOpenClothAtMax { get; private set; }
         public static ConfigEntry<int> InflationMaxCount { get; private set; }
 
+        public static ConfigEntry<bool> LactationEnabled { get; private set; }
+        public static ConfigEntry<int> LactationFillTime { get; private set; }
+        public static ConfigEntry<bool> LactationForceMaxCapacity { get; private set; }
+
         internal static new ManualLogSource Logger { get; private set; }
 
         private void Start()
@@ -63,14 +67,23 @@ namespace KK_Pregnancy
 
             InflationEnable = Config.Bind("Inflation", "Enable inflation", true, "Turn on the inflation effect.");
 
-            InflationSpeed = Config.Bind("Inflation", "Inflation speed modifier", 1, 
+            InflationSpeed = Config.Bind("Inflation", "Inflation speed modifier", 1,
                 new ConfigDescription("How quickly the belly will inflate/deflate compared to normal (1x, 2x, 3x as fast).", new AcceptableValueList<int>(1, 2, 3)));
 
-            InflationOpenClothAtMax = Config.Bind("Inflation", "Open clothes at max inflation", true, 
+            InflationOpenClothAtMax = Config.Bind("Inflation", "Open clothes at max inflation", true,
                 "If clothes are fully on, open them when inflation reaches the max value (they 'burst' open).");
 
-            InflationMaxCount = Config.Bind("Inflation", "Cum count until full", 8, 
+            InflationMaxCount = Config.Bind("Inflation", "Cum count until full", 8,
                 new ConfigDescription("How many times you have to let out inside to reach the maximum belly size.", new AcceptableValueRange<int>(2, 15)));
+
+            LactationEnabled = Config.Bind("Lactation", "Enable lactation", true,
+                "Enable the lactation effect. For the effect to work the character has to be pregnant, or the override setting has to be enabled.");
+
+            LactationFillTime = Config.Bind("Lactation", "Time to fully refill", 5,
+                new ConfigDescription("How many minutes it takes to fully refill the milk. 0 is always fully refilled.", new AcceptableValueRange<int>(0, 10)));
+
+            LactationForceMaxCapacity = Config.Bind("Lactation", "Force max milk capacity", false,
+                "If enabled, all characters will lactate and have full capacity. If off, capacity depends on the pregnancy progress.");
 
             CharacterApi.RegisterExtraBehaviour<PregnancyCharaController>(GUID);
             GameAPI.RegisterExtraBehaviour<PregnancyGameController>(GUID);
