@@ -1,4 +1,5 @@
 ﻿using BepInEx;
+using BepInEx.Configuration;
 using HarmonyLib;
 using Studio;
 using UnityEngine;
@@ -11,12 +12,17 @@ namespace StudioCameraTweaks
         public const string GUID = "StudioCameraTweaks";
         public const string Version = "1.0";
 
+        private static ConfigEntry<bool> _spawnAtMaincam;
+        private static OCICamera _lastCamera;
+
         private void Awake()
         {
+            _spawnAtMaincam = Config.Bind("Camera Object", "Spawn at current camera position", true,
+                "Should clicking the Camera button in Workspace window spawn the new camera at the current viewport camera position?\n" +
+                "The deafault is to spawn the new camera object at either origin point or current cursor position.");
+
             Harmony.CreateAndPatchAll(typeof(StudioCameraTweaksPlugin));
         }
-        
-        private static OCICamera _lastCamera;
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(AddObjectCamera), nameof(AddObjectCamera.Add))]
@@ -29,10 +35,13 @@ namespace StudioCameraTweaks
         [HarmonyPatch(typeof(WorkspaceCtrl), "OnClickCamera")]
         public static void AddCameraHook2()
         {
-            var changeAmount = _lastCamera.objectInfo.changeAmount;
-            var camera = Camera.main.transform;
-            changeAmount.pos = camera.position;
-            changeAmount.rot = camera.rotation.eulerAngles;
+            if (_spawnAtMaincam.Value)
+            {
+                var changeAmount = _lastCamera.objectInfo.changeAmount;
+                var camera = Camera.main.transform;
+                changeAmount.pos = camera.position;
+                changeAmount.rot = camera.rotation.eulerAngles;
+            }
         }
     }
 }
