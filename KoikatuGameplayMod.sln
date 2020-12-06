@@ -17,7 +17,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KK_MobAdder", "KK_MobAdder\
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KK_WarpToCharacters", "KK_WarpToCharacters\KK_WarpToCharacters.csproj", "{033339B2-01B3-4CC0-9732-BF88ED5ACF98}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudioCameraTweaks", "StudioCameraTweaks\StudioCameraTweaks.csproj", "{1CA4932C-0B11-40CF-B906-23CCC52AD7E1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudioCameraObjectTweaks", "StudioCameraObjectTweaks\StudioCameraObjectTweaks.csproj", "{1CA4932C-0B11-40CF-B906-23CCC52AD7E1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

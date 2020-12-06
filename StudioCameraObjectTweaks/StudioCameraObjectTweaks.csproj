@@ -7,8 +7,8 @@
     <ProjectGuid>{1CA4932C-0B11-40CF-B906-23CCC52AD7E1}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>StudioCameraTweaks</RootNamespace>
-    <AssemblyName>StudioCameraTweaks</AssemblyName>
+    <RootNamespace>StudioCameraObjectTweaks</RootNamespace>
+    <AssemblyName>StudioCameraObjectTweaks</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
@@ -55,7 +55,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="StudioCameraTweaksPlugin.cs" />
+    <Compile Include="StudioCameraObjectTweaksPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

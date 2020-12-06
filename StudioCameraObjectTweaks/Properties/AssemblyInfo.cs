@@ -1,11 +1,11 @@
 ﻿using System.Reflection;
 using System.Runtime.InteropServices;
-using StudioCameraTweaks;
+using StudioCameraObjectTweaks;
 
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Studio Camera Tweaks")]
+[assembly: AssemblyTitle("Studio Camera Object Tweaks")]
 [assembly: AssemblyDescription("Tweaks to camera items in studio")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("https://github.com/ManlyMarco/KoikatuGameplayMods")]
@@ -32,4 +32,4 @@ using StudioCameraTweaks;
 // You can specify all the values or you can default the Build and Revision Numbers
 // by using the '*' as shown below:
 // [assembly: AssemblyVersion("1.0.*")]
-[assembly: AssemblyVersion(StudioCameraTweaksPlugin.Version)]
+[assembly: AssemblyVersion(StudioCameraObjectTweaksPlugin.Version)]

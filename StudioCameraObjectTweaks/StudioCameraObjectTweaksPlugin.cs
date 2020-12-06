@@ -4,12 +4,12 @@ using HarmonyLib;
 using Studio;
 using UnityEngine;
 
-namespace StudioCameraTweaks
+namespace StudioCameraObjectTweaks
 {
     [BepInPlugin(GUID, "Studio Camera Tweaks", Version)]
     [BepInProcess("CharaStudio")]
     [BepInProcess("StudioNEOV2")]
-    public class StudioCameraTweaksPlugin : BaseUnityPlugin
+    public class StudioCameraObjectTweaksPlugin : BaseUnityPlugin
     {
         public const string GUID = "StudioCameraTweaks";
         public const string Version = "1.0";
@@ -28,7 +28,7 @@ namespace StudioCameraTweaks
                 "This will cause their gizmo to not appear, but they will still function normally.\n" +
                 "Useful when spawning at current camera position to not obscure the view.");
 
-            Harmony.CreateAndPatchAll(typeof(StudioCameraTweaksPlugin));
+            Harmony.CreateAndPatchAll(typeof(StudioCameraObjectTweaksPlugin));
         }
 
         [HarmonyPostfix]
