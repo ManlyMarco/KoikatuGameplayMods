@@ -49,12 +49,15 @@ Because the pregnant effect is made by manipulating bones, there are some limita
 
 ![preview](https://user-images.githubusercontent.com/39247311/60744379-f8764000-9f75-11e9-886b-be5e74448258.png)
 
-# KK_OrthographicCamera
+# OrthographicCamera
 Plugin that allows using of the orthographic (parallel projection) camera mode. Works in both Studio and main game/maker. (This is the effect that is used in isometric games like for example Diablo 2 and Fallout 2)
 
 To toggle between perspective (normal) and orthographic camera mode press the I key (can be changed in settings) and then use your mouse scroll wheel to zoom in and out.
 
 ![preview](https://user-images.githubusercontent.com/39247311/59981520-dd661080-9604-11e9-9b2b-eefbd1a1a66b.png)
+
+# StudioCameraObjectTweaks
+Plugin that tweaks to how camera objects work in studio (the ones created by pressing the camera button). It makes the camera objects spawn at the position of the current camera view, instead of at the cursor, and it hides the spawned cameras by default (configurable in plugin settings).
 
 # KK_MobAdder
 This plugin adds random mob characters across maps in story mode in order to make it feel less vacant. The mobs have simple animations, no annoying sounds and don't move from their spots - they are purely for decoration.
