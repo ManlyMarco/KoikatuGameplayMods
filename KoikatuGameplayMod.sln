@@ -19,6 +19,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KK_WarpToCharacters", "KK_W
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "StudioCameraObjectTweaks", "StudioCameraObjectTweaks\StudioCameraObjectTweaks.csproj", "{1CA4932C-0B11-40CF-B906-23CCC52AD7E1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KK_Bulge", "KK_Bulge\KK_Bulge.csproj", "{904B04C0-5095-40F9-915A-005F80BC2CB1}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -57,6 +59,10 @@ Global
 		{1CA4932C-0B11-40CF-B906-23CCC52AD7E1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1CA4932C-0B11-40CF-B906-23CCC52AD7E1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1CA4932C-0B11-40CF-B906-23CCC52AD7E1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{904B04C0-5095-40F9-915A-005F80BC2CB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{904B04C0-5095-40F9-915A-005F80BC2CB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{904B04C0-5095-40F9-915A-005F80BC2CB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{904B04C0-5095-40F9-915A-005F80BC2CB1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
