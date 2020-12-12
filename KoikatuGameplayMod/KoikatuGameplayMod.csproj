@@ -71,7 +71,6 @@
       <HintPath>..\packages\IllusionModdingAPI.KKAPI.1.12.3\lib\net35\KKAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="System" />
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\IllusionLibs.PlayHome.UnityEngine.5.5.5\lib\net35\UnityEngine.dll</HintPath>
       <Private>False</Private>
