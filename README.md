@@ -80,3 +80,6 @@ Inspired by PHmod44_KK_Dark_Map_Ver mod, thanks to HCM06 for bringing it up.
 This plugin adds a "warp to this character" button to the character roster in roaming mode (press middle mouse button and select the clipboard icon from the menu). You can also warp to the next story event (it will appear at the top center).
 
 This plugin is a replacement/upgrade for KK_MoveMapFromCharaList. Compared to its precedesor, this plugin warps the player right next to the target, has a nicer icon that only appears if characters are on a different map than the player, and uses BepInEx5 instead of IPA.
+
+# KK_Bulge
+Automatically adds crotch bulges to characters with fun sticks when they are wearing clothes. Can be configured globally, and per-character for when you want the bulge size to be just right.
