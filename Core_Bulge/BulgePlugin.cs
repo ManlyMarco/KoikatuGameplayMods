@@ -5,16 +5,21 @@ using BepInEx;
 using BepInEx.Configuration;
 using ExtensibleSaveFormat;
 using KKABMX.Core;
-using KKABMX.GUI;
 using KKAPI;
 using KKAPI.Chara;
-using KKAPI.MainGame;
 using KKAPI.Maker;
 using KKAPI.Maker.UI;
 using KKAPI.Studio;
 using KKAPI.Studio.UI;
 using UniRx;
 using UnityEngine;
+
+#if AI
+
+
+#elif KK
+using CoordinateType = ChaFileDefine.CoordinateType;
+#endif
 
 namespace KK_Bulge
 {
@@ -41,8 +46,12 @@ namespace KK_Bulge
 
             CreateInterface();
 
-            GameAPI.StartH += (sender, args) => DuringH = true;
-            GameAPI.EndH += (sender, args) => DuringH = false;
+#if KK
+            KKAPI.MainGame.GameAPI.StartH += (sender, args) => DuringH = true;
+            KKAPI.MainGame.GameAPI.EndH += (sender, args) => DuringH = false;
+#elif AI
+            //TODO Detect h scene in ai
+#endif
         }
 
         private void CreateInterface()
@@ -51,7 +60,11 @@ namespace KK_Bulge
             {
                 MakerAPI.MakerBaseLoaded += (sender, e) =>
                 {
-                    var cat = InterfaceData.BodyGenitals;
+#if KK
+                    var cat = KKABMX.GUI.InterfaceData.BodyGenitals;
+#elif AI
+                    var cat = MakerConstants.Body.Lower;
+#endif
 
                     e.AddControl(new MakerRadioButtons(cat, this, "Enable crotch bulge", (int)DefaultBulgeState.Value, "Auto", "Always", "Never"))
                         .BindToFunctionController<BulgeController, int>(controller => (int)controller.EnableBulge, (controller, value) => controller.EnableBulge = (BulgeEnableLevel)value);
@@ -130,7 +143,12 @@ namespace KK_Bulge
 
     internal class BulgeBoneEffect : BoneEffect
     {
-        private static readonly string[] _affectedBones = { "cf_j_kokan" };
+#if KK
+        private const string BulgeBoneName = "cf_j_kokan";
+#elif AI
+        private const string BulgeBoneName = //TODO CRITICAL no working bone with this effect? kokan bones don't work
+#endif
+        private static readonly string[] _affectedBones = { BulgeBoneName };
         private static readonly Vector3 _maxScale = new Vector3(2, 3, 3.3f);
         private static readonly Vector3 _maxPosition = new Vector3(0, -0.040f, 0);
         private static readonly BoneModifierData _boneModifierData = new BoneModifierData(_maxScale, 1, _maxPosition, Vector3.zero);
@@ -142,7 +160,12 @@ namespace KK_Bulge
         {
             if (ctrl == null) throw new ArgumentNullException(nameof(ctrl));
             _ctrl = ctrl;
+#if KK
+
             _son = _ctrl.ChaControl.GetReferenceInfo(ChaReference.RefObjKey.S_Son);
+#elif AI
+            _son = _ctrl.ChaControl.cmpSimpleBody.targetEtc.objDanTop;
+#endif
         }
 
         private bool GetBulgeVisible()
@@ -153,8 +176,16 @@ namespace KK_Bulge
             {
                 case BulgeEnableLevel.Auto:
                 default:
-                    if (BulgePlugin.DuringH && !Manager.Config.EtcData.VisibleSon)
-                        return false;
+                    if (BulgePlugin.DuringH)
+                    {
+#if KK
+                        if (!Manager.Config.EtcData.VisibleSon)
+#elif AI
+                        if (!Manager.Config.HData.Son)
+#endif
+                            return false;
+                    }
+
                     var status = _ctrl.ChaControl.fileStatus;
                     var bulgeVisible = status.visibleSonAlways && !_son.activeSelf;
                     return bulgeVisible;
@@ -170,9 +201,9 @@ namespace KK_Bulge
             return GetBulgeVisible() ? _affectedBones : Enumerable.Empty<string>();
         }
 
-        public override BoneModifierData GetEffect(string bone, BoneController origin, ChaFileDefine.CoordinateType coordinate)
+        public override BoneModifierData GetEffect(string bone, BoneController origin, CoordinateType coordinate)
         {
-            if (GetBulgeVisible() && bone == "cf_j_kokan")
+            if (GetBulgeVisible() && bone == BulgeBoneName)
             {
                 _boneModifierData.ScaleModifier = Vector3.Lerp(Vector3.one, _maxScale, _ctrl.BulgeSize);
                 _boneModifierData.PositionModifier = Vector3.Lerp(Vector3.zero, _maxPosition, _ctrl.BulgeSize);
