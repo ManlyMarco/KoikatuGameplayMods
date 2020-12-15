@@ -13,6 +13,7 @@ using KKAPI.Maker;
 using KKAPI.Maker.UI;
 using KKAPI.Studio;
 using KKAPI.Studio.UI;
+using StrayTech;
 using UniRx;
 using UnityEngine;
 
@@ -142,7 +143,9 @@ namespace KK_Bulge
         {
             if (ctrl == null) throw new ArgumentNullException(nameof(ctrl));
             _ctrl = ctrl;
-            _son = _ctrl.ChaControl.GetReferenceInfo(ChaReference.RefObjKey.S_Son);
+            // BodyTop/p_cf_body_00/cf_o_root/n_body/n_dankon
+            // BodyTop/p_cf_body_00 can be disabled in kkp in some cases, somehow, so need a full scan
+            _son = _ctrl.transform.FindChildDeep("n_dankon").gameObject;
         }
 
         private bool GetBulgeVisible()
