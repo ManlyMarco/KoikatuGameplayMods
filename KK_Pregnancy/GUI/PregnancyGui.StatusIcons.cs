@@ -22,7 +22,7 @@ namespace KK_Pregnancy
             private static Sprite _unknownSprite;
             private static Sprite _leaveSprite;
 
-            private const string ICON_NAME = "Pregnancy_Icon"; 
+            private const string ICON_NAME = "Pregnancy_Icon";
 
             private static readonly List<KeyValuePair<SaveData.Heroine, RectTransform>> _currentHeroine = new List<KeyValuePair<SaveData.Heroine, RectTransform>>();
 
@@ -109,7 +109,8 @@ namespace KK_Pregnancy
             /// </summary>
             [HarmonyPostfix]
             [HarmonyPatch(typeof(ParamUI), "SetHeroine", typeof(SaveData.Heroine))]
-            private static void ParamUI_SetHeroine(ParamUI __instance, SaveData.Heroine _heroine) {
+            private static void ParamUI_SetHeroine(ParamUI __instance, SaveData.Heroine _heroine)
+            {
                 var objFemaleRoot = Traverse.Create(__instance).Field("objFemaleRoot").GetValue<GameObject>();
                 if (objFemaleRoot == null) return;
 
@@ -119,8 +120,8 @@ namespace KK_Pregnancy
                 {
                     yield return new WaitForEndOfFrame();
 
-                    _currentHeroine.Clear();                    
-                    SetQuickStatusIcon(objFemaleRoot, _heroine, -214f, -26f);                    
+                    _currentHeroine.Clear();
+                    SetQuickStatusIcon(objFemaleRoot, _heroine, -214f, -26f);
                 }
 
                 _pluginInstance.StartCoroutine(HeroineCanvasPreviewUpdateCo());
@@ -196,10 +197,11 @@ namespace KK_Pregnancy
                                     GUILayout.Label($"{adjustedDay}: {(adjustedSafe ? "Safe" : "Risky")}");
                                 }
 
-                                if (pregData.PregnancyCount > 0)
+                                var pregnancyCount = pregData.IsPregnant ? pregData.PregnancyCount - 1 : pregData.PregnancyCount;
+                                if (pregnancyCount > 0)
                                 {
                                     GUILayout.FlexibleSpace();
-                                    GUILayout.Label($"This character was pregnant {pregData.PregnancyCount} times.");
+                                    GUILayout.Label($"This character was pregnant {pregnancyCount} times.");
                                 }
 
                                 if (pregData.WeeksSinceLastPregnancy > 0)
@@ -262,7 +264,8 @@ namespace KK_Pregnancy
             /// <param name="heroine">Is the preg icon shown</param>
             /// <param name="xOffset">Offset from the character image</param>
             /// <param name="yOffset">Offset from the character image</param>
-            private static void SetQuickStatusIcon(GameObject characterImageObj, SaveData.Heroine heroine, float xOffset, float yOffset) {                            
+            private static void SetQuickStatusIcon(GameObject characterImageObj, SaveData.Heroine heroine, float xOffset, float yOffset)
+            {
                 var existing = characterImageObj.transform.Find(ICON_NAME);
 
                 if (heroine == null)
@@ -275,8 +278,8 @@ namespace KK_Pregnancy
                     if (existing == null)
                     {
                         var newChildIcon = new GameObject();
-                        newChildIcon.AddComponent<RectTransform>();                
-                        newChildIcon.AddComponent<Image>();   
+                        newChildIcon.AddComponent<RectTransform>();
+                        newChildIcon.AddComponent<Image>();
 
                         var copy = Instantiate(newChildIcon, characterImageObj.transform);
                         copy.name = ICON_NAME;
@@ -294,7 +297,8 @@ namespace KK_Pregnancy
                 }
             }
 
-            private static void AddPregIcon(Transform pregIconTransform, SaveData.Heroine heroine) {
+            private static void AddPregIcon(Transform pregIconTransform, SaveData.Heroine heroine)
+            {
                 var image = pregIconTransform.GetComponent<Image>();
 
                 _currentHeroine.Add(new KeyValuePair<SaveData.Heroine, RectTransform>(heroine, image.GetComponent<RectTransform>()));
