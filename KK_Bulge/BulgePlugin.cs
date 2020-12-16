@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BepInEx;
 using BepInEx.Configuration;
+using BepInEx.Logging;
 using ExtensibleSaveFormat;
 using KKABMX.Core;
 using KKABMX.GUI;
@@ -27,12 +28,16 @@ namespace KK_Bulge
         public const string GUID = "Bulge";
         public const string Version = "1.0.1";
 
+        internal static new ManualLogSource Logger;
+
         internal static ConfigEntry<float> DefaultBulgeSize;
         internal static ConfigEntry<BulgeEnableLevel> DefaultBulgeState;
         internal static bool DuringH;
 
         private void Awake()
         {
+            Logger = base.Logger;
+
             DefaultBulgeSize = Config.Bind("Default settings", "Default bulge size", 0.5f,
                 new ConfigDescription("Default size of bulges if not specified per-character (in Body/Genitals tab in character maker).", new AcceptableValueRange<float>(0, 1)));
             DefaultBulgeState = Config.Bind("Default settings", "Enable bulge by default", BulgeEnableLevel.Auto,
@@ -113,9 +118,20 @@ namespace KK_Bulge
 
             if (_bulgeBoneEffect == null)
             {
-                _bulgeBoneEffect = new BulgeBoneEffect(this);
-                var bc = GetComponent<BoneController>();
-                bc.AddBoneEffect(_bulgeBoneEffect);
+                // BodyTop/p_cf_body_00/cf_o_root/n_body/n_dankon
+                // BodyTop/p_cf_body_00 can be disabled in kkp in some cases, somehow, so need a full scan
+                var sonGo = transform.FindChildDeep("n_dankon");
+                if (sonGo)
+                {
+                    BulgePlugin.Logger.LogDebug("Found n_dankon bone GameObject at " + sonGo.FullPath());
+                    _bulgeBoneEffect = new BulgeBoneEffect(this, sonGo.gameObject);
+                    var bc = GetComponent<BoneController>();
+                    bc.AddBoneEffect(_bulgeBoneEffect);
+                }
+                else
+                {
+                    BulgePlugin.Logger.LogDebug("Did not find n_dankon bone GameObject under " + gameObject.FullPath());
+                }
             }
 
             EnableBulge = BulgePlugin.DefaultBulgeState.Value;
@@ -139,13 +155,12 @@ namespace KK_Bulge
         private readonly BulgeController _ctrl;
         private readonly GameObject _son;
 
-        public BulgeBoneEffect(BulgeController ctrl)
+        public BulgeBoneEffect(BulgeController ctrl, GameObject son)
         {
             if (ctrl == null) throw new ArgumentNullException(nameof(ctrl));
+            if (son == null) throw new ArgumentNullException(nameof(son));
             _ctrl = ctrl;
-            // BodyTop/p_cf_body_00/cf_o_root/n_body/n_dankon
-            // BodyTop/p_cf_body_00 can be disabled in kkp in some cases, somehow, so need a full scan
-            _son = _ctrl.transform.FindChildDeep("n_dankon").gameObject;
+            _son = son;
         }
 
         private bool GetBulgeVisible()
