@@ -26,7 +26,7 @@ namespace KK_Bulge
     public class BulgePlugin : BaseUnityPlugin
     {
         public const string GUID = "Bulge";
-        public const string Version = "1.0.1";
+        public const string Version = "1.0.2";
 
         internal static new ManualLogSource Logger;
 
