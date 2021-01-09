@@ -138,7 +138,9 @@ namespace KK_Pregnancy
                 if (_currentHeroine.Count == 0) return;
 
                 var pos = new Vector2(Input.mousePosition.x, -(Input.mousePosition.y - Screen.height));
-                var heroine = _currentHeroine.FirstOrDefault(x => GetOccupiedScreenRect(x).Contains(pos)).Key;
+                var heroineKeyVal = _currentHeroine.FirstOrDefault(x => GetOccupiedScreenRect(x).Contains(pos));
+                if (heroineKeyVal.Equals(null)) return;
+                var heroine = heroineKeyVal.Key;
                 if (heroine == null) return;
 
                 var pregData = heroine.GetPregnancyData();
