@@ -8,8 +8,11 @@ namespace KK_LewdCrestX
         None = 0,
 
         command,
+        lactation,
+        liberated,
         libido,
         mindmelt,
+        vibrancy,
 
 
         //animalistic,
@@ -21,9 +24,7 @@ namespace KK_LewdCrestX
         //gaze,
         //glow,
         //inferiority,
-        //lactation,
         //lesser,
-        //liberated,
         //mantraction,
         //messaging,
         //pheromone,
@@ -38,7 +39,6 @@ namespace KK_LewdCrestX
         //sway,
         //task,
         //triggered,
-        vibrancy,
         //violove,
         //wombgasm
     }

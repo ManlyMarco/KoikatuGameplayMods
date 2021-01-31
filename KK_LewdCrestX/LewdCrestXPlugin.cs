@@ -11,7 +11,6 @@ using ExtensibleSaveFormat;
 using HarmonyLib;
 using Illusion.Extensions;
 using JetBrains.Annotations;
-using KK_Pregnancy;
 using KKABMX.Core;
 using KKAPI;
 using KKAPI.Chara;
@@ -63,7 +62,7 @@ namespace KK_LewdCrestX
     [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
     [BepInDependency(KKABMX_Core.GUID, "4.0")]
     [BepInDependency(KoiSkinOverlayMgr.GUID, "5.2")]
-    [BepInDependency(PregnancyPlugin.GUID, PregnancyPlugin.Version)]
+    [BepInDependency("KK_Pregnancy", BepInDependency.DependencyFlags.SoftDependency)]
     public class LewdCrestXPlugin : BaseUnityPlugin
     {
         public const string GUID = "LewdCrestX";
@@ -79,12 +78,41 @@ namespace KK_LewdCrestX
         {
             _hi?.UnpatchSelf();
         }
+
+        private static void GetMilkAmountPatch(CharaCustomFunctionController controller, ref float __result)
+        {
+            if (__result < 1f && controller != null)
+            {
+                if (LewdCrestXPlugin.GetCurrentCrest(controller.ChaControl) == CrestType.lactation)
+                    __result = 1f;
+            }
+        }
+
         private void Start()
         {
             Logger = base.Logger;
 
             _hi = Harmony.CreateAndPatchAll(typeof(TalkHooks), GUID);
             _hi.PatchAll(typeof(HsceneHooks));
+            _hi.PatchAll(typeof(CharacterHooks));
+
+            var lactType = Type.GetType("KK_Pregnancy.LactationController, KK_Pregnancy", false);
+            if (lactType != null)
+            {
+                var lactDataType = lactType.GetNestedType("CharaData", AccessTools.all);
+                if (lactDataType != null)
+                {
+                    var milkAmountMethod = lactDataType.GetMethod("GetMilkAmount", AccessTools.all);
+                    if (milkAmountMethod != null)
+                        _hi.Patch(milkAmountMethod, postfix: new HarmonyMethod(typeof(LewdCrestXPlugin), nameof(LewdCrestXPlugin.GetMilkAmountPatch)));
+                    else
+                        Logger.LogWarning("Could not find KK_Pregnancy.LactationController.CharaData.GetMilkAmount - something isn't right, please report this");
+                }
+                else
+                    Logger.LogWarning("Could not find KK_Pregnancy.LactationController.CharaData - something isn't right, please report this");
+            }
+            else
+                Logger.LogWarning("Could not find KK_Pregnancy.LactationController, some features might not work until you install KK_Pregnancy (please report this if you do have latest version of KK_Pregnancy installed)");
 
             ////var mat = new Material(Shader.Find("Standard"));
             ////ChaControl.rendBody.materials = ChaControl.rendBody.materials.Where(x => x != mat).AddItem(mat).ToArray();
@@ -153,9 +181,33 @@ namespace KK_LewdCrestX
         //private static LewdCrestXController GetController(ChaControl chaCtrl) => chaCtrl != null ? chaCtrl.GetComponent<LewdCrestXController>() : null;
         public static CrestType GetCurrentCrest(SaveData.Heroine heroine)
         {
+            //todo maybe cache too
             //var ctrl = GetController(heroine);
             //return ctrl == null ? CrestType.None : ctrl.CurrentCrest;
-            return CrestType.command;
+            return CrestType.liberated;
+        }
+        public static CrestType GetCurrentCrest(ChaControl chaCtrl)
+        {
+            //todo
+            //var ctrl = GetController(chaCtrl);
+            //return ctrl == null ? CrestType.None : ctrl.CurrentCrest;
+            return CrestType.liberated;
+        }
+    }
+
+    internal static class CharacterHooks
+    {
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(ChaControl), nameof(ChaControl.notBra), MethodType.Setter)]
+        [HarmonyPatch(typeof(ChaControl), nameof(ChaControl.notShorts), MethodType.Setter)]
+        private static void notBraOverride(ChaControl __instance, ref bool value)
+        {
+            Console.WriteLine("notBraOverride");
+            if (LewdCrestXPlugin.GetCurrentCrest(__instance) == CrestType.liberated)
+            {
+                // Force underwear to be off
+                value = true;
+            }
         }
     }
 
@@ -222,12 +274,14 @@ namespace KK_LewdCrestX
 
         private static CrestType _currentCrestType;
         private static bool _isHEvent;
+        private static PassingInfo _currentPassingInfo;
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(Info), nameof(Info.GetEventADV))]
         static void GetEventADVPrefix(Info __instance, int _command, PassingInfo ____passingInfo)
         {
             _currentCrestType = LewdCrestXPlugin.GetCurrentCrest(____passingInfo.heroine);
+            _currentPassingInfo = ____passingInfo;
             Console.WriteLine("GetEventADVPrefix " + _currentCrestType);
             _isHEvent = _command == 3;
         }
@@ -294,6 +348,9 @@ namespace KK_LewdCrestX
                 case CrestType.command:
                     __result = 0;
                     break;
+                case CrestType.liberated:
+                    if (_isHEvent && _currentPassingInfo.isOtherPeople) __result = 0;
+                    break;
             }
         }
 
@@ -309,6 +366,7 @@ namespace KK_LewdCrestX
             {
                 case CrestType.command:
                 case CrestType.libido:
+                case CrestType.liberated:
                     __result = true;
                     break;
             }
@@ -319,10 +377,20 @@ namespace KK_LewdCrestX
     {
         private readonly LewdCrestXController _controller;
 
-        private static readonly string[] _vibrancyBones;
-
         // todo might cause issues if in future abmx holds on to the bone modifiers since we reuse them for all characters
         private static readonly Dictionary<string, KeyValuePair<Vector3, BoneModifierData>> _vibrancyBoneModifiers;
+        private static readonly string[] _vibrancyBones;
+        private float _previousVibRatio;
+
+        private static readonly Dictionary<string, BoneModifierData> _lactationModifiers =
+            new Dictionary<string, BoneModifierData>
+            {
+                {"cf_d_bust01_L" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
+                {"cf_d_bust01_R" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
+                {"cf_d_bnip01_L" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
+                {"cf_d_bnip01_R" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
+            };
+        private static readonly string[] _lactationBones;
 
         public LewdCrestXBoneModifier(LewdCrestXController controller)
         {
@@ -331,10 +399,10 @@ namespace KK_LewdCrestX
 
         static LewdCrestXBoneModifier()
         {
-            var d = new Dictionary<string, Vector3>
+            var vibDict = new Dictionary<string, Vector3>
             {
-                {"cf_d_bust01_L", new Vector3(1.25f, 1.25f, 1.25f)},
-                {"cf_d_bust01_R", new Vector3(1.25f, 1.25f, 1.25f)},
+                {"cf_d_bust01_L", new Vector3(1.2f, 1.2f, 1.2f)},
+                {"cf_d_bust01_R", new Vector3(1.2f, 1.2f, 1.2f)},
                 {"cf_d_bnip01_L", new Vector3(1.1f, 1.1f, 1.1f)},
                 {"cf_d_bnip01_R", new Vector3(1.1f, 1.1f, 1.1f)},
                 {"cf_s_bnip02_L", new Vector3(1.2f, 1.2f, 1.2f)},
@@ -350,47 +418,59 @@ namespace KK_LewdCrestX
                 {"cf_s_thigh03_L", new Vector3(1.1f, 1.1f, 1.1f)},
                 {"cf_s_thigh03_R", new Vector3(1.1f, 1.1f, 1.1f)},
             };
+            _vibrancyBones = vibDict.Keys.ToArray();
+            _vibrancyBoneModifiers = vibDict.ToDictionary(
+                x => x.Key,
+                x => new KeyValuePair<Vector3, BoneModifierData>(x.Value, new BoneModifierData(x.Value, 1)));
 
-            _vibrancyBones = d.Keys.ToArray();
-            _vibrancyBoneModifiers = d.ToDictionary(x => x.Key, x => new KeyValuePair<Vector3, BoneModifierData>(x.Value, new BoneModifierData(x.Value, 1)));
+            _lactationBones = _lactationModifiers.Keys.ToArray();
         }
 
         public override IEnumerable<string> GetAffectedBones(BoneController origin)
         {
-            return _controller.CurrentCrest == CrestType.vibrancy && _controller.Heroine != null && _controller.Heroine.lewdness > 0 ? _vibrancyBones : Enumerable.Empty<string>();
+            switch (_controller.CurrentCrest)
+            {
+                case CrestType.vibrancy:
+                    return _vibrancyBones;
+                case CrestType.lactation:
+                    return _lactationBones;
+                default:
+                    return Enumerable.Empty<string>();
+            }
         }
-
-        private float _previousRatio;
 
         public override BoneModifierData GetEffect(string bone, BoneController origin, ChaFileDefine.CoordinateType coordinate)
         {
-            if (_controller.CurrentCrest == CrestType.vibrancy)
+            switch (_controller.CurrentCrest)
             {
-                if (_vibrancyBoneModifiers.TryGetValue(bone, out var kvp))
-                {
-                    var modifier = kvp.Value;
-
-                    if (_controller.Heroine != null)
+                case CrestType.vibrancy:
+                    if (_vibrancyBoneModifiers.TryGetValue(bone, out var kvp))
                     {
-                        // Effect increases the lewder the character is
-                        var ratio = _controller.Heroine.lewdness / 120f + (int)_controller.Heroine.HExperience * 0.1f;
-                        if (ratio != _previousRatio)
+                        var vibMod = kvp.Value;
+                        if (_controller.Heroine != null)
                         {
-                            ratio = Mathf.MoveTowards(_previousRatio, ratio, Time.deltaTime / 10);
-                            _previousRatio = ratio;
+                            // Effect increases the lewder the character is
+                            var vibRatio = _controller.Heroine.lewdness / 120f + (int)_controller.Heroine.HExperience * 0.1f;
+                            if (vibRatio != _previousVibRatio)
+                            {
+                                vibRatio = Mathf.MoveTowards(_previousVibRatio, vibRatio, Time.deltaTime / 10);
+                                _previousVibRatio = vibRatio;
+                            }
+                            vibMod.ScaleModifier = Vector3.Lerp(Vector3.one, kvp.Key, vibRatio);
                         }
-                        modifier.ScaleModifier = Vector3.Lerp(Vector3.one, kvp.Key, ratio);
+                        else
+                        {
+                            // If outside of main game always set to max
+                            vibMod.ScaleModifier = kvp.Key;
+                        }
+                        return vibMod;
                     }
-                    else
-                    {
-                        // If outside of main game always set to max
-                        modifier.ScaleModifier = kvp.Key;
-                    }
-
-                    return modifier;
-                }
+                    return null;
+                case CrestType.lactation:
+                    return _lactationModifiers.TryGetValue(bone, out var lactMod) ? lactMod : null;
+                default:
+                    return null;
             }
-            return null;
         }
     }
 
@@ -450,27 +530,35 @@ namespace KK_LewdCrestX
 
             Heroine = ChaControl.GetHeroine();
             //if (_heroine != null) _npc = ChaControl.transform.parent?.GetComponent<NPC>(););
-        }
 
-        protected override void Update()
-        {
-            base.Update();
-
-            // todo reduce run rate?
-            if (CurrentCrest == CrestType.libido)
+            if (Heroine != null)
             {
-                if (Heroine != null)
+                var actCtrl = Manager.Game.Instance.actScene.actCtrl;
+                switch (CurrentCrest)
                 {
-                    Heroine.lewdness = 100;
-                    var actCtrl = Manager.Game.Instance.actScene.actCtrl;
-                    actCtrl.SetDesire(4, Heroine, 110); //want to mast
-                    actCtrl.SetDesire(5, Heroine, 120); //want to h
-                    actCtrl.SetDesire(26, Heroine, 100); //les
-                    actCtrl.SetDesire(27, Heroine, 100); //les
-                    actCtrl.SetDesire(29, Heroine, 150); //ask for h
+                    case CrestType.libido:
+                        Heroine.lewdness = 100;
+                        actCtrl.AddDesire(4, Heroine, 50); //want to mast
+                        actCtrl.AddDesire(5, Heroine, 60); //want to h
+                        actCtrl.AddDesire(26, Heroine, 40); //les
+                        actCtrl.AddDesire(27, Heroine, 40); //les
+                        actCtrl.AddDesire(29, Heroine, 100); //ask for h
+                        break;
+
+                    case CrestType.liberated:
+                        Heroine.lewdness = Mathf.Min(100, Heroine.lewdness + 20);
+                        actCtrl.AddDesire(4, Heroine, 50); //want to mast
+                        break;
                 }
             }
         }
+
+        //protected override void Update()
+        //{
+        //    base.Update();
+        //
+        //    // todo reduce run rate?
+        //}
 
         private void ApplyCrestTexture()
         {
