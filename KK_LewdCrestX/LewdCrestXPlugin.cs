@@ -6,6 +6,7 @@ using ActionGame;
 using ActionGame.Chara;
 using ActionGame.Communication;
 using BepInEx;
+using BepInEx.Configuration;
 using BepInEx.Logging;
 using ExtensibleSaveFormat;
 using HarmonyLib;
@@ -24,40 +25,10 @@ using StrayTech;
 using UniRx;
 using UnityEngine;
 using UnityEngine.UI;
-using Object = UnityEngine.Object;
 using Random = UnityEngine.Random;
 
 namespace KK_LewdCrestX
 {
-    public sealed class CrestInfo
-    {
-        private readonly AssetBundle _bundle;
-        public readonly string Description;
-        public readonly CrestType Id;
-        public readonly string Name;
-        private Texture2D _tex;
-
-        public CrestInfo(string id, string name, string description, AssetBundle bundle)
-        {
-            Id = (CrestType)Enum.Parse(typeof(CrestType), id);
-            Name = name;
-            Description = description;
-            _bundle = bundle;
-        }
-
-        public Texture2D GetTexture()
-        {
-            if (_tex == null && Id > CrestType.None)
-            {
-                _tex = _bundle.LoadAsset<Texture2D>(Id.ToString()) ??
-                       throw new Exception("Crest tex asset not found - " + Id);
-                Object.DontDestroyOnLoad(_tex);
-            }
-
-            return _tex;
-        }
-    }
-
     [BepInPlugin(GUID, "LewdCrestX", Version)]
     [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
     [BepInDependency(KKABMX_Core.GUID, "4.0")]
@@ -69,8 +40,10 @@ namespace KK_LewdCrestX
         public const string Version = "1.0";
 
         internal static new ManualLogSource Logger;
-        //private MakerText _descControl;
+        private MakerText _descTxtControl;
         private Harmony _hi;
+        private Sprite _iconOff, _iconOn;
+        private ConfigEntry<bool> _confUnlockStoryMaker;
 
         public static Dictionary<CrestType, CrestInfo> CrestInfos { get; } = new Dictionary<CrestType, CrestInfo>();
 
@@ -87,10 +60,14 @@ namespace KK_LewdCrestX
                     __result = 1f;
             }
         }
-
+        //todo hook only when entering story mode?
         private void Start()
         {
             Logger = base.Logger;
+
+            _confUnlockStoryMaker = Config.Bind("Gameplay", "Allow changing crests in story mode character maker", false,
+                "If false, to change crests inside story mode you have to invite the character to the club and use the crest icon in clubroom.");
+
 
             _hi = Harmony.CreateAndPatchAll(typeof(TalkHooks), GUID);
             _hi.PatchAll(typeof(HsceneHooks));
@@ -117,64 +94,99 @@ namespace KK_LewdCrestX
             ////var mat = new Material(Shader.Find("Standard"));
             ////ChaControl.rendBody.materials = ChaControl.rendBody.materials.Where(x => x != mat).AddItem(mat).ToArray();
             //
-            //var resource = ResourceUtils.GetEmbeddedResource("crests");
-            //var bundle = AssetBundle.LoadFromMemory(resource);
-            //DontDestroyOnLoad(bundle);
-            //var textAsset = bundle.LoadAsset<TextAsset>("crestinfo");
-            //var infoText = textAsset.text;
-            //Destroy(textAsset);
-            //
-            //var xd = XDocument.Parse(infoText);
-            //// ReSharper disable PossibleNullReferenceException
-            //var infoElements = xd.Root.Elements("Crest");
-            //var crestInfos = infoElements
-            //    .Where(x => bool.Parse(x.Element("Implemented").Value))
-            //    .Select(x => new CrestInfo(
-            //        x.Element("ID").Value,
-            //        x.Element("Name").Value,
-            //        x.Element("Description").Value,
-            //        bundle));
-            //// ReSharper restore PossibleNullReferenceException
-            //foreach (var crestInfo in crestInfos)
-            //{
-            //    Logger.LogDebug("Added implemented crest - " + crestInfo.Id);
-            //    CrestInfos.Add(crestInfo.Id, crestInfo);
-            //}
-            //
-            //CharacterApi.RegisterExtraBehaviour<LewdCrestXController>(GUID);
-            //
-            //if (StudioAPI.InsideStudio)
-            //{
-            //    //todo
-            //}
-            //else
-            //{
-            //    MakerAPI.RegisterCustomSubCategories += MakerAPI_RegisterCustomSubCategories;
-            //    MakerAPI.MakerFinishedLoading += MakerAPIOnMakerFinishedLoading;
-            //}
+            var resource = ResourceUtils.GetEmbeddedResource("crests");
+            var bundle = AssetBundle.LoadFromMemory(resource);
+            DontDestroyOnLoad(bundle);
+
+            // todo on demand
+            _iconOff = (bundle.LoadAsset<Texture2D>("action_icon_crest_off") ?? throw new Exception("asset not found - action_icon_crest_off")).ToSprite();
+            _iconOn = (bundle.LoadAsset<Texture2D>("action_icon_crest_on") ?? throw new Exception("asset not found - action_icon_crest_on")).ToSprite();
+            DontDestroyOnLoad(_iconOff);
+            DontDestroyOnLoad(_iconOn);
+
+            GameAPI.RegisterExtraBehaviour<LewdCrestXGameController>(GUID);
+
+            var textAsset = bundle.LoadAsset<TextAsset>("crestinfo");
+            var infoText = textAsset.text;
+            Destroy(textAsset);
+
+            var xd = XDocument.Parse(infoText);
+            // ReSharper disable PossibleNullReferenceException
+            var infoElements = xd.Root.Elements("Crest");
+            var crestInfos = infoElements
+                .Select(x => new CrestInfo(
+                    x.Element("ID").Value,
+                    x.Element("Name").Value,
+                    x.Element("Description").Value,
+                    bool.Parse(x.Element("Implemented").Value),
+                    bundle));
+            // ReSharper restore PossibleNullReferenceException
+            foreach (var crestInfo in crestInfos)
+            {
+                Logger.LogDebug("Added implemented crest - " + crestInfo.Id);
+                CrestInfos.Add(crestInfo.Id, crestInfo);
+            }
+
+            CharacterApi.RegisterExtraBehaviour<LewdCrestXController>(GUID);
+
+            if (StudioAPI.InsideStudio)
+            {
+                //todo
+            }
+            else
+            {
+                MakerAPI.RegisterCustomSubCategories += MakerAPI_RegisterCustomSubCategories;
+                MakerAPI.MakerFinishedLoading += MakerAPIOnMakerFinishedLoading;
+            }
         }
 
-        //private void MakerAPIOnMakerFinishedLoading(object sender, EventArgs e)
-        //{
-        //    _descControl.ControlObject.GetComponent<LayoutElement>().minHeight = 80;
-        //}
-        //
-        //private void MakerAPI_RegisterCustomSubCategories(object sender, RegisterSubCategoriesEvent e)
-        //{
-        //    var category = new MakerCategory(MakerConstants.Parameter.ADK.CategoryName, "Crest");
-        //    e.AddSubCategory(category);
-        //
-        //    var infos = CrestInfos.Values.ToList();
-        //    var crests = new[] { "None" }.Concat(infos.Select(x => x.Name)).ToArray();
-        //
-        //    var dropdown = e.AddControl(new MakerDropdown("Crest type", crests, category, 0, this));
-        //    dropdown.BindToFunctionController<LewdCrestXController, int>(
-        //        controller => infos.FindIndex(info => info.Id == controller.CurrentCrest) + 1,
-        //        (controller, value) => controller.CurrentCrest = value <= 0 ? CrestType.None : infos[value - 1].Id);
-        //
-        //    _descControl = e.AddControl(new MakerText("Description", category, this));
-        //    dropdown.ValueChanged.Subscribe(value => _descControl.Text = value <= 0 ? "No crest selected, no effects applied" : infos[value - 1].Description);
-        //}
+        private void MakerAPIOnMakerFinishedLoading(object sender, EventArgs e)
+        {
+            _descTxtControl.ControlObject.GetComponent<LayoutElement>().minHeight = 80;
+        }
+
+        private void MakerAPI_RegisterCustomSubCategories(object sender, RegisterSubCategoriesEvent e)
+        {
+            var category = new MakerCategory(MakerConstants.Parameter.ADK.CategoryName, "Crest");
+            e.AddSubCategory(category);
+
+            if (!_confUnlockStoryMaker.Value && MakerAPI.IsInsideClassMaker())
+            {
+                _descTxtControl = e.AddControl(new MakerText("To change crests inside story mode you have to invite the character to the club and use the crest icon in clubroom. You can also disable this limitation in plugin settings.", category, this));
+            }
+            else
+            {
+                e.AddControl(new MakerText("Crests with the [+] tag will change gameplay in story mode.", category, this) { TextColor = MakerText.ExplanationGray });
+                
+                var infos = CrestInfos.Values.ToList();
+                var crests = new[] { "None" }.Concat(infos.Select(x => x.Implemented ? "[+] " + x.Name : x.Name)).ToArray();
+
+                var dropdownControl = e.AddControl(new MakerDropdown("Crest type", crests, category, 0, this));
+                dropdownControl.BindToFunctionController<LewdCrestXController, int>(
+                    controller => infos.FindIndex(info => info.Id == controller.CurrentCrest) + 1,
+                    (controller, value) => controller.CurrentCrest = value <= 0 ? CrestType.None : infos[value - 1].Id);
+
+                _descTxtControl = e.AddControl(new MakerText("Description", category, this));
+                var implementedTxtControl = e.AddControl(new MakerText("", category, this));
+                e.AddControl(new MakerText("The crests were created by novaksus on pixiv", category, this) { TextColor = MakerText.ExplanationGray });
+                dropdownControl.ValueChanged.Subscribe(value =>
+                {
+                    if (value <= 0)
+                    {
+                        _descTxtControl.Text = "No crest selected, no effects applied";
+                        implementedTxtControl.Text = "";
+                    }
+                    else
+                    {
+                        var crestInfo = infos[value - 1];
+                        _descTxtControl.Text = crestInfo.Description;
+                        implementedTxtControl.Text = crestInfo.Implemented
+                            ? "This crest will affect gameplay in story mode as described"
+                            : "This crest is only for looks (it might be implemented in the future with modified lore)";
+                    }
+                });
+            }
+        }
 
 
         //private static LewdCrestXController GetController(SaveData.Heroine heroine) => GetController(heroine?.chaCtrl);
@@ -195,6 +207,27 @@ namespace KK_LewdCrestX
         }
     }
 
+    public sealed class LewdCrestXGameController : GameCustomFunctionController
+    {
+        protected override void OnDayChange(Cycle.Week day)
+        {
+            //todo use cached? might not detect all
+            foreach (var controller in GameObject.FindObjectsOfType<LewdCrestXController>())
+            {
+                if (controller.CurrentCrest == CrestType.restore)
+                {
+                    var heroine = controller.Heroine;
+                    if (heroine != null)
+                    {
+                        LewdCrestXPlugin.Logger.LogDebug("Resetting heroine to virgin because of restore crest: " + heroine.charFile.parameter.fullname);
+                        heroine.isVirgin = true;
+                        heroine.hCount = 0;
+                    }
+                }
+            }
+        }
+    }
+
     internal static class CharacterHooks
     {
         [HarmonyPostfix]
@@ -208,6 +241,16 @@ namespace KK_LewdCrestX
                 // Force underwear to be off
                 value = true;
             }
+        }
+
+        private static readonly ChaFileParameter.Denial _noDenial = new ChaFileParameter.Denial { aibu = true, anal = true, kiss = true, massage = true, notCondom = true };
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(SaveData.CharaData), nameof(SaveData.CharaData.denial), MethodType.Getter)]
+        public static void DenialOverride(SaveData.CharaData __instance, ref ChaFileParameter.Denial __result)
+        {
+            // todo is this fast enough? cache upstream?
+            var commandcrest = LewdCrestXPlugin.GetCurrentCrest(__instance as SaveData.Heroine) == CrestType.command;
+            if (commandcrest) __result = _noDenial;
         }
     }
 

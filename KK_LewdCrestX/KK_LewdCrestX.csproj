@@ -19,7 +19,7 @@
     <DebugSymbols>true</DebugSymbols>
     <DebugType>embedded</DebugType>
     <Optimize>false</Optimize>
-    <OutputPath>F:\Games\KoikatsuP\BepInEx\plugins\</OutputPath>
+    <OutputPath>..\bin\BepInEx\plugins\</OutputPath>
     <DefineConstants>TRACE;DEBUG;KK</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -27,7 +27,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>embedded</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>F:\Games\Koikatu_SE_AS\BepInEx\scripts\</OutputPath>
+    <OutputPath>..\bin\BepInEx\plugins\</OutputPath>
     <DefineConstants>TRACE;KK</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -90,6 +90,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CrestInfo.cs" />
     <Compile Include="CrestType.cs" />
     <Compile Include="LewdCrestXPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -100,6 +101,7 @@
     </EmbeddedResource>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\IllusionLibs.BepInEx.Harmony.2.2.0.1\build\IllusionLibs.BepInEx.Harmony.targets" Condition="Exists('..\packages\IllusionLibs.BepInEx.Harmony.2.2.0.1\build\IllusionLibs.BepInEx.Harmony.targets')" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

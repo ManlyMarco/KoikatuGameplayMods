@@ -13,6 +13,7 @@ namespace KK_LewdCrestX
         libido,
         mindmelt,
         vibrancy,
+        restore,
 
 
         //animalistic,
@@ -36,7 +37,6 @@ namespace KK_LewdCrestX
         //soulchained,
         //statistics,
         //suffer,
-        //sway,
         //task,
         //triggered,
         //violove,
