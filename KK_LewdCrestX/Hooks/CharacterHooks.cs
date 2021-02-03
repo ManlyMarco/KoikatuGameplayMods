@@ -5,13 +5,13 @@ namespace KK_LewdCrestX
 {
     internal static class CharacterHooks
     {
-        [HarmonyPostfix]
+        [HarmonyPrefix]
         [HarmonyPatch(typeof(ChaControl), nameof(ChaControl.notBra), MethodType.Setter)]
         [HarmonyPatch(typeof(ChaControl), nameof(ChaControl.notShorts), MethodType.Setter)]
         private static void notBraOverride(ChaControl __instance, ref bool value)
         {
             Console.WriteLine("notBraOverride");
-            if (LewdCrestXPlugin.GetCurrentCrest(__instance) == CrestType.liberated)
+            if (__instance.GetCurrentCrest() == CrestType.liberated)
             {
                 // Force underwear to be off
                 value = true;
@@ -23,9 +23,8 @@ namespace KK_LewdCrestX
         [HarmonyPatch(typeof(SaveData.CharaData), nameof(SaveData.CharaData.denial), MethodType.Getter)]
         public static void DenialOverride(SaveData.CharaData __instance, ref ChaFileParameter.Denial __result)
         {
-            // todo is this fast enough? cache upstream?
-            var commandcrest = LewdCrestXPlugin.GetCurrentCrest(__instance as SaveData.Heroine) == CrestType.command;
-            if (commandcrest) __result = _noDenial;
+            if ((__instance as SaveData.Heroine)?.GetCurrentCrest() == CrestType.command)
+                __result = _noDenial;
         }
     }
 }

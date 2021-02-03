@@ -5,7 +5,7 @@ using UnityEngine;
 namespace KK_LewdCrestX
 {
     [DisallowMultipleComponent]
-    public class ObservableOnGUITrigger : ObservableTriggerBase
+    internal class ObservableOnGUITrigger : ObservableTriggerBase
     {
         private void OnGUI()
         {

@@ -28,7 +28,7 @@ namespace KK_LewdCrestX
     [BepInDependency(KKABMX_Core.GUID, "4.0")]
     [BepInDependency(KoiSkinOverlayMgr.GUID, "5.2")]
     [BepInDependency("KK_Pregnancy", BepInDependency.DependencyFlags.SoftDependency)]
-    public class LewdCrestXPlugin : BaseUnityPlugin
+    public partial class LewdCrestXPlugin : BaseUnityPlugin
     {
         public const string GUID = "LewdCrestX";
         public const string Version = "1.0";
@@ -75,28 +75,6 @@ namespace KK_LewdCrestX
             }
         }
 
-        private static void CreateStudioControls()
-        {
-            var crestInfos = CrestInfos.Values.OrderBy(x => x.Name).ToList();
-            var crests = new[] { "No crest" }.Concat(crestInfos.Select(x => x.Name)).ToArray();
-
-            int ReadValue(OCIChar c)
-            {
-                var crest = c.GetChaControl().GetComponent<LewdCrestXController>().CurrentCrest;
-                return crestInfos.FindIndex(x => x.Id == crest) + 1;
-            }
-
-            void SetValue(int i)
-            {
-                var crest = i <= 0 ? CrestType.None : crestInfos[i - 1].Id;
-                foreach (var controller in StudioAPI.GetSelectedControllers<LewdCrestXController>())
-                    controller.CurrentCrest = crest;
-            }
-
-            StudioAPI.GetOrCreateCurrentStateCategory(null).AddControl(
-                new CurrentStateCategoryDropdown("Lewd Crest", crests, ReadValue)).Value.Subscribe(SetValue);
-        }
-
         private static void LoadAssets()
         {
             var resource = ResourceUtils.GetEmbeddedResource("crests");
@@ -115,7 +93,6 @@ namespace KK_LewdCrestX
                     x.Element("ID").Value,
                     x.Element("Name").Value,
                     x.Element("Description").Value,
-                    bool.Parse(x.Element("Implemented").Value),
                     Bundle));
             // ReSharper restore PossibleNullReferenceException
             foreach (var crestInfo in crestInfos)
@@ -127,6 +104,27 @@ namespace KK_LewdCrestX
             //todo use custom material in the future? might allow glow effects, showing through clothes, adjusting crest location
             //var mat = new Material(Shader.Find("Standard"));
             //ChaControl.rendBody.materials = ChaControl.rendBody.materials.Where(x => x != mat).AddItem(mat).ToArray();
+        }
+
+        private static void CreateStudioControls()
+        {
+            var list = CrestInterfaceList.Create(false, false);
+
+            int ReadValue(OCIChar c)
+            {
+                var crest = c.GetChaControl().GetComponent<LewdCrestXController>().CurrentCrest;
+                return list.GetIndex(crest);
+            }
+
+            void SetValue(int i)
+            {
+                var crest = list.GetType(i);
+                foreach (var controller in StudioAPI.GetSelectedControllers<LewdCrestXController>())
+                    controller.CurrentCrest = crest;
+            }
+
+            StudioAPI.GetOrCreateCurrentStateCategory(null).AddControl(
+                new CurrentStateCategoryDropdown("Lewd Crest", list.GetInterfaceNames(), ReadValue)).Value.Subscribe(SetValue);
         }
 
         private void MakerAPIOnMakerFinishedLoading(object sender, EventArgs e)
@@ -149,13 +147,12 @@ namespace KK_LewdCrestX
             {
                 e.AddControl(new MakerText("Crests with the [+] tag will change gameplay in story mode.", category, this) { TextColor = MakerText.ExplanationGray });
 
-                var infos = CrestInfos.Values.ToList();
-                var crests = new[] { "None" }.Concat(infos.Select(x => x.Implemented ? "[+] " + x.Name : x.Name)).ToArray();
+                var list = CrestInterfaceList.Create(false, true);
 
-                var dropdownControl = e.AddControl(new MakerDropdown("Crest type", crests, category, 0, this));
+                var dropdownControl = e.AddControl(new MakerDropdown("Crest type", list.GetInterfaceNames(), category, 0, this));
                 dropdownControl.BindToFunctionController<LewdCrestXController, int>(
-                    controller => infos.FindIndex(info => info.Id == controller.CurrentCrest) + 1,
-                    (controller, value) => controller.CurrentCrest = value <= 0 ? CrestType.None : infos[value - 1].Id);
+                    controller => list.GetIndex(controller.CurrentCrest),
+                    (controller, value) => controller.CurrentCrest = list.GetType(value));
 
                 _descTxtControl = e.AddControl(new MakerText("Description", category, this));
                 var implementedTxtControl = e.AddControl(new MakerText("", category, this));
@@ -169,7 +166,7 @@ namespace KK_LewdCrestX
                     }
                     else
                     {
-                        var crestInfo = infos[value - 1];
+                        var crestInfo = list.GetInfo(value);
                         _descTxtControl.Text = crestInfo.Description;
                         implementedTxtControl.Text = crestInfo.Implemented
                             ? "This crest will affect gameplay in story mode as described"
@@ -177,27 +174,6 @@ namespace KK_LewdCrestX
                     }
                 });
             }
-        }
-
-        public static LewdCrestXController GetController(SaveData.Heroine heroine)
-        {
-            return GetController(heroine?.chaCtrl);
-        }
-
-        public static LewdCrestXController GetController(ChaControl chaCtrl)
-        {
-            return chaCtrl != null ? chaCtrl.GetComponent<LewdCrestXController>() : null;
-        }
-
-        public static CrestType GetCurrentCrest(SaveData.Heroine heroine)
-        {
-            return GetCurrentCrest(heroine?.chaCtrl);
-        }
-
-        public static CrestType GetCurrentCrest(ChaControl chaCtrl)
-        {
-            var ctrl = GetController(chaCtrl);
-            return ctrl == null ? CrestType.None : ctrl.CurrentCrest;
         }
     }
 }

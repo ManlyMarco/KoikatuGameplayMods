@@ -13,10 +13,10 @@ namespace KK_LewdCrestX
         public readonly string Name;
         private Texture2D _tex;
 
-        public CrestInfo(string id, string name, string description, bool implemented, AssetBundle bundle)
+        public CrestInfo(string id, string name, string description, AssetBundle bundle)
         {
-            Implemented = implemented;
             Id = (CrestType)Enum.Parse(typeof(CrestType), id);
+            Implemented = LewdCrestXPlugin.ImplementedCrestTypes.Contains(Id);
             Name = name;
             Description = description;
             _bundle = bundle;

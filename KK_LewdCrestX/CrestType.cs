@@ -1,4 +1,5 @@
-﻿using System.Diagnostics.CodeAnalysis;
+﻿using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 
 namespace KK_LewdCrestX
 {
@@ -7,18 +8,9 @@ namespace KK_LewdCrestX
     {
         None = 0,
 
-        // Implemented
-        command,
-        lactation,
-        liberated,
-        libido,
-        mindmelt,
-        restore,
-        vibrancy,
-
-        // Looks only
         animalistic,
         breedgasm,
+        command,
         cumdiction,
         deepfocus,
         destruction,
@@ -26,21 +18,41 @@ namespace KK_LewdCrestX
         gaze,
         glow,
         inferiority,
+        lactation,
         lesser,
+        liberated,
+        libido,
         mantraction,
         messaging,
+        mindmelt,
         pheromone,
         receptacle,
         reprogram,
+        restore,
         sensitivity,
+        siphoning,
         slave,
-        soiphoning,
         soulchained,
         statistics,
         suffer,
         task,
         triggered,
+        vibrancy,
         violove,
         wombgasm
+    }
+
+    public partial class LewdCrestXPlugin
+    {
+        internal static readonly HashSet<CrestType> ImplementedCrestTypes = new HashSet<CrestType>{
+            CrestType.command,
+            CrestType.lactation,
+            CrestType.liberated,
+            CrestType.libido,
+            CrestType.mindmelt,
+            CrestType.restore,
+            CrestType.siphoning,
+            CrestType.vibrancy,
+        };
     }
 }

@@ -16,7 +16,6 @@ namespace KK_LewdCrestX
         private BoneController _boneCtrl;
 
         internal SaveData.Heroine Heroine { get; private set; }
-        //private NPC _npc;
 
         public CrestType CurrentCrest
         {
@@ -64,7 +63,6 @@ namespace KK_LewdCrestX
             }
 
             Heroine = ChaControl.GetHeroine();
-            //if (_heroine != null) _npc = ChaControl.transform.parent?.GetComponent<NPC>(););
 
             if (Heroine != null)
             {

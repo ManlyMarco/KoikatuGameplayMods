@@ -16,7 +16,7 @@ namespace KK_LewdCrestX
         [HarmonyPatch(typeof(Info), nameof(Info.GetEventADV))]
         static void GetEventADVPrefix(Info __instance, int _command, PassingInfo ____passingInfo)
         {
-            _currentCrestType = LewdCrestXPlugin.GetCurrentCrest(____passingInfo.heroine);
+            _currentCrestType = ____passingInfo?.heroine?.GetCurrentCrest() ?? CrestType.None;
             _currentPassingInfo = ____passingInfo;
             Console.WriteLine("GetEventADVPrefix " + _currentCrestType);
             _isHEvent = _command == 3;
@@ -31,10 +31,9 @@ namespace KK_LewdCrestX
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(TalkScene), "UpdateUI")]
-        //private void UpdateUI(bool _gauge = false)
         static void UpdateUIPrefix(TalkScene __instance)
         {
-            _currentCrestType = LewdCrestXPlugin.GetCurrentCrest(__instance.targetHeroine);
+            _currentCrestType = __instance.targetHeroine.GetCurrentCrest();
             Console.WriteLine("UpdateUIPrefix " + _currentCrestType);
             _isHEvent = false;
         }
@@ -47,7 +46,8 @@ namespace KK_LewdCrestX
             if (_currentCrestType == CrestType.libido)
             {
                 // 3 is lets have h
-                ___buttonEventContents[3].gameObject.SetActiveIfDifferent(true);
+                // todo avoid using index for better compat?
+                ___buttonEventContents[3]?.gameObject.SetActiveIfDifferent(true);
             }
 
             _currentCrestType = CrestType.None;
@@ -85,7 +85,7 @@ namespace KK_LewdCrestX
                     __result = 0;
                     break;
                 case CrestType.liberated:
-                    if (_isHEvent && _currentPassingInfo.isOtherPeople) __result = 0;
+                    if (_isHEvent && _currentPassingInfo?.isOtherPeople == true) __result = 0;
                     break;
             }
         }
@@ -95,7 +95,9 @@ namespace KK_LewdCrestX
         static void isHPossiblePatch(ref bool __result, PassingInfo __instance)
         {
             var crest = _currentCrestType;
-            if (_currentCrestType == CrestType.None) crest = LewdCrestXPlugin.GetCurrentCrest(__instance.heroine);
+            if (_currentCrestType == CrestType.None)
+                crest = __instance.heroine.GetCurrentCrest();
+
             Console.WriteLine("isHPossiblePatch " + _currentCrestType);
 
             switch (crest)

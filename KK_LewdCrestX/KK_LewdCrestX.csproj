@@ -90,6 +90,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CrestInterfaceList.cs" />
+    <Compile Include="Extensions\Extensions.cs" />
     <Compile Include="Hooks\ActionIconHooks.cs" />
     <Compile Include="Hooks\CharacterHooks.cs" />
     <Compile Include="CrestInfo.cs" />

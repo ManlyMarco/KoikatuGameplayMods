@@ -35,7 +35,7 @@ namespace KK_LewdCrestX
         {
             if (__result < 1f && controller != null)
             {
-                if (LewdCrestXPlugin.GetCurrentCrest(controller.ChaControl) == CrestType.lactation)
+                if (controller.ChaControl.GetCurrentCrest() == CrestType.lactation)
                     __result = 1f;
             }
         }

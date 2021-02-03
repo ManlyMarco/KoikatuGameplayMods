@@ -1,6 +1,5 @@
 ﻿using ActionGame;
 using KKAPI.MainGame;
-using UnityEngine;
 
 namespace KK_LewdCrestX
 {
@@ -8,18 +7,13 @@ namespace KK_LewdCrestX
     {
         protected override void OnDayChange(Cycle.Week day)
         {
-            //todo use cached? might not detect all
-            foreach (var controller in GameObject.FindObjectsOfType<LewdCrestXController>())
+            foreach (var heroine in Manager.Game.Instance.HeroineList)
             {
-                if (controller.CurrentCrest == CrestType.restore)
+                if (heroine != null && heroine.GetCurrentCrest() == CrestType.restore && !heroine.isVirgin)
                 {
-                    var heroine = controller.Heroine;
-                    if (heroine != null)
-                    {
-                        LewdCrestXPlugin.Logger.LogDebug("Resetting heroine to virgin because of restore crest: " + heroine.charFile.parameter.fullname);
-                        heroine.isVirgin = true;
-                        heroine.hCount = 0;
-                    }
+                    LewdCrestXPlugin.Logger.LogDebug("Resetting heroine to virgin because of restore crest: " + heroine.charFile?.parameter?.fullname);
+                    heroine.isVirgin = true;
+                    heroine.hCount = 0;
                 }
             }
         }
