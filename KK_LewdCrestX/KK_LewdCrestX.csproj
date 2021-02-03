@@ -88,10 +88,15 @@
       <HintPath>..\packages\IllusionLibs.Koikatu.UnityEngine.UI.5.6.2.2\lib\net35\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="XUnity.AutoTranslator.Plugin.Core, Version=4.13.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\IllusionLibs.XUnity.AutoTranslator.Plugin.Core.4.13.0\lib\net35\XUnity.AutoTranslator.Plugin.Core.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CrestInterfaceList.cs" />
     <Compile Include="Extensions\Extensions.cs" />
+    <Compile Include="Extensions\TranslationHelper.cs" />
     <Compile Include="Hooks\ActionIconHooks.cs" />
     <Compile Include="Hooks\CharacterHooks.cs" />
     <Compile Include="CrestInfo.cs" />
@@ -102,7 +107,6 @@
     <Compile Include="LewdCrestXGameController.cs" />
     <Compile Include="LewdCrestXPlugin.cs" />
     <Compile Include="Extensions\ObservableExtensions.cs" />
-    <Compile Include="Extensions\ObservableOnGUITrigger.cs" />
     <Compile Include="Hooks\PreggersHooks.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Hooks\TalkHooks.cs" />

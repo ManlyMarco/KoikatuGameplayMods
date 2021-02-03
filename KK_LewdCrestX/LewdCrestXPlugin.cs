@@ -97,7 +97,7 @@ namespace KK_LewdCrestX
             // ReSharper restore PossibleNullReferenceException
             foreach (var crestInfo in crestInfos)
             {
-                Logger.LogDebug("Added implemented crest - " + crestInfo.Id);
+                Logger.LogDebug("Added crest " + crestInfo.Id);
                 CrestInfos.Add(crestInfo.Id, crestInfo);
             }
 

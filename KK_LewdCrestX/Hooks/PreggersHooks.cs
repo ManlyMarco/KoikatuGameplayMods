@@ -17,7 +17,7 @@ namespace KK_LewdCrestX
                     var milkAmountMethod = lactDataType.GetMethod("GetMilkAmount", AccessTools.all);
                     if (milkAmountMethod != null)
                         hi.Patch(milkAmountMethod,
-                            postfix: new HarmonyMethod(typeof(LewdCrestXPlugin), nameof(PreggersHooks.GetMilkAmountPatch)));
+                            postfix: new HarmonyMethod(typeof(PreggersHooks), nameof(PreggersHooks.GetMilkAmountPatch)));
                     else
                         LewdCrestXPlugin.Logger.LogWarning(
                             "Could not find KK_Pregnancy.LactationController.CharaData.GetMilkAmount - something isn't right, please report this");
