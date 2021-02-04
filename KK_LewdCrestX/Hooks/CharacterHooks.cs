@@ -23,8 +23,20 @@ namespace KK_LewdCrestX
         [HarmonyPatch(typeof(SaveData.CharaData), nameof(SaveData.CharaData.denial), MethodType.Getter)]
         public static void DenialOverride(SaveData.CharaData __instance, ref ChaFileParameter.Denial __result)
         {
-            if ((__instance as SaveData.Heroine)?.GetCurrentCrest() == CrestType.command)
+            var currentCrest = (__instance as SaveData.Heroine)?.GetCurrentCrest();
+            if (currentCrest == CrestType.command)
+            {
                 __result = _noDenial;
+            }
+            else if (currentCrest == CrestType.suffer)
+            {
+                var newResult = new ChaFileParameter.Denial();
+                newResult.Copy(__result);
+                newResult.aibu = true;
+                newResult.anal = true;
+                newResult.massage = true;
+                __result = newResult;
+            }
         }
     }
 }

@@ -17,9 +17,8 @@ namespace KK_LewdCrestX
         forlorn,
         gaze,
         glow,
-        inferiority,
+        gullible,
         lactation,
-        lesser,
         liberated,
         libido,
         mantraction,
@@ -27,6 +26,7 @@ namespace KK_LewdCrestX
         mindmelt,
         pheromone,
         receptacle,
+        regrowth,
         reprogram,
         restore,
         sensitivity,
@@ -50,9 +50,13 @@ namespace KK_LewdCrestX
             CrestType.liberated,
             CrestType.libido,
             CrestType.mindmelt,
+            CrestType.regrowth,
             CrestType.restore,
             CrestType.siphoning,
+            CrestType.suffer,
+            CrestType.triggered,
             CrestType.vibrancy,
+            CrestType.violove,
         };
     }
 }

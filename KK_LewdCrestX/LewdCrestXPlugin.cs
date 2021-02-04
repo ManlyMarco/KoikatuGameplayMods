@@ -28,6 +28,7 @@ namespace KK_LewdCrestX
     [BepInDependency(KKABMX_Core.GUID, "4.0")]
     [BepInDependency(KoiSkinOverlayMgr.GUID, "5.2")]
     [BepInDependency("KK_Pregnancy", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency("Marco.SkinEffects", BepInDependency.DependencyFlags.SoftDependency)]
     public partial class LewdCrestXPlugin : BaseUnityPlugin
     {
         public const string GUID = "LewdCrestX";
@@ -56,6 +57,12 @@ namespace KK_LewdCrestX
             _hi = new Harmony(GUID);
             _hi.PatchAll(typeof(CharacterHooks));
             PreggersHooks.TryPatchPreggers(_hi);
+
+            var effType = Type.GetType("KK_SkinEffects.SkinEffectsController, KK_SkinEffects", false);
+            if (effType != null)
+                LewdCrestXGameController.SkinEffectsType = effType;
+            else 
+                Logger.LogWarning("Could not find KK_SkinEffects.SkinEffectsController, some features might not work until you install KK_SkinEffects (please report this if you do have latest version of KK_SkinEffects installed)");
 
             if (StudioAPI.InsideStudio)
             {

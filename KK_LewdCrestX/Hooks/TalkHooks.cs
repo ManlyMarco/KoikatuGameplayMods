@@ -2,6 +2,8 @@
 using ActionGame.Communication;
 using HarmonyLib;
 using Illusion.Extensions;
+using Manager;
+using UnityEngine;
 using UnityEngine.UI;
 
 namespace KK_LewdCrestX
@@ -27,6 +29,26 @@ namespace KK_LewdCrestX
         {
             Console.WriteLine("GetEventADVFinalizer " + _currentCrestType);
             _currentCrestType = CrestType.None;
+        }
+
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(TalkScene), "ReflectChangeValue")]
+        static void ReflectChangeValuePrefix(TalkScene __instance, bool ___isDesire)
+        {
+            // This is set by using the talk lewd option
+            if (___isDesire)
+            {
+                var heroine = __instance.targetHeroine;
+                if (heroine.GetCurrentCrest() == CrestType.triggered)
+                {
+                    var actCtrl = Singleton<Game>.Instance.actScene.actCtrl;
+                    actCtrl.AddDesire(4, heroine, 60);
+                    actCtrl.AddDesire(5, heroine, 60);
+                    actCtrl.AddDesire(26, heroine, heroine.parameter.attribute.likeGirls ? 60 : 30);
+                    actCtrl.AddDesire(29, heroine, 40);
+                    heroine.lewdness = Mathf.Min(100, heroine.lewdness + 60);
+                }
+            }
         }
 
         [HarmonyPrefix]
