@@ -1,7 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using ActionGame;
 using HarmonyLib;
+using KK_Pregnancy;
 using KKAPI.MainGame;
 using KKAPI.Utilities;
 using Manager;
@@ -12,9 +14,27 @@ namespace KK_LewdCrestX
 {
     public sealed class LewdCrestXGameController : GameCustomFunctionController
     {
-        internal static Type SkinEffectsType;
         private HsceneHeroineInfo[] _hSceneHeroines;
         private HSceneProc _hSceneProc;
+
+        private static readonly HashSet<PregnancyCharaController> _tempPreggers = new HashSet<PregnancyCharaController>();
+
+        public static void ApplyTempPreggers(SaveData.Heroine heroine)
+        {
+            var ctrl = heroine.GetCrestController()?.GetComponent<PregnancyCharaController>();
+            if (ctrl)
+            {
+                if (_tempPreggers.Add(ctrl))
+                    LewdCrestXPlugin.Logger.LogInfo("Triggering temporary pregnancy because of breedgasm crest: " + heroine.charFile?.parameter?.fullname);
+            }
+        }
+
+        private static void ClearTempPreggers()
+        {
+            foreach (var pregCtrl in _tempPreggers)
+                pregCtrl.Data.Week = 0;
+            _tempPreggers.Clear();
+        }
 
         protected override void OnStartH(HSceneProc proc, bool freeH)
         {
@@ -41,7 +61,7 @@ namespace KK_LewdCrestX
             {
                 if (heroine.CrestType == CrestType.violove)
                 {
-                    var totalTime = (int) heroine.TotalRoughTime;
+                    var totalTime = (int)heroine.TotalRoughTime;
                     var h = heroine.Heroine;
                     h.lewdness = Mathf.Min(100, h.lewdness + totalTime / 10);
                     h.favor = Mathf.Min(100, h.favor + totalTime / 20);
@@ -58,7 +78,7 @@ namespace KK_LewdCrestX
 
         private void Update()
         {
-            if (_hSceneProc != null && _hSceneProc.flags.speed > 0.7f)
+            if (_hSceneHeroines != null && _hSceneProc.flags.speed > 0.7f)
             {
                 var id = _hSceneProc.flags.GetLeadingHeroineId();
                 var heroineInfo = _hSceneHeroines[id];
@@ -69,17 +89,62 @@ namespace KK_LewdCrestX
             }
         }
 
+        protected override void OnPeriodChange(Cycle.Type period)
+        {
+            // Apply the effect now to get a delay
+            foreach (var pregCtrl in _tempPreggers)
+                pregCtrl.Data.Week = PregnancyData.LeaveSchoolWeek;
+
+            var actCtrl = Game.Instance.actScene?.actCtrl;
+            if (actCtrl == null) return;
+            foreach (var heroine in Game.Instance.HeroineList)
+            {
+                if (heroine == null) continue;
+
+                switch (heroine.GetCurrentCrest())
+                {
+                    case CrestType.libido:
+                        heroine.lewdness = 100;
+                        actCtrl.AddDesire(4, heroine, 20); //want to mast
+                        actCtrl.AddDesire(5, heroine, 40); //want to h
+                        actCtrl.AddDesire(26, heroine, heroine.parameter.attribute.likeGirls ? 30 : 10); //les
+                        actCtrl.AddDesire(27, heroine, heroine.parameter.attribute.likeGirls ? 30 : 10); //les
+                        actCtrl.AddDesire(29, heroine, 60); //ask for h
+                        break;
+
+                    case CrestType.liberated:
+                        heroine.lewdness = Mathf.Min(100, heroine.lewdness + 20);
+                        actCtrl.AddDesire(4, heroine, 40); //want to mast
+                        break;
+                }
+            }
+        }
+
         protected override void OnDayChange(Cycle.Week day)
         {
             foreach (var heroine in Game.Instance.HeroineList)
             {
-                if (heroine != null && heroine.GetCurrentCrest() == CrestType.restore && !heroine.isVirgin)
+                if (heroine == null) continue;
+
+                switch (heroine.GetCurrentCrest())
                 {
-                    LewdCrestXPlugin.Logger.LogDebug("Resetting heroine to virgin because of restore crest: " + heroine.charFile?.parameter?.fullname);
-                    heroine.isVirgin = true;
-                    heroine.hCount = 0;
+                    case CrestType.restore:
+                        if (!heroine.isVirgin)
+                        {
+                            LewdCrestXPlugin.Logger.LogInfo("Resetting heroine to virgin because of restore crest: " + heroine.charFile?.parameter?.fullname);
+                            heroine.isVirgin = true;
+                            heroine.hCount = 0;
+                        }
+                        break;
                 }
             }
+
+            ClearTempPreggers();
+        }
+
+        protected override void OnGameSave(GameSaveLoadEventArgs args)
+        {
+            ClearTempPreggers();
         }
 
         private sealed class HsceneHeroineInfo
@@ -99,9 +164,9 @@ namespace KK_LewdCrestX
 
             public Traverse<bool> GetRegenProp()
             {
-                if (SkinEffectsType == null) return null;
+                if (LewdCrestXPlugin.SkinEffectsType == null) return null;
                 if (Controller == null) return null;
-                var seCtrl = Controller.GetComponent(SkinEffectsType);
+                var seCtrl = Controller.GetComponent(LewdCrestXPlugin.SkinEffectsType);
                 if (seCtrl == null)
                 {
                     LewdCrestXPlugin.Logger.LogWarning("SkinEffectsController was not found on " + Controller.FullPath());

@@ -6,6 +6,7 @@ using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
+using KK_Pregnancy;
 using KKABMX.Core;
 using KKAPI;
 using KKAPI.Chara;
@@ -27,20 +28,23 @@ namespace KK_LewdCrestX
     [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
     [BepInDependency(KKABMX_Core.GUID, "4.0")]
     [BepInDependency(KoiSkinOverlayMgr.GUID, "5.2")]
-    [BepInDependency("KK_Pregnancy", BepInDependency.DependencyFlags.SoftDependency)]
+    [BepInDependency(PregnancyPlugin.GUID, PregnancyPlugin.Version)]
     [BepInDependency("Marco.SkinEffects", BepInDependency.DependencyFlags.SoftDependency)]
     public partial class LewdCrestXPlugin : BaseUnityPlugin
     {
         public const string GUID = "LewdCrestX";
         public const string Version = "1.0";
 
+        public static Dictionary<CrestType, CrestInfo> CrestInfos { get; } = new Dictionary<CrestType, CrestInfo>();
+        
         internal static new ManualLogSource Logger;
         internal static AssetBundle Bundle;
+        internal static Type SkinEffectsType;
+
         private ConfigEntry<bool> _confUnlockStoryMaker;
         private MakerText _descTxtControl;
-        private Harmony _hi;
 
-        public static Dictionary<CrestType, CrestInfo> CrestInfos { get; } = new Dictionary<CrestType, CrestInfo>();
+        private Harmony _hi;
 
         private void Start()
         {
@@ -56,11 +60,10 @@ namespace KK_LewdCrestX
 
             _hi = new Harmony(GUID);
             _hi.PatchAll(typeof(CharacterHooks));
-            PreggersHooks.TryPatchPreggers(_hi);
 
             var effType = Type.GetType("KK_SkinEffects.SkinEffectsController, KK_SkinEffects", false);
             if (effType != null)
-                LewdCrestXGameController.SkinEffectsType = effType;
+                SkinEffectsType = effType;
             else 
                 Logger.LogWarning("Could not find KK_SkinEffects.SkinEffectsController, some features might not work until you install KK_SkinEffects (please report this if you do have latest version of KK_SkinEffects installed)");
 
@@ -74,6 +77,7 @@ namespace KK_LewdCrestX
                 _hi.PatchAll(typeof(ActionIconHooks));
                 _hi.PatchAll(typeof(TalkHooks));
                 _hi.PatchAll(typeof(HsceneHooks));
+                PreggersHooks.TryPatchPreggers(_hi);
 
                 GameAPI.RegisterExtraBehaviour<LewdCrestXGameController>(GUID);
 

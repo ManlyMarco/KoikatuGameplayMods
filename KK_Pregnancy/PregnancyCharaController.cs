@@ -181,15 +181,15 @@ namespace KK_Pregnancy
         {
             base.Update();
 
-            float GetInflationChange()
-            {
-                //var inflationChange = Time.deltaTime / 2 + Time.deltaTime * _inflationChange / 3;
-                return Mathf.Max((0.1f * PregnancyPlugin.InflationSpeed.Value) * Time.deltaTime,
-                    Mathf.Abs(Time.deltaTime * (_inflationChange * PregnancyPlugin.InflationSpeed.Value) / 4));
-            }
-
             if (PregnancyPlugin.InflationEnable.Value)
             {
+                float GetInflationChange()
+                {
+                    //var inflationChange = Time.deltaTime / 2 + Time.deltaTime * _inflationChange / 3;
+                    return Mathf.Max((0.1f * PregnancyPlugin.InflationSpeed.Value) * Time.deltaTime,
+                        Mathf.Abs(Time.deltaTime * (_inflationChange * PregnancyPlugin.InflationSpeed.Value) / 4));
+                }
+
                 if (_inflationChange > 0.05f)
                 {
                     _inflationChange = Mathf.Max(0, _inflationChange - GetInflationChange());

@@ -63,27 +63,6 @@ namespace KK_LewdCrestX
             }
 
             Heroine = ChaControl.GetHeroine();
-
-            if (Heroine != null)
-            {
-                var actCtrl = Manager.Game.Instance.actScene.actCtrl;
-                switch (CurrentCrest)
-                {
-                    case CrestType.libido:
-                        Heroine.lewdness = 100;
-                        actCtrl.AddDesire(4, Heroine, 20); //want to mast
-                        actCtrl.AddDesire(5, Heroine, 40); //want to h
-                        actCtrl.AddDesire(26, Heroine, Heroine.parameter.attribute.likeGirls ? 30 : 10); //les
-                        actCtrl.AddDesire(27, Heroine, Heroine.parameter.attribute.likeGirls ? 30 : 10); //les
-                        actCtrl.AddDesire(29, Heroine, 60); //ask for h
-                        break;
-
-                    case CrestType.liberated:
-                        Heroine.lewdness = Mathf.Min(100, Heroine.lewdness + 20);
-                        actCtrl.AddDesire(4, Heroine, 40); //want to mast
-                        break;
-                }
-            }
         }
 
         private void ApplyCrestTexture()

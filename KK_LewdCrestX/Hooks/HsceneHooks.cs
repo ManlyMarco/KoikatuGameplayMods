@@ -20,12 +20,21 @@ namespace KK_LewdCrestX
         {
             try
             {
-                if (__instance.player != null && __instance.GetLeadingHeroine().GetCurrentCrest() == CrestType.siphoning)
+                if (__instance.player != null)
                 {
-                    __instance.player.physical = Mathf.Min(100, __instance.player.physical + 15);
-                    __instance.player.intellect = Mathf.Min(100, __instance.player.intellect + 10);
-                    __instance.player.hentai = Mathf.Min(100, __instance.player.hentai + 5);
-                    Game.Instance.actScene?.actCtrl?.AddDesire(22, __instance.GetLeadingHeroine(), 35);
+                    var heroine = __instance.GetLeadingHeroine();
+                    var currentCrest = heroine.GetCurrentCrest();
+                    if (currentCrest == CrestType.siphoning)
+                    {
+                        __instance.player.physical = Mathf.Min(100, __instance.player.physical + 15);
+                        __instance.player.intellect = Mathf.Min(100, __instance.player.intellect + 10);
+                        __instance.player.hentai = Mathf.Min(100, __instance.player.hentai + 5);
+                        Game.Instance.actScene?.actCtrl?.AddDesire(22, heroine, 35);
+                    }
+                    else if (currentCrest == CrestType.breedgasm)
+                    {
+                        LewdCrestXGameController.ApplyTempPreggers(heroine);
+                    }
                 }
             }
             catch (Exception e)

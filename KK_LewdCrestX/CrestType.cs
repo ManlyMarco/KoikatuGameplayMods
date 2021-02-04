@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 
 namespace KK_LewdCrestX
@@ -44,7 +45,9 @@ namespace KK_LewdCrestX
 
     public partial class LewdCrestXPlugin
     {
-        internal static readonly HashSet<CrestType> ImplementedCrestTypes = new HashSet<CrestType>{
+        internal static readonly HashSet<CrestType> ImplementedCrestTypes = new HashSet<CrestType>
+        {
+            CrestType.breedgasm,
             CrestType.command,
             CrestType.lactation,
             CrestType.liberated,
