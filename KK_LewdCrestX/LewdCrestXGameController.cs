@@ -18,6 +18,7 @@ namespace KK_LewdCrestX
         private HSceneProc _hSceneProc;
 
         private static readonly HashSet<PregnancyCharaController> _tempPreggers = new HashSet<PregnancyCharaController>();
+        private List<LewdCrestXController> _existingControllers;
 
         public static void ApplyTempPreggers(SaveData.Heroine heroine)
         {
@@ -78,14 +79,41 @@ namespace KK_LewdCrestX
 
         private void Update()
         {
-            if (_hSceneHeroines != null && _hSceneProc.flags.speed > 0.7f)
+            if (_hSceneHeroines != null)
             {
-                var id = _hSceneProc.flags.GetLeadingHeroineId();
-                var heroineInfo = _hSceneHeroines[id];
-                heroineInfo.TotalRoughTime += Time.deltaTime;
+                if (_hSceneProc.flags.speed > 0.7f)
+                {
+                    var id = _hSceneProc.flags.GetLeadingHeroineId();
+                    var heroineInfo = _hSceneHeroines[id];
+                    heroineInfo.TotalRoughTime += Time.deltaTime;
 
-                if (heroineInfo.CrestType == CrestType.suffer)
-                    _hSceneProc.flags.gaugeFemale += (_hSceneProc.flags.speed - 0.7f) * 3 * Time.deltaTime * 4;
+                    if (heroineInfo.CrestType == CrestType.suffer)
+                        _hSceneProc.flags.gaugeFemale += (_hSceneProc.flags.speed - 0.7f) * 3 * Time.deltaTime * 4;
+                }
+            }
+            else
+            {
+                for (var i = 0; i < _existingControllers.Count; i++)
+                {
+                    var controller = _existingControllers[i];
+                    if (controller.CurrentCrest == CrestType.mantraction)
+                    {
+                        var actScene = Game.Instance.actScene;
+                        if (actScene == null) return;
+                        var player = actScene.Player;
+                        if (player == null) continue;
+
+                        if (player.chaser == null)
+                        {
+                            var npc = controller.Heroine.GetNPC();
+                            if (player.mapNo == npc.mapNo)
+                            {
+                                LewdCrestXPlugin.Logger.LogInfo("Chasing player because of mantraction crest: " + controller.Heroine.charFile?.parameter?.fullname);
+                                player.ChaserSet(npc);
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -95,13 +123,16 @@ namespace KK_LewdCrestX
             foreach (var pregCtrl in _tempPreggers)
                 pregCtrl.Data.Week = PregnancyData.LeaveSchoolWeek;
 
+            _existingControllers = Game.Instance.HeroineList.Select(x => x.GetCrestController()).Where(x => x != null).ToList();
+
             var actCtrl = Game.Instance.actScene?.actCtrl;
             if (actCtrl == null) return;
-            foreach (var heroine in Game.Instance.HeroineList)
-            {
-                if (heroine == null) continue;
 
-                switch (heroine.GetCurrentCrest())
+            foreach (var ctrl in _existingControllers)
+            {
+                var heroine = ctrl.Heroine;
+                if (heroine == null) continue;
+                switch (ctrl.CurrentCrest)
                 {
                     case CrestType.libido:
                         heroine.lewdness = 100;

@@ -52,6 +52,7 @@ namespace KK_LewdCrestX
             CrestType.lactation,
             CrestType.liberated,
             CrestType.libido,
+            CrestType.mantraction,
             CrestType.mindmelt,
             CrestType.regrowth,
             CrestType.restore,

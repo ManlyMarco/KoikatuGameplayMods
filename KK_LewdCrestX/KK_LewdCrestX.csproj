@@ -121,6 +121,7 @@
     <ProjectReference Include="..\KK_Pregnancy\KK_Pregnancy.csproj">
       <Project>{930a00a6-2935-4ea0-81f0-b16d3e71b74c}</Project>
       <Name>KK_Pregnancy</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
