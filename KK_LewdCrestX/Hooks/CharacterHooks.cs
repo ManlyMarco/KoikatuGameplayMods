@@ -1,5 +1,7 @@
 ﻿using System;
 using HarmonyLib;
+using KKAPI;
+using KKAPI.MainGame;
 
 namespace KK_LewdCrestX
 {
@@ -8,13 +10,15 @@ namespace KK_LewdCrestX
         [HarmonyPrefix]
         [HarmonyPatch(typeof(ChaControl), nameof(ChaControl.notBra), MethodType.Setter)]
         [HarmonyPatch(typeof(ChaControl), nameof(ChaControl.notShorts), MethodType.Setter)]
-        private static void notBraOverride(ChaControl __instance, ref bool value)
+        private static void NotBraShortsOverride(ChaControl __instance, ref bool value)
         {
-            Console.WriteLine("notBraOverride");
             if (__instance.GetCurrentCrest() == CrestType.liberated)
             {
-                // Force underwear to be off
-                value = true;
+                if (KoikatuAPI.GetCurrentGameMode() == GameMode.MainGame || GameAPI.InsideHScene)
+                {
+                    // Force underwear to be off
+                    value = true;
+                }
             }
         }
 

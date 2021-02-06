@@ -39,13 +39,38 @@ namespace KK_LewdCrestX
 
         protected override void OnCardBeingSaved(GameMode currentGameMode)
         {
+            SaveData();
+        }
+
+        protected override void OnReload(GameMode currentGameMode)
+        {
+            ReadData();
+
+            if (CurrentCrest == CrestType.liberated)
+            {
+                // Need to reload clothes for the hooks to take effect, since this controller loads too late to be seen from the hooks (NotBraShortsOverride)
+                if (KoikatuAPI.GetCurrentGameMode() == GameMode.MainGame || GameAPI.InsideHScene)
+                {
+                    var bra = ChaControl.objClothes[2];
+                    var pan = ChaControl.objClothes[3];
+                    // Avoid unnecessary reloads
+                    if (bra != null && bra.activeSelf || pan != null && pan.activeSelf)
+                        ChaControl.ChangeClothes(true);
+                }
+            }
+
+            Heroine = ChaControl.GetHeroine();
+        }
+
+        public void SaveData()
+        {
             // todo save null if default
             var data = new PluginData();
             data.data[nameof(CurrentCrest)] = CurrentCrest;
             SetExtendedData(data);
         }
 
-        protected override void OnReload(GameMode currentGameMode)
+        public void ReadData()
         {
             // todo better handling
             var data = GetExtendedData()?.data;
@@ -61,8 +86,6 @@ namespace KK_LewdCrestX
                     CurrentCrest = CrestType.None;
                 }
             }
-
-            Heroine = ChaControl.GetHeroine();
         }
 
         private void ApplyCrestTexture()

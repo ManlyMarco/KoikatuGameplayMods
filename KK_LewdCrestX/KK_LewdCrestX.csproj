@@ -95,6 +95,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CrestInterfaceList.cs" />
+    <Compile Include="Extensions\TextureUtils.cs" />
     <Compile Include="Extensions\Extensions.cs" />
     <Compile Include="Extensions\TranslationHelper.cs" />
     <Compile Include="Hooks\ActionIconHooks.cs" />

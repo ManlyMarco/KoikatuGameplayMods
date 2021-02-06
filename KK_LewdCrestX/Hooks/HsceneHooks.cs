@@ -10,7 +10,7 @@ namespace KK_LewdCrestX
 {
     internal static class HsceneHooks
     {
-        [HarmonyPrefix]
+        [HarmonyPostfix]
         [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddHoushiInside))]
         [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuInside))]
         [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuCondomInside))]
@@ -31,10 +31,6 @@ namespace KK_LewdCrestX
                         __instance.player.hentai = Mathf.Min(100, __instance.player.hentai + 5);
                         Game.Instance.actScene?.actCtrl?.AddDesire(22, heroine, 35);
                     }
-                    else if (currentCrest == CrestType.breedgasm)
-                    {
-                        LewdCrestXGameController.ApplyTempPreggers(heroine);
-                    }
                 }
             }
             catch (Exception e)
@@ -43,7 +39,27 @@ namespace KK_LewdCrestX
             }
         }
 
-        [HarmonyPrefix]
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuInside))]
+        public static void OnInsideFinish2(HFlag __instance)
+        {
+            try
+            {
+                if (__instance.player != null)
+                {
+                    var heroine = __instance.GetLeadingHeroine();
+                    var currentCrest = heroine.GetCurrentCrest();
+                    if (currentCrest == CrestType.breedgasm)
+                        LewdCrestXGameController.ApplyTempPreggers(heroine);
+                }
+            }
+            catch (Exception e)
+            {
+                UnityEngine.Debug.LogError(e);
+            }
+        }
+
+        [HarmonyPostfix]
         [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddAibuOrg))]
         [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuAnalOrg))]
         [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuOrg))]

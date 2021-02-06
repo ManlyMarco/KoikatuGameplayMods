@@ -58,15 +58,6 @@ namespace KK_LewdCrestX
 
             CharacterApi.RegisterExtraBehaviour<LewdCrestXController>(GUID);
 
-            _hi = new Harmony(GUID);
-            _hi.PatchAll(typeof(CharacterHooks));
-
-            var effType = Type.GetType("KK_SkinEffects.SkinEffectsController, KK_SkinEffects", false);
-            if (effType != null)
-                SkinEffectsType = effType;
-            else 
-                Logger.LogWarning("Could not find KK_SkinEffects.SkinEffectsController, some features might not work until you install KK_SkinEffects (please report this if you do have latest version of KK_SkinEffects installed)");
-
             if (StudioAPI.InsideStudio)
             {
                 CreateStudioControls();
@@ -74,10 +65,19 @@ namespace KK_LewdCrestX
             else
             {
                 //todo hook only when entering story mode?
+                _hi = new Harmony(GUID);
+                _hi.PatchAll(typeof(CharacterHooks));
                 _hi.PatchAll(typeof(ActionIconHooks));
                 _hi.PatchAll(typeof(TalkHooks));
                 _hi.PatchAll(typeof(HsceneHooks));
                 PreggersHooks.TryPatchPreggers(_hi);
+
+                var effType = Type.GetType("KK_SkinEffects.SkinEffectsController, KK_SkinEffects", false);
+                if (effType != null)
+                    SkinEffectsType = effType;
+                else 
+                    Logger.LogWarning("Could not find KK_SkinEffects.SkinEffectsController, some features might not work until you install KK_SkinEffects (please report this if you do have latest version of KK_SkinEffects installed)");
+
 
                 GameAPI.RegisterExtraBehaviour<LewdCrestXGameController>(GUID);
 

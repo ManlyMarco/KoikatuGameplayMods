@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ActionGame;
@@ -17,23 +18,26 @@ namespace KK_LewdCrestX
         private HsceneHeroineInfo[] _hSceneHeroines;
         private HSceneProc _hSceneProc;
 
-        private static readonly HashSet<PregnancyCharaController> _tempPreggers = new HashSet<PregnancyCharaController>();
+        private static readonly HashSet<SaveData.Heroine> _tempPreggers = new HashSet<SaveData.Heroine>();
         private List<LewdCrestXController> _existingControllers;
 
         public static void ApplyTempPreggers(SaveData.Heroine heroine)
         {
-            var ctrl = heroine.GetCrestController()?.GetComponent<PregnancyCharaController>();
-            if (ctrl)
-            {
-                if (_tempPreggers.Add(ctrl))
-                    LewdCrestXPlugin.Logger.LogInfo("Triggering temporary pregnancy because of breedgasm crest: " + heroine.charFile?.parameter?.fullname);
-            }
+            if (_tempPreggers.Add(heroine))
+                LewdCrestXPlugin.Logger.LogInfo("Triggering temporary pregnancy because of breedgasm crest: " + heroine.charFile?.parameter?.fullname);
         }
 
         private static void ClearTempPreggers()
         {
-            foreach (var pregCtrl in _tempPreggers)
-                pregCtrl.Data.Week = 0;
+            foreach (var heroine in _tempPreggers)
+            {
+                var pregCtrl = heroine?.GetCrestController()?.GetComponent<PregnancyCharaController>();
+                if (pregCtrl != null)
+                {
+                    pregCtrl.Data.Week = 0;
+                    pregCtrl.SaveData();
+                }
+            }
             _tempPreggers.Clear();
         }
 
@@ -81,17 +85,20 @@ namespace KK_LewdCrestX
         {
             if (_hSceneHeroines != null)
             {
-                if (_hSceneProc.flags.speed > 0.7f)
+                var speed = _hSceneProc.flags.IsSonyu() && _hSceneProc.flags.speedCalc > 0.7f
+                    ? (_hSceneProc.flags.speedCalc - 0.7f) * 3.3f
+                    : (_hSceneProc.flags.speedItem > 1.4f ? 0.33f : 0);
+                if (speed > 0)
                 {
                     var id = _hSceneProc.flags.GetLeadingHeroineId();
                     var heroineInfo = _hSceneHeroines[id];
                     heroineInfo.TotalRoughTime += Time.deltaTime;
 
                     if (heroineInfo.CrestType == CrestType.suffer)
-                        _hSceneProc.flags.gaugeFemale += (_hSceneProc.flags.speed - 0.7f) * 3 * Time.deltaTime * 4;
+                        _hSceneProc.flags.gaugeFemale += speed * Time.deltaTime * 2;
                 }
             }
-            else
+            else if (_existingControllers != null)
             {
                 for (var i = 0; i < _existingControllers.Count; i++)
                 {
@@ -119,34 +126,51 @@ namespace KK_LewdCrestX
 
         protected override void OnPeriodChange(Cycle.Type period)
         {
+            StopAllCoroutines();
+            StartCoroutine(OnPeriodChangeCo());
+        }
+
+        private IEnumerator OnPeriodChangeCo()
+        {
+            yield return null;
+            yield return new WaitWhile(() => Scene.Instance.IsNowLoadingFade);
+
             // Apply the effect now to get a delay
-            foreach (var pregCtrl in _tempPreggers)
-                pregCtrl.Data.Week = PregnancyData.LeaveSchoolWeek;
+            foreach (var heroine in _tempPreggers)
+            {
+                var pregCtrl = heroine?.GetCrestController()?.GetComponent<PregnancyCharaController>();
+                if (pregCtrl != null)
+                {
+                    pregCtrl.Data.Week = PregnancyData.LeaveSchoolWeek;
+                    pregCtrl.SaveData();
+                }
+            }
 
             _existingControllers = Game.Instance.HeroineList.Select(x => x.GetCrestController()).Where(x => x != null).ToList();
 
             var actCtrl = Game.Instance.actScene?.actCtrl;
-            if (actCtrl == null) return;
-
-            foreach (var ctrl in _existingControllers)
+            if (actCtrl != null)
             {
-                var heroine = ctrl.Heroine;
-                if (heroine == null) continue;
-                switch (ctrl.CurrentCrest)
+                foreach (var ctrl in _existingControllers)
                 {
-                    case CrestType.libido:
-                        heroine.lewdness = 100;
-                        actCtrl.AddDesire(4, heroine, 20); //want to mast
-                        actCtrl.AddDesire(5, heroine, 40); //want to h
-                        actCtrl.AddDesire(26, heroine, heroine.parameter.attribute.likeGirls ? 30 : 10); //les
-                        actCtrl.AddDesire(27, heroine, heroine.parameter.attribute.likeGirls ? 30 : 10); //les
-                        actCtrl.AddDesire(29, heroine, 60); //ask for h
-                        break;
+                    var heroine = ctrl.Heroine;
+                    if (heroine == null) continue;
+                    switch (ctrl.CurrentCrest)
+                    {
+                        case CrestType.libido:
+                            heroine.lewdness = 100;
+                            actCtrl.AddDesire(4, heroine, 20); //want to mast
+                            actCtrl.AddDesire(5, heroine, 40); //want to h
+                            actCtrl.AddDesire(26, heroine, heroine.parameter.attribute.likeGirls ? 30 : 10); //les
+                            actCtrl.AddDesire(27, heroine, heroine.parameter.attribute.likeGirls ? 30 : 10); //les
+                            actCtrl.AddDesire(29, heroine, 60); //ask for h
+                            break;
 
-                    case CrestType.liberated:
-                        heroine.lewdness = Mathf.Min(100, heroine.lewdness + 20);
-                        actCtrl.AddDesire(4, heroine, 40); //want to mast
-                        break;
+                        case CrestType.liberated:
+                            heroine.lewdness = Mathf.Min(100, heroine.lewdness + 20);
+                            actCtrl.AddDesire(4, heroine, 40); //want to mast
+                            break;
+                    }
                 }
             }
         }
@@ -181,7 +205,7 @@ namespace KK_LewdCrestX
         private sealed class HsceneHeroineInfo
         {
             public readonly LewdCrestXController Controller;
-            public readonly CrestType CrestType;
+            public CrestType CrestType => Controller?.CurrentCrest ?? CrestType.None;
             public readonly SaveData.Heroine Heroine;
             public bool NeedsRegenRestored;
             public float TotalRoughTime;
@@ -190,7 +214,6 @@ namespace KK_LewdCrestX
             {
                 Heroine = heroine;
                 if (heroine != null) Controller = heroine.GetCrestController();
-                if (Controller != null) CrestType = Controller.CurrentCrest;
             }
 
             public Traverse<bool> GetRegenProp()

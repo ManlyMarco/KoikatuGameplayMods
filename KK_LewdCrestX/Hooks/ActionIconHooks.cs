@@ -114,6 +114,7 @@ namespace KK_LewdCrestX
             public readonly SaveData.Heroine Heroine;
             public readonly LewdCrestXController Controller;
             private string _heroineName;
+            private Texture2D _faceTex;
 
             public HeroineData(SaveData.Heroine heroine)
             {
@@ -124,10 +125,28 @@ namespace KK_LewdCrestX
                 TranslationHelper.TranslateAsync(_heroineName, s => _heroineName = s);
             }
 
-            public string HeroineNameAndCrest =>
-                LewdCrestXPlugin.CrestInfos.TryGetValue(Controller.CurrentCrest, out var ci)
-                    ? _heroineName + "   [" + ci.Name + "]"
-                    : _heroineName;
+            public string GetCrestName() => LewdCrestXPlugin.CrestInfos.TryGetValue(Controller.CurrentCrest, out var ci) ? ci.Name : "No crest";
+
+            public string HeroineName => _heroineName;
+
+            public Texture GetFaceTex()
+            {
+                if (_faceTex == null)
+                {
+                    var origTex = Heroine.charFile.facePngData.LoadTexture();
+                    var scale = 84f / origTex.width;
+                    _faceTex = origTex.ResizeTexture(TextureUtils.ImageFilterMode.Average, scale);
+                    GameObject.Destroy(origTex);
+                }
+
+                return _faceTex;
+
+            }
+
+            public void Destroy()
+            {
+                GameObject.Destroy(_faceTex);
+            }
         }
 
         private static Sprite _iconOff, _iconOn;
@@ -158,9 +177,15 @@ namespace KK_LewdCrestX
                         ShowOnlyImplemented = true;
 
                         _screenRect = new Rect(0, 0, Screen.width, Screen.height);
-                        const int windowSize = 450;
+                        const int windowSize = 540;
                         _windowRect = new Rect((_screenRect.width - windowSize) / 2,
                             (_screenRect.height - windowSize) / 2, windowSize, windowSize);
+
+                        if (_crestableHeroines != null)
+                        {
+                            foreach (var heroine in _crestableHeroines)
+                                heroine.Destroy();
+                        }
 
                         _crestableHeroines = Singleton<Game>.Instance.HeroineList
                             .Where(x => x != null && x.isStaff) // staff is club member
@@ -170,6 +195,14 @@ namespace KK_LewdCrestX
 
                         _selCrest = _selHeroine = 0;
                         _scrollPos1 = _scrollPos2 = Vector2.zero;
+                    }
+                    else
+                    {
+                        foreach (var heroine in _crestableHeroines)
+                        {
+                            if (heroine.Controller != null)
+                                heroine.Controller.SaveData();
+                        }
                     }
 
                     _showWindow = value;
@@ -184,7 +217,7 @@ namespace KK_LewdCrestX
             {
                 if (_showOnlyImplemented != value || _crestlist == null)
                 {
-                    _crestlist = CrestInterfaceList.Create(value, true);
+                    _crestlist = CrestInterfaceList.Create(value, false);
                     _showOnlyImplemented = value;
                 }
             }
@@ -196,7 +229,7 @@ namespace KK_LewdCrestX
             {
                 GUILayout.BeginHorizontal(GUI.skin.box, GUILayout.ExpandWidth(true));
                 {
-                    GUILayout.Label("As a part of the club's research activities, you can give other club members lewd (womb) crests.\nCrests can have mental and/or physical effects, but members don't know about this to avoid bias in the research.\nAll effects are reverted after a crest is removed, but memories remain.");
+                    GUILayout.Label("Your club's love research includes giving other club members lewd crests. Crests can have many different effects, but members don't know about them to avoid bias.\nThe effects are reverted after a crest is removed, but memories remain.");
                 }
                 GUILayout.EndHorizontal();
 
@@ -216,20 +249,30 @@ namespace KK_LewdCrestX
                 else
                 {
                     GUILayout.BeginVertical(GUI.skin.box, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
-                    _scrollPos1 = GUILayout.BeginScrollView(_scrollPos1, false, true, GUILayout.ExpandWidth(true),
-                        GUILayout.ExpandHeight(true));
                     {
-                        _selHeroine = GUILayout.SelectionGrid(_selHeroine, _crestableHeroines.Select(x => x.HeroineNameAndCrest).ToArray(), 1, GUILayout.ExpandWidth(true));
-                        if (GUI.changed)
+                        _scrollPos1 = GUILayout.BeginScrollView(_scrollPos1, false, true, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
                         {
-                            _selCrest = _crestlist.GetIndex(_crestableHeroines[_selHeroine].Controller.CurrentCrest);
-                            GUI.changed = false;
+                            //_selHeroine = GUILayout.SelectionGrid(_selHeroine, _crestableHeroines.Select(x => x.HeroineNameAndCrest).ToArray(), 1, GUILayout.ExpandWidth(true));
+                            _selHeroine = GUILayout.SelectionGrid(_selHeroine, _crestableHeroines.Select(x => x.GetFaceTex()).ToArray(), 5, GUILayout.ExpandWidth(true));
+                            if (GUI.changed)
+                            {
+                                _selCrest = _crestlist.GetIndex(_crestableHeroines[_selHeroine].Controller.CurrentCrest);
+                                GUI.changed = false;
+                            }
                         }
+                        GUILayout.EndScrollView();
+
+                        GUILayout.BeginHorizontal();
+                        {
+                            GUILayout.FlexibleSpace();
+                            GUILayout.Label(_crestableHeroines[_selHeroine].HeroineName, GUILayout.ExpandWidth(false));
+                            GUILayout.FlexibleSpace();
+                        }
+                        GUILayout.EndHorizontal();
                     }
-                    GUILayout.EndScrollView();
                     GUILayout.EndVertical();
 
-                    GUILayout.BeginHorizontal(GUILayout.Height(150), GUILayout.ExpandWidth(true));
+                    GUILayout.BeginHorizontal(GUILayout.Height(165), GUILayout.ExpandWidth(true));
                     {
                         GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(150), GUILayout.ExpandHeight(true));
                         _scrollPos2 = GUILayout.BeginScrollView(_scrollPos2, false, true, GUILayout.ExpandWidth(true));
