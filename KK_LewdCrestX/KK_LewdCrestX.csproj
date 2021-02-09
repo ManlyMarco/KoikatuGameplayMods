@@ -94,6 +94,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ClubInterface.HeroineData.cs" />
     <Compile Include="CrestInterfaceList.cs" />
     <Compile Include="Extensions\TextureUtils.cs" />
     <Compile Include="Extensions\Extensions.cs" />
@@ -102,6 +103,7 @@
     <Compile Include="Hooks\CharacterHooks.cs" />
     <Compile Include="CrestInfo.cs" />
     <Compile Include="CrestType.cs" />
+    <Compile Include="ClubInterface.cs" />
     <Compile Include="Hooks\HsceneHooks.cs" />
     <Compile Include="LewdCrestXBoneModifier.cs" />
     <Compile Include="LewdCrestXController.cs" />
