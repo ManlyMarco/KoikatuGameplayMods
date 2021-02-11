@@ -83,3 +83,14 @@ This plugin is a replacement/upgrade for KK_MoveMapFromCharaList. Compared to it
 
 # KK_Bulge
 Automatically adds crotch bulges to characters with fun sticks when they are wearing clothes. Can be configured globally, and per-character for when you want the bulge size to be just right.
+
+# KK_LewdCrestX
+A plugin for Koikatsu that lets you give characters lewd crests in character maker and in story mode. Many crests have actual gameplay effects, while others are only for flavor. All crests can be used in character maker and studio. There are 32 different crests at the moment.
+
+Inspired by the original KK_LewdCrest plugin by picolet21. Crests were drawn and described by novaksus.
+
+### How to use
+1. Either install KK HF Patch v3.7 (or later), or manually update these plugins (to specified version or newer): BepInEx 5.4.4, BepisPlugins r16, KKAPI 1.15, KKABMX 4.0, OverlayMods 5.2, KK_Pregnancy 2.3.1, and optionally AutoTranslator (can be not installed at all).
+2. Download the latest release.
+3. Extract the archive into your game directory. The plugin .dll should end up inside your BepInEx\plugins directory.
+4. Check if there are no warnings on game startup. A new "Crest" category should appear in character maker in the same tab as character name (check preview screenshots). To give characters crests in story mode, invite them to the club and look for a new action icon in the clubroom. If you applied a crest to the character in maker then it will already be applied when you add the character to story mode. To give crests in studio, select character and scroll down in the "anim / Current State" menu (check preview pictures).
