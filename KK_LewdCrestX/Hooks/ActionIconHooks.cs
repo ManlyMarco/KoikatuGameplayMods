@@ -93,9 +93,8 @@ namespace KK_LewdCrestX
                 .Where(_ => playerInRange && ActionInput.isAction && !player.isActionNow)
                 .Subscribe(_ => ClubInterface.ShowWindow = true)
                 .AddTo(evt);
-
             evt.OnGUIAsObservable()
-                .Subscribe(ClubInterface.ClubInterfaceOnGui)
+                .Subscribe(ClubInterface.OnGui)
                 .AddTo(evt);
         }
 

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using HarmonyLib;
 using KKAPI.Utilities;
@@ -10,17 +11,25 @@ namespace KK_LewdCrestX
 {
     internal static partial class ClubInterface
     {
+        private static GUIStyle _btnStyleDeselected, _btnStyleSelected;
+
+        private static Rect _screenRect,_windowRect;
+        private static Vector2 _scrollPos1, _scrollPos2;
+        private static int _rowCount = 3;
+        private static int _charaListWidth = 380;
+        private static float _singleItemSize = (_charaListWidth - 6 * 2 - 17) / _rowCount - 6;
+
         private static List<HeroineData> _crestableHeroines;
-        private static Rect _screenRect;
-        private static Rect _windowRect;
-        private static Vector2 _scrollPos1;
-        private static Vector2 _scrollPos2;
+        private static CrestInterfaceList _crestlist;
+        
         private static int _selHeroine;
         private static int _selCrest;
-        private static CrestInterfaceList _crestlist;
+
+        private static bool _mouseDown;
+        
         private static bool _showWindow;
         private static bool _showOnlyImplemented;
-
+        
         public static bool ShowWindow
         {
             get => _showWindow;
@@ -39,10 +48,11 @@ namespace KK_LewdCrestX
                         ShowOnlyImplemented = true;
 
                         _screenRect = new Rect(0, 0, Screen.width, Screen.height);
-                        const int windowSize = 540;
-                        _windowRect = new Rect((_screenRect.width - windowSize) / 2,
-                            (_screenRect.height - windowSize) / 2, windowSize, windowSize);
-
+                        const int windowWidth = 750;
+                        const int windowHeight = 530;
+                        _windowRect = new Rect((_screenRect.width - windowWidth) / 2,
+                            (_screenRect.height - windowHeight) / 2, windowWidth, windowHeight);
+                        
                         if (_crestableHeroines != null)
                         {
                             foreach (var heroine in _crestableHeroines)
@@ -85,70 +95,134 @@ namespace KK_LewdCrestX
             }
         }
 
-        public static void ClubInterfaceOnGui(Unit _)
+        private static bool ClickedInsideLastElement()
+        {
+            var current = Event.current;
+            // Has to be during repaint for GetLastRect, can't use Input to check mouse down here
+            return current.type == EventType.Repaint && _mouseDown && GUILayoutUtility.GetLastRect().Contains(current.mousePosition);
+        }
+
+        public static void OnGui(Unit _)
         {
             if (!ShowWindow) return;
+
             if (GUI.Button(_screenRect, string.Empty, GUI.skin.box) && !_windowRect.Contains(Input.mousePosition)) ShowWindow = false;
+
+            if (_btnStyleDeselected == null)
+            {
+                _btnStyleDeselected = new GUIStyle(GUI.skin.button);
+                _btnStyleDeselected.normal.background = GUI.skin.button.active.background;
+                _btnStyleSelected = new GUIStyle(GUI.skin.button);
+                _btnStyleSelected.normal.background = GUI.skin.button.onNormal.background;
+                _btnStyleSelected.hover.background = GUI.skin.button.onHover.background;
+            }
+
             IMGUIUtils.DrawSolidBox(_windowRect);
             GUILayout.Window(47238, _windowRect, CrestWindow, "Assign lewd crests to club members");
+
             Input.ResetInputAxes();
         }
 
         private static void CrestWindow(int id)
         {
-            GUILayout.BeginVertical();
-            {
-                GUILayout.BeginHorizontal(GUI.skin.box, GUILayout.ExpandWidth(true));
-                {
-                    GUILayout.Label("Your club's love research includes giving other club members lewd crests. Crests can have many different effects, but members don't know about them to avoid bias.\nThe effects are reverted after a crest is removed, but memories remain.");
-                }
-                GUILayout.EndHorizontal();
+            if (Event.current.type == EventType.MouseDown && Event.current.button == 0) _mouseDown = true;
 
+            try
+            {
+                DrawColumns();
+            }
+            catch (ArgumentException e)
+            {
+                if (!e.Message.Contains("position in a group with only"))
+                    throw;
+            }
+
+            // This has to be specifically reset in repaint at the end of this method because ongui
+            // when mouse click is handled there's an extra layout added after the repaint and then the
+            // mouse event is processed, so the mouseDown has to survive the entire frame before being seein in repaint
+            if (Event.current.type == EventType.repaint)
+                _mouseDown = false;
+        }
+
+        private static void DrawColumns()
+        {
+            GUILayout.BeginHorizontal();
+            {
+                // Left column ----------------------------------------------------------------------------------------
+                GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(_charaListWidth), GUILayout.ExpandHeight(true));
                 if (_crestableHeroines.Count == 0)
                 {
                     GUILayout.FlexibleSpace();
-                    GUILayout.BeginHorizontal(GUI.skin.box, GUILayout.ExpandWidth(true));
-                    {
-                        var alig = GUI.skin.label.alignment;
-                        GUI.skin.label.alignment = TextAnchor.MiddleCenter;
-                        GUILayout.Label("Only present club memebers can be given a crest.\n\nInvite some new members and try again!");
-                        GUI.skin.label.alignment = alig;
-                    }
-                    GUILayout.EndHorizontal();
+                    var alig = GUI.skin.label.alignment;
+                    GUI.skin.label.alignment = TextAnchor.MiddleCenter;
+                    GUILayout.Label("Only present club memebers can be given a crest.\n\nInvite some new members and try again!");
+                    GUI.skin.label.alignment = alig;
                     GUILayout.FlexibleSpace();
                 }
                 else
                 {
-                    GUILayout.BeginVertical(GUI.skin.box, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+                    _scrollPos1 = GUILayout.BeginScrollView(_scrollPos1, false, true, GUILayout.ExpandWidth(true),
+                        GUILayout.ExpandHeight(true));
                     {
-                        _scrollPos1 = GUILayout.BeginScrollView(_scrollPos1, false, true, GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(true));
+                        if (_singleItemSize > 0)
                         {
-                            //_selHeroine = GUILayout.SelectionGrid(_selHeroine, _crestableHeroines.Select(x => x.HeroineNameAndCrest).ToArray(), 1, GUILayout.ExpandWidth(true));
-                            _selHeroine = GUILayout.SelectionGrid(_selHeroine, _crestableHeroines.Select(x => x.GetFaceTex()).ToArray(), 5, GUILayout.ExpandWidth(true));
-                            if (GUI.changed)
+                            for (int i = 0; i < _crestableHeroines.Count;)
                             {
-                                _selCrest = _crestlist.GetIndex(_crestableHeroines[_selHeroine].Controller.CurrentCrest);
-                                GUI.changed = false;
+                                GUILayout.BeginHorizontal(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(false));
+                                for (int r = 0; r < _rowCount && i < _crestableHeroines.Count; i++, r++)
+                                {
+                                    var style = _selHeroine == i ? _btnStyleSelected : _btnStyleDeselected;
+                                    GUILayout.BeginVertical(style, GUILayout.Width(_singleItemSize), GUILayout.ExpandHeight(false));
+                                    {
+                                        var heroine = _crestableHeroines[i];
+                                        GUILayout.Label(heroine.GetFaceTex());
+                                        GUILayout.Label(heroine.HeroineName);
+                                        GUILayout.Label(heroine.GetCrestName());
+                                    }
+                                    GUILayout.EndVertical();
+
+                                    // bug This will pick up elements even if they are scrolled outside of the scrollview.
+                                    // This is mitigated by making the scrollview take whole left side, but beware when reordering.
+                                    // Getting scrollview rect and checking if mouse is inside of it didn't work properly because it was offset for some reason.
+                                    if (ClickedInsideLastElement())
+                                    {
+                                        _selHeroine = i;
+                                        _selCrest = _crestlist.GetIndex(_crestableHeroines[_selHeroine].Controller.CurrentCrest);
+                                    }
+                                }
+                                GUILayout.EndHorizontal();
                             }
                         }
-                        GUILayout.EndScrollView();
+                    }
+                    GUILayout.EndScrollView();
 
-                        GUILayout.BeginHorizontal();
-                        {
-                            GUILayout.FlexibleSpace();
-                            GUILayout.Label(_crestableHeroines[_selHeroine].HeroineName, GUILayout.ExpandWidth(false));
-                            GUILayout.FlexibleSpace();
-                        }
-                        GUILayout.EndHorizontal();
+                    //if (Event.current.type == EventType.repaint)
+                    //{
+                    //    _scrollRect = GUILayoutUtility.GetLastRect();
+                    //    //Console.WriteLine("scrl " + _scrollRect.ToString());
+                    //}
+                }
+
+                GUILayout.EndVertical();
+
+                // Right column ----------------------------------------------------------------------------------------
+                GUILayout.BeginVertical(GUILayout.ExpandHeight(true), GUILayout.ExpandWidth(true));
+                {
+                    GUILayout.BeginVertical(GUI.skin.box, GUILayout.ExpandWidth(true));
+                    {
+                        GUILayout.Label("Your club's love research includes giving other club members lewd crests. " +
+                                        "Crests can have many different effects, but members don't know about them to avoid bias.");
+                        GUILayout.Label("If you don't see a character, make sure they are club members. " +
+                                        "Effects are applied immediately or on next period. " +
+                                        "After a crest is removed effects are reverted but memories remain.");
                     }
                     GUILayout.EndVertical();
 
-                    GUILayout.BeginHorizontal(GUILayout.Height(165), GUILayout.ExpandWidth(true));
+                    GUILayout.BeginVertical(GUI.skin.box, GUILayout.Height(160), GUILayout.ExpandWidth(true));
                     {
-                        GUILayout.BeginVertical(GUI.skin.box, GUILayout.Width(150), GUILayout.ExpandHeight(true));
                         _scrollPos2 = GUILayout.BeginScrollView(_scrollPos2, false, true, GUILayout.ExpandWidth(true));
                         {
-                            _selCrest = GUILayout.SelectionGrid(_selCrest, _crestlist.GetInterfaceNames(), 1, GUILayout.ExpandWidth(true));
+                            _selCrest = GUILayout.SelectionGrid(_selCrest, _crestlist.GetInterfaceNames(), 3, _btnStyleDeselected, GUILayout.ExpandWidth(true));
                             if (GUI.changed)
                             {
                                 _crestableHeroines[_selHeroine].Controller.CurrentCrest = _crestlist.GetType(_selCrest);
@@ -156,27 +230,34 @@ namespace KK_LewdCrestX
                             }
                         }
                         GUILayout.EndScrollView();
-                        ShowOnlyImplemented = GUILayout.Toggle(ShowOnlyImplemented, "Only with effects");
-                        GUILayout.EndVertical();
-
-                        GUILayout.BeginVertical(GUI.skin.box, GUILayout.ExpandHeight(true));
-                        {
-                            var currentCrest = _crestlist.GetInfo(_selCrest);
-                            GUILayout.Label("Currently selected crest: " + (currentCrest?.Name ?? "None"));
-                            GUILayout.Label(currentCrest != null ? "Description: " + currentCrest.Description : "No crest selected. Choose a crest on the left see its description and give it to the selected character.");
-                            GUILayout.FlexibleSpace();
-                            if (currentCrest != null)
-                                GUILayout.Label(currentCrest.Implemented ? "Gameplay will be changed roughly as described." : "Only for looks and lore, it won't change gameplay.");
-                        }
-                        GUILayout.EndVertical();
+                        ShowOnlyImplemented = GUILayout.Toggle(ShowOnlyImplemented, "Show only crests with gameplay effects");
                     }
-                    GUILayout.EndHorizontal();
-                }
+                    GUILayout.EndVertical();
 
-                if (GUILayout.Button("Close this window", GUILayout.ExpandWidth(true)))
-                    ShowWindow = false;
+                    GUILayout.BeginVertical(GUI.skin.box, GUILayout.ExpandHeight(true));
+                    {
+                        GUILayout.Label("Currently selected heroine: " + _crestableHeroines[_selHeroine].HeroineName);
+                        var currentCrest = _crestlist.GetInfo(_selCrest);
+                        GUILayout.Label("Currently selected crest: " + (currentCrest?.Name ?? "None"));
+                        GUILayout.Label(currentCrest != null
+                            ? "Description: " + currentCrest.Description
+                            : "No crest selected. Choose a crest on the left see its description and give it to the selected character.");
+                        if (currentCrest != null)
+                        {
+                            GUILayout.FlexibleSpace();
+                            GUILayout.Label(currentCrest.Implemented
+                                ? "Gameplay will be changed roughly as described."
+                                : "Only for looks and lore, it won't change gameplay.");
+                        }
+                    }
+                    GUILayout.EndVertical();
+
+                    if (GUILayout.Button("Close this window", GUILayout.ExpandWidth(true)))
+                        ShowWindow = false;
+                }
+                GUILayout.EndVertical();
             }
-            GUILayout.EndVertical();
+            GUILayout.EndHorizontal();
         }
     }
 }

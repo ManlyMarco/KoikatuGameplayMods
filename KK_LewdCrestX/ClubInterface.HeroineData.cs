@@ -30,7 +30,7 @@ namespace KK_LewdCrestX
                 if (_faceTex == null)
                 {
                     var origTex = Heroine.charFile.facePngData.LoadTexture();
-                    var scale = 84f / origTex.width;
+                    var scale = (_singleItemSize - 10) / origTex.width;
                     _faceTex = origTex.ResizeTexture(TextureUtils.ImageFilterMode.Average, scale);
                     Object.Destroy(origTex);
                 }
