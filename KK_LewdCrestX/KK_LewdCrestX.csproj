@@ -115,9 +115,7 @@
     <Compile Include="Hooks\TalkHooks.cs" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="E:\Unity projects\kk test\Assets\AssetBundles\crests">
-      <Link>crests</Link>
-    </EmbeddedResource>
+    <EmbeddedResource Include="crests" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
