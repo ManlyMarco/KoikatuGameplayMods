@@ -70,7 +70,7 @@ namespace KK_LewdCrestX
                     var h = heroine.Heroine;
                     h.lewdness = Mathf.Min(100, h.lewdness + totalTime / 10);
                     h.favor = Mathf.Min(100, h.favor + totalTime / 20);
-                    h.intimacy = Mathf.Min(100, h.favor + totalTime / 30);
+                    h.intimacy = Mathf.Min(100, h.intimacy + totalTime / 30);
                 }
 
                 if (heroine.NeedsRegenRestored)
