@@ -1,7 +1,12 @@
 ﻿using System;
 using System.Linq;
 using ExtensibleSaveFormat;
-using KKAPI.MainGame;
+#if KK
+    using KKAPI.MainGame;
+#endif
+#if AI
+    using AIChara;
+#endif
 
 namespace KK_Pregnancy
 {

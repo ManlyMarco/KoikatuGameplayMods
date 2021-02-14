@@ -5,6 +5,9 @@ using HarmonyLib;
 using Illusion.Game;
 using UnityEngine;
 using Random = UnityEngine.Random;
+#if AI
+    using AIChara;
+#endif
 
 namespace KK_Pregnancy
 {

@@ -1,9 +1,14 @@
 ﻿using KKABMX.Core;
 using KKAPI;
 using KKAPI.Chara;
-using KKAPI.MainGame;
+#if KK
+    using KKAPI.MainGame;
+#endif
 using KKAPI.Maker;
 using UnityEngine;
+#if AI
+    using AIChara;
+#endif
 
 namespace KK_Pregnancy
 {

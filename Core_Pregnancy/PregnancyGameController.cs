@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using ActionGame;
 using ExtensibleSaveFormat;
-using KKAPI.MainGame;
+#if KK
+    using ActionGame;
+    using KKAPI.MainGame;
+#endif
 using Manager;
 using UnityEngine;
 using Random = UnityEngine.Random;

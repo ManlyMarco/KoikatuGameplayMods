@@ -4,7 +4,9 @@ using System.Reflection;
 using System.Reflection.Emit;
 using ExtensibleSaveFormat;
 using HarmonyLib;
-using KKAPI.MainGame;
+#if KK
+    using KKAPI.MainGame;
+#endif
 using Manager;
 using UnityEngine;
 

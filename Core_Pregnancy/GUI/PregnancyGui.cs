@@ -7,6 +7,9 @@ using KKAPI.Studio.UI;
 using KKAPI.Utilities;
 using UniRx;
 using UnityEngine;
+#if AI
+    using AIChara;
+#endif
 
 namespace KK_Pregnancy
 {

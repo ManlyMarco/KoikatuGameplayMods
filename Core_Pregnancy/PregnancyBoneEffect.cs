@@ -5,6 +5,9 @@ using KKABMX.Core;
 using KKAPI.Maker;
 using KKAPI.Studio;
 using UnityEngine;
+#if AI
+    using AIChara;
+#endif
 
 namespace KK_Pregnancy
 {
