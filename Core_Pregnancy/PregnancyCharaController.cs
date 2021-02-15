@@ -51,9 +51,10 @@ namespace KK_Pregnancy
             if (!CanGetDangerousDays())
             {
                 // Force the girl to always be on the safe day, happens every day after day of conception
-                var heroine = ChaControl.GetHeroine();
-                if (heroine != null)
-                    HFlag.SetMenstruation(heroine, HFlag.MenstruationType.安全日);
+                //TODO
+                // var heroine = ChaControl.GetHeroine();
+                // if (heroine != null)
+                //     HFlag.SetMenstruation(heroine, HFlag.MenstruationType.安全日);
             }
         }
 
@@ -74,20 +75,21 @@ namespace KK_Pregnancy
             }
         }
 
-        internal static byte[] GetMenstruationsArr(MenstruationSchedule menstruationSchedule)
-        {
-            switch (menstruationSchedule)
-            {
-                default:
-                    return HFlag.menstruations;
-                case MenstruationSchedule.MostlyRisky:
-                    return _menstruationsRisky;
-                case MenstruationSchedule.AlwaysSafe:
-                    return _menstruationsAlwaysSafe;
-                case MenstruationSchedule.AlwaysRisky:
-                    return _menstruationsAlwaysRisky;
-            }
-        }
+        //TODO
+        // internal static byte[] GetMenstruationsArr(MenstruationSchedule menstruationSchedule)
+        // {
+        //     switch (menstruationSchedule)
+        //     {
+        //         default:
+        //             return HFlag.menstruations;
+        //         case MenstruationSchedule.MostlyRisky:
+        //             return _menstruationsRisky;
+        //         case MenstruationSchedule.AlwaysSafe:
+        //             return _menstruationsAlwaysSafe;
+        //         case MenstruationSchedule.AlwaysRisky:
+        //             return _menstruationsAlwaysRisky;
+        //     }
+        // }
 
         private static readonly byte[] _menstruationsRisky = {
             0,

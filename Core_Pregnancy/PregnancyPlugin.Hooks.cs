@@ -1,4 +1,10 @@
-﻿using System.Collections.Generic;
+﻿#if KK
+    using System;
+    using System.Collections.Generic;
+#elif AI
+    using System;
+    using System.Collections.Generic;
+#endif
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -9,6 +15,10 @@ using HarmonyLib;
 #endif
 using Manager;
 using UnityEngine;
+#if AI
+    using AIChara;
+    using AIProject;
+#endif
 
 namespace KK_Pregnancy
 {
@@ -20,134 +30,234 @@ namespace KK_Pregnancy
             {
                 harmonyInstance.PatchAll(typeof(Hooks));
 
-                PatchNPCLoadAll(harmonyInstance, new HarmonyMethod(typeof(Hooks), nameof(NPCLoadAllTpl)));
+                #if KK
+                    PatchNPCLoadAll(harmonyInstance, new HarmonyMethod(typeof(Hooks), nameof(NPCLoadAllTpl)));
+                #endif
             }
 
             #region Custom safe day schedule
 
-            private static SaveData.Heroine _lastHeroine;
+            #if KK
+                private static SaveData.Heroine _lastHeroine;
+            #elif AI
+                private static AgentActor _lastHeroine;
+            #endif
+
             private static byte[] _menstruationsBackup;
 
-            [HarmonyPostfix]
-            [HarmonyPatch(typeof(SaveData.Heroine), nameof(SaveData.Heroine.MenstruationDay), MethodType.Getter)]
-            private static void LastAccessedHeroinePatch(SaveData.Heroine __instance)
-            {
-                _lastHeroine = __instance;
-            }
+            //TODO
+            // [HarmonyPostfix]
+            // [HarmonyPatch(typeof(SaveData.Heroine), nameof(SaveData.Heroine.MenstruationDay), MethodType.Getter)]
+            // private static void LastAccessedHeroinePatch(SaveData.Heroine __instance)
+            // {
+            //     _lastHeroine = __instance;
+            // }
 
-            [HarmonyPrefix]
-            [HarmonyPatch(typeof(HFlag), nameof(HFlag.GetMenstruation), typeof(byte))]
-            private static void GetMenstruationOverridePrefix()
-            {
-                if (_lastHeroine != null)
-                {
-                    // Get a schedule directly this way since the controller is not spawned in class roster
-                    var schedule = _lastHeroine.GetRelatedChaFiles()
-                        .Select(c => PregnancyData.Load(ExtendedSave.GetExtendedDataById(c, GUID))?.MenstruationSchedule ?? MenstruationSchedule.Default)
-                        .FirstOrDefault(x => x != MenstruationSchedule.Default);
+            //TODO
+            // [HarmonyPrefix]
+            // [HarmonyPatch(typeof(HFlag), nameof(HFlag.GetMenstruation), typeof(byte))]
+            // private static void GetMenstruationOverridePrefix()
+            // {
+            //     if (_lastHeroine != null)
+            //     {
+            //         // Get a schedule directly this way since the controller is not spawned in class roster
+            //         var schedule = _lastHeroine.GetRelatedChaFiles()
+            //             .Select(c => PregnancyData.Load(ExtendedSave.GetExtendedDataById(c, GUID))?.MenstruationSchedule ?? MenstruationSchedule.Default)
+            //             .FirstOrDefault(x => x != MenstruationSchedule.Default);
 
-                    _menstruationsBackup = HFlag.menstruations;
-                    HFlag.menstruations = PregnancyCharaController.GetMenstruationsArr(schedule);
-                }
-            }
+            //         _menstruationsBackup = HFlag.menstruations;
+            //         HFlag.menstruations = PregnancyCharaController.GetMenstruationsArr(schedule);
+            //     }
+            // }
 
-            [HarmonyPostfix]
-            [HarmonyPatch(typeof(HFlag), nameof(HFlag.GetMenstruation), typeof(byte))]
-            private static void GetMenstruationOverridePostfix()
-            {
-                if (_menstruationsBackup != null)
-                {
-                    HFlag.menstruations = _menstruationsBackup;
-                    _menstruationsBackup = null;
-                }
-            }
+            // [HarmonyPostfix]
+            // [HarmonyPatch(typeof(HFlag), nameof(HFlag.GetMenstruation), typeof(byte))]
+            // private static void GetMenstruationOverridePostfix()
+            // {
+            //     if (_menstruationsBackup != null)
+            //     {
+            //         HFlag.menstruations = _menstruationsBackup;
+            //         _menstruationsBackup = null;
+            //     }
+            // }
 
             #endregion
 
             #region Preg leave from school
 
-            /// <summary>
-            /// Needed for preventing characters from going to school when on leave after pregnancy
-            /// </summary>
-            private static void PatchNPCLoadAll(Harmony instance, HarmonyMethod transpiler)
-            {
-                var t = typeof(ActionScene).GetNestedTypes(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Single(x => x.Name.StartsWith("<NPCLoadAll>c__Iterator"));
-                var m = t.GetMethod("MoveNext");
-                instance.Patch(m, null, null, transpiler);
-            }
-
-            private static IEnumerable<CodeInstruction> NPCLoadAllTpl(IEnumerable<CodeInstruction> instructions)
-            {
-                var target = AccessTools.Property(typeof(Game), nameof(Game.HeroineList)).GetGetMethod();
-                var customFilterM = AccessTools.Method(typeof(Hooks), nameof(GetFilteredHeroines));
-                foreach (var instruction in instructions)
+            #if KK
+                /// <summary>
+                /// Needed for preventing characters from going to school when on leave after pregnancy
+                /// </summary>
+                private static void PatchNPCLoadAll(Harmony instance, HarmonyMethod transpiler)
                 {
-                    yield return instruction;
+                    var t = typeof(ActionScene).GetNestedTypes(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Single(x => x.Name.StartsWith("<NPCLoadAll>c__Iterator"));
+                    var m = t.GetMethod("MoveNext");
+                    instance.Patch(m, null, null, transpiler);
+                }
 
-                    if (instruction.operand == target)
+                private static IEnumerable<CodeInstruction> NPCLoadAllTpl(IEnumerable<CodeInstruction> instructions)
+                {
+                    var target = AccessTools.Property(typeof(Game), nameof(Game.HeroineList)).GetGetMethod();
+                    var customFilterM = AccessTools.Method(typeof(Hooks), nameof(GetFilteredHeroines));
+                    foreach (var instruction in instructions)
                     {
-                        // Grab the return of get_HeroineList and process it
-                        yield return new CodeInstruction(OpCodes.Call, customFilterM);
+                        yield return instruction;
+
+                        if (instruction.operand == target)
+                        {
+                            // Grab the return of get_HeroineList and process it
+                            yield return new CodeInstruction(OpCodes.Call, customFilterM);
+                        }
                     }
                 }
-            }
+            #endif
 
-            private static bool CanGetSpawned(SaveData.Heroine heroine)
-            {
-                var isOnLeave = heroine.GetRelatedChaFiles()
-                    .Any(c =>
-                    {
-                        var pd = PregnancyData.Load(ExtendedSave.GetExtendedDataById(heroine.charFile, GUID));
-                        if (pd == null) return false;
-                        return pd.GameplayEnabled && pd.Week >= PregnancyData.LeaveSchoolWeek;
-                    });
-                return !isOnLeave;
-            }
+            #endregion Preg leave from school
 
-            private static List<SaveData.Heroine> GetFilteredHeroines(List<SaveData.Heroine> originalList)
-            {
-                var filteredHeroines = originalList.Where(CanGetSpawned).ToList();
-                return filteredHeroines;
-            }
+            #if KK
+                private static bool CanGetSpawned(SaveData.Heroine heroine)
+                {
+                    var isOnLeave = heroine.GetRelatedChaFiles()
+                        .Any(c =>
+                        {
+                            var pd = PregnancyData.Load(ExtendedSave.GetExtendedDataById(heroine.charFile, GUID));
+                            if (pd == null) return false;
+                            return pd.GameplayEnabled && pd.Week >= PregnancyData.LeaveSchoolWeek;
+                        });
+                    return !isOnLeave;
+                }
 
-            #endregion
+                private static List<SaveData.Heroine> GetFilteredHeroines(List<SaveData.Heroine> originalList)
+                {
+                    var filteredHeroines = originalList.Where(CanGetSpawned).ToList();
+                    return filteredHeroines;
+                }
 
-            #region Inflation
+                #region Inflation
 
-            // todo separate anal/vag?
-            [HarmonyPrefix]
-            [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuInside))]
-            [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuAnalInside))]
-            [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddHoushiDrink))]
-            public static void OnFinishInside(HFlag __instance)
-            {
-                var heroine = GetLeadHeroine(__instance);
-                var controller = GetEffectController(heroine);
-                controller.AddInflation(1);
-            }
+                // todo separate anal/vag?
+                [HarmonyPrefix]
+                [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuInside))]
+                [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuAnalInside))]
+                [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddHoushiDrink))]
+                public static void OnFinishInside(HFlag __instance)
+                {
+                    var heroine = GetLeadHeroine(__instance);
+                    var controller = GetEffectController(heroine);
+                    controller.AddInflation(1);
+                }
 
-            [HarmonyPrefix]
-            [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuTare))]
-            [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuAnalTare))]
-            public static void OnDrain(HFlag __instance)
-            {
-                var heroine = GetLeadHeroine(__instance);
-                var controller = GetEffectController(heroine);
-                controller.DrainInflation(Mathf.Max(3, Mathf.CeilToInt(InflationMaxCount.Value / 2.2f)));
-            }
+                [HarmonyPrefix]
+                [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuTare))]
+                [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuAnalTare))]
+                public static void OnDrain(HFlag __instance)
+                {
+                    var heroine = GetLeadHeroine(__instance);
+                    var controller = GetEffectController(heroine);
+                    controller.DrainInflation(Mathf.Max(3, Mathf.CeilToInt(InflationMaxCount.Value / 2.2f)));
+                }
 
-            private static PregnancyCharaController GetEffectController(SaveData.Heroine heroine)
-            {
-                return heroine?.chaCtrl != null ? heroine.chaCtrl.GetComponent<PregnancyCharaController>() : null;
-            }
+                private static PregnancyCharaController GetEffectController(SaveData.Heroine heroine)
+                {
+                    return heroine?.chaCtrl != null ? heroine.chaCtrl.GetComponent<PregnancyCharaController>() : null;
+                }
 
-            private static SaveData.Heroine GetLeadHeroine(HFlag hflag)
-            {
-                var id = hflag.mode == HFlag.EMode.houshi3P || hflag.mode == HFlag.EMode.sonyu3P ? hflag.nowAnimationInfo.id % 2 : 0;
-                return hflag.lstHeroine[id];
-            }
+                private static SaveData.Heroine GetLeadHeroine(HFlag hflag)
+                {
+                    var id = hflag.mode == HFlag.EMode.houshi3P || hflag.mode == HFlag.EMode.sonyu3P ? hflag.nowAnimationInfo.id % 2 : 0;
+                    return hflag.lstHeroine[id];
+                }
 
-            #endregion
+                #endregion    
+
+            #elif AI
+
+                //TODO copied from KKAPI
+                private static Actor GetNPC(AgentActor heroine)
+                {
+                    if (heroine == null) throw new ArgumentNullException(nameof(heroine));
+
+                    if (heroine.transform == null) return null;
+                    return heroine.transform.GetComponent<Actor>();
+                }
+
+                //TODO copied from KKAPI
+                private static IEnumerable<ChaFileControl> GetRelatedChaFiles(AgentActor heroine)
+                {
+                    if (heroine == null) throw new ArgumentNullException(nameof(heroine));
+
+                    var results = new List<ChaFileControl>();
+
+                    if (heroine.ChaControl != null && heroine.ChaControl.chaFile != null)
+                        results.Add(heroine.ChaControl.chaFile);
+
+                    var npc = GetNPC(heroine);
+                    if (npc != null && npc.ChaControl != null && npc.ChaControl.chaFile != null)
+                        results.Add(npc.ChaControl.chaFile);
+
+                    return results;
+                }
+
+                private static bool CanGetSpawned(AgentActor heroine)
+                {
+                    var isOnLeave = GetRelatedChaFiles(heroine)
+                        .Any(c =>
+                        {
+                            var pd = PregnancyData.Load(ExtendedSave.GetExtendedDataById(heroine.ChaControl.chaFile, GUID));
+                            if (pd == null) return false;
+                            return pd.GameplayEnabled && pd.Week >= PregnancyData.LeaveSchoolWeek;
+                        });
+                    return !isOnLeave;
+                }
+
+                private static List<AgentActor> GetFilteredHeroines(List<AgentActor> originalList)
+                {
+                    var filteredHeroines = originalList.Where(CanGetSpawned).ToList();
+                    return filteredHeroines;
+                }       
+
+                #region InflationAI
+
+
+                //TODO inflations stuff
+                // // todo separate anal/vag?
+                // [HarmonyPrefix]
+                // [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuInside))]
+                // [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuAnalInside))]
+                // [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddHoushiDrink))]
+                // public static void OnFinishInside(HFlag __instance)
+                // {
+                //     var heroine = GetLeadHeroine(__instance);
+                //     var controller = GetEffectController(heroine);
+                //     controller.AddInflation(1);
+                // }
+
+                // [HarmonyPrefix]
+                // [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuTare))]
+                // [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuAnalTare))]
+                // public static void OnDrain(HFlag __instance)
+                // {
+                //     var heroine = GetLeadHeroine(__instance);
+                //     var controller = GetEffectController(heroine);
+                //     controller.DrainInflation(Mathf.Max(3, Mathf.CeilToInt(InflationMaxCount.Value / 2.2f)));
+                // }
+
+                // private static PregnancyCharaController GetEffectController(AgentActor heroine)
+                // {
+                //     return heroine?.ChaControl != null ? heroine.ChaControl.GetComponent<PregnancyCharaController>() : null;
+                // }
+
+                // private static AgentActor GetLeadHeroine(HFlag hflag)
+                // {
+                //     var id = hflag.mode == HFlag.EMode.houshi3P || hflag.mode == HFlag.EMode.sonyu3P ? hflag.nowAnimationInfo.id % 2 : 0;
+                //     return hflag.lstHeroine[id];
+                // }
+
+                #endregion                              
+            #endif
+
+
         }
     }
 }

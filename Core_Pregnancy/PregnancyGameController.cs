@@ -9,82 +9,93 @@ using ExtensibleSaveFormat;
 using Manager;
 using UnityEngine;
 using Random = UnityEngine.Random;
+#if AI
+    using AIChara;
+    using AIProject;
+#endif
 
 namespace KK_Pregnancy
 {
     public class PregnancyGameController : GameCustomFunctionController
     {
-        private static readonly HashSet<SaveData.Heroine> _startedPregnancies = new HashSet<SaveData.Heroine>();
+        #if KK
+            private static readonly HashSet<SaveData.Heroine> _startedPregnancies = new HashSet<SaveData.Heroine>();
+        #elif AI
+            private static readonly HashSet<AgentActor> _startedPregnancies = new HashSet<AgentActor>();
+        #endif
 
-        protected override void OnDayChange(Cycle.Week day)
-        {
-            // Use Sunday for weekly stuff because it is always triggered (all other days can get skipped)
-            if (day == Cycle.Week.Holiday)
-            {
-                // At start of each week increase pregnancy week counters of all pregnant characters
-                ApplyToAllDatas((heroine, data) => AddPregnancyWeek(data));
-            }
-        }
+        //TODO AIProject.SaveData.setDay?
+        // protected override void OnDayChange(Cycle.Week day)
+        // {
+        //     // Use Sunday for weekly stuff because it is always triggered (all other days can get skipped)
+        //     if (day == Cycle.Week.Holiday)
+        //     {
+        //         // At start of each week increase pregnancy week counters of all pregnant characters
+        //         ApplyToAllDatas((heroine, data) => AddPregnancyWeek(data));
+        //     }
+        // }
 
         internal static bool InsideHScene { get; private set; }
 
-        protected override void OnStartH(HSceneProc proc, bool freeH)
-        {
-            InsideHScene = true;
-            proc.gameObject.AddComponent<LactationController>();
-        }
+        //TODO
+        // protected override void OnStartH(HSceneProc proc, bool freeH)
+        // {
+        //     InsideHScene = true;
+        //     // proc.gameObject.AddComponent<LactationController>(); //TODO
+        // }
 
-        protected override void OnEndH(HSceneProc proc, bool freeH)
-        {
-            InsideHScene = false;
-            Destroy(proc.GetComponent<LactationController>());
+        //TODO
+        // protected override void OnEndH(HSceneProc proc, bool freeH)
+        // {
+        //     InsideHScene = false;
+        //     // Destroy(proc.GetComponent<LactationController>()); //TODO
 
-            // Figure out if conception happened at end of h scene
-            // bug Don't know which character is which
-            if (proc.flags.mode == HFlag.EMode.houshi3P || proc.flags.mode == HFlag.EMode.sonyu3P) return;
+        //     // Figure out if conception happened at end of h scene
+        //     // bug Don't know which character is which
+        //     if (proc.flags.mode == HFlag.EMode.houshi3P || proc.flags.mode == HFlag.EMode.sonyu3P) return;
 
-            var heroine = proc.flags.lstHeroine.First(x => x != null);
-            var isDangerousDay = HFlag.GetMenstruation(heroine.MenstruationDay) == HFlag.MenstruationType.危険日;
-            if (!isDangerousDay) return;
+        //     var heroine = proc.flags.lstHeroine.First(x => x != null);
+        //     var isDangerousDay = HFlag.GetMenstruation(heroine.MenstruationDay) == HFlag.MenstruationType.危険日;
+        //     if (!isDangerousDay) return;
 
-            var cameInside = PregnancyPlugin.ConceptionEnabled.Value && proc.flags.count.sonyuInside > 0;
-            var cameInsideAnal = PregnancyPlugin.AnalConceptionEnabled.Value && proc.flags.count.sonyuAnalInside > 0;
-            if (cameInside || cameInsideAnal)
-            {
-                var controller = heroine.chaCtrl.GetComponent<PregnancyCharaController>();
-                if (controller == null) throw new ArgumentNullException(nameof(controller));
+        //     var cameInside = PregnancyPlugin.ConceptionEnabled.Value && proc.flags.count.sonyuInside > 0;
+        //     var cameInsideAnal = PregnancyPlugin.AnalConceptionEnabled.Value && proc.flags.count.sonyuAnalInside > 0;
+        //     if (cameInside || cameInsideAnal)
+        //     {
+        //         var controller = heroine.chaCtrl.GetComponent<PregnancyCharaController>();
+        //         if (controller == null) throw new ArgumentNullException(nameof(controller));
 
-                //Allow pregnancy if enabled, or overridden, and is not currently pregnant
-                if (!controller.Data.GameplayEnabled || controller.Data.IsPregnant) return;
+        //         //Allow pregnancy if enabled, or overridden, and is not currently pregnant
+        //         if (!controller.Data.GameplayEnabled || controller.Data.IsPregnant) return;
 
-                var fertility = Mathf.Max(PregnancyPlugin.FertilityOverride.Value, controller.Data.Fertility);
+        //         var fertility = Mathf.Max(PregnancyPlugin.FertilityOverride.Value, controller.Data.Fertility);
 
-                var winThreshold = Mathf.RoundToInt(fertility * 100);
-                var childLottery = Random.Range(1, 100);
-                //Logger.Log(LogLevel.Debug, $"Preg - OnEndH calc pregnancy chance {childLottery} to {winThreshold}");
-                var wonAChild = winThreshold >= childLottery;
-                if (wonAChild)
-                {
-                    //Logger.Log(LogLevel.Debug, "Preg - child lottery won, pregnancy will start");
-                    _startedPregnancies.Add(heroine);
-                }
-            }
-        }
+        //         var winThreshold = Mathf.RoundToInt(fertility * 100);
+        //         var childLottery = Random.Range(1, 100);
+        //         //Logger.Log(LogLevel.Debug, $"Preg - OnEndH calc pregnancy chance {childLottery} to {winThreshold}");
+        //         var wonAChild = winThreshold >= childLottery;
+        //         if (wonAChild)
+        //         {
+        //             //Logger.Log(LogLevel.Debug, "Preg - child lottery won, pregnancy will start");
+        //             _startedPregnancies.Add(heroine);
+        //         }
+        //     }
+        // }
+        
+        // protected override void OnGameLoad(GameSaveLoadEventArgs args)
+        // {
+        //     _startedPregnancies.Clear();
+        // }
 
-        protected override void OnGameLoad(GameSaveLoadEventArgs args)
-        {
-            _startedPregnancies.Clear();
-        }
+        // protected override void OnGameSave(GameSaveLoadEventArgs args)
+        // {
+        //     ProcessPendingChanges();
+        // }
 
-        protected override void OnGameSave(GameSaveLoadEventArgs args)
-        {
-            ProcessPendingChanges();
-        }
-
-        protected override void OnPeriodChange(Cycle.Type period)
-        {
-            ProcessPendingChanges();
-        }
+        // protected override void OnPeriodChange(Cycle.Type period)
+        // {
+        //     ProcessPendingChanges();
+        // }
 
         private static void ProcessPendingChanges()
         {
@@ -100,23 +111,47 @@ namespace KK_Pregnancy
             _startedPregnancies.Clear();
         }
 
-        private static void ApplyToAllDatas(Func<SaveData.Heroine, PregnancyData, bool> action)
-        {
-            foreach (var heroine in Game.Instance.HeroineList)
+        #if KK
+            private static void ApplyToAllDatas(Func<SaveData.Heroine, PregnancyData, bool> action)
             {
-                foreach (var chaFile in heroine.GetRelatedChaFiles())
+                foreach (var heroine in Game.Instance.HeroineList)
                 {
-                    var data = ExtendedSave.GetExtendedDataById(chaFile, PregnancyPlugin.GUID);
-                    var pd = PregnancyData.Load(data) ?? new PregnancyData();
-                    if (action(heroine, pd))
-                        ExtendedSave.SetExtendedDataById(chaFile, PregnancyPlugin.GUID, pd.Save());
+                    foreach (var chaFile in heroine.GetRelatedChaFiles())
+                    {
+                        var data = ExtendedSave.GetExtendedDataById(chaFile, PregnancyPlugin.GUID);
+                        var pd = PregnancyData.Load(data) ?? new PregnancyData();
+                        if (action(heroine, pd))
+                            ExtendedSave.SetExtendedDataById(chaFile, PregnancyPlugin.GUID, pd.Save());
+                    }
                 }
+
+                // If controller exists then update its state so it gets any pregnancy week updates
+                foreach (var controller in FindObjectsOfType<PregnancyCharaController>())
+                    controller.ReadData();
             }
 
-            // If controller exists then update its state so it gets any pregnancy week updates
-            foreach (var controller in FindObjectsOfType<PregnancyCharaController>())
-                controller.ReadData();
-        }
+        #elif AI
+
+            private static void ApplyToAllDatas(Func<AgentActor, PregnancyData, bool> action)
+            {
+                foreach (var heroine in Game.Instance.HeroineList)
+                {
+                    foreach (var chaFile in heroine.GetRelatedChaFiles())
+                    {
+                        var data = ExtendedSave.GetExtendedDataById(chaFile, PregnancyPlugin.GUID);
+                        var pd = PregnancyData.Load(data) ?? new PregnancyData();
+                        if (action(heroine, pd))
+                            ExtendedSave.SetExtendedDataById(chaFile, PregnancyPlugin.GUID, pd.Save());
+                    }
+                }
+
+                // If controller exists then update its state so it gets any pregnancy week updates
+                foreach (var controller in FindObjectsOfType<PregnancyCharaController>())
+                    controller.ReadData();
+            }
+        #endif
+
+
 
         private static bool AddPregnancyWeek(PregnancyData pd)
         {

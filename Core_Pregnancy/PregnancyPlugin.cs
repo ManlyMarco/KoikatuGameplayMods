@@ -16,10 +16,18 @@ namespace KK_Pregnancy
 {
     [BepInPlugin(GUID, GUID, Version)]
     [BepInDependency(KKABMX_Core.GUID, "4.1")]
-    [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
+    #if KK
+        [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
+    #elif AI
+        [BepInDependency(KoikatuAPI.GUID, "1.12")]
+    #endif
     public partial class PregnancyPlugin : BaseUnityPlugin
     {
-        public const string GUID = "KK_Pregnancy";
+        #if KK
+            public const string GUID = "KK_Pregnancy";
+        #elif AI
+            public const string GUID = "AI_Pregnancy";
+        #endif
         public const string Version = "2.3.1";
 
         public static ConfigEntry<bool> ConceptionEnabled { get; private set; }
@@ -95,7 +103,7 @@ namespace KK_Pregnancy
 
             var hi = new Harmony(GUID);
             // Hooks.InitHooks(hi);
-            // PregnancyGui.Init(hi, this);
+            PregnancyGui.Init(hi, this);
         }
     }
 }

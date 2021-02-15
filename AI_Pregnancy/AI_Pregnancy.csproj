@@ -12,6 +12,7 @@
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -70,7 +71,10 @@
       <SpecificVersion>False</SpecificVersion>
       <Private>False</Private>
     </Reference>
-    <Reference Include="System.Core" />
+    <Reference Include="UniRx,  Culture=neutral, processorArchitecture=MSIL" >
+      <HintPath>..\packages\IllusionLibs.AIGirl.UniRx.2020.5.29.2\lib\net46\UniRx.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="UnityEngine,  Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\IllusionLibs.AIGirl.UnityEngine.CoreModule.2018.2.21.3\lib\net46\UnityEngine.dll</HintPath>
       <Private>False</Private>
@@ -86,16 +90,16 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\Core_Pregnancy\Data\HeroineStatus.cs" />
-    <Compile Include="..\Core_Pregnancy\LactationController.cs" />
-    <Compile Include="..\Core_Pregnancy\Data\MenstruationSchedule.cs" />
+    <!-- <Compile Include="..\Core_Pregnancy\LactationController.cs" /> -->
+    <!-- <Compile Include="..\Core_Pregnancy\Data\MenstruationSchedule.cs" /> -->
     <Compile Include="..\Core_Pregnancy\PregnancyBoneEffect.cs" />
     <Compile Include="..\Core_Pregnancy\PregnancyCharaController.cs" />
     <Compile Include="..\Core_Pregnancy\Data\PregnancyData.cs" />
     <Compile Include="..\Core_Pregnancy\Data\PregnancyDataUtils.cs" />
-    <Compile Include="..\Core_Pregnancy\PregnancyGameController.cs" />
+    <!-- <Compile Include="..\Core_Pregnancy\PregnancyGameController.cs" /> -->
     <Compile Include="..\Core_Pregnancy\GUI\PregnancyGui.cs" />
-    <Compile Include="..\Core_Pregnancy\GUI\PregnancyGui.HSceneMenstrIconOverride.cs" />
-    <Compile Include="..\Core_Pregnancy\GUI\PregnancyGui.StatusIcons.cs" />
+    <!-- <Compile Include="..\Core_Pregnancy\GUI\PregnancyGui.HSceneMenstrIconOverride.cs" /> -->
+    <!-- <Compile Include="..\Core_Pregnancy\GUI\PregnancyGui.StatusIcons.cs" /> -->
     <Compile Include="..\Core_Pregnancy\PregnancyPlugin.cs" />
     <Compile Include="..\Core_Pregnancy\PregnancyPlugin.Hooks.cs" />
     <Compile Include="..\Core_Pregnancy\Properties\AssemblyInfo.cs" />
