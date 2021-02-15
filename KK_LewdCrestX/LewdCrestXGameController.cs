@@ -94,7 +94,7 @@ namespace KK_LewdCrestX
                     var heroineInfo = _hSceneHeroines[id];
                     heroineInfo.TotalRoughTime += Time.deltaTime;
 
-                    if (heroineInfo.CrestType == CrestType.suffer)
+                    if (heroineInfo.CrestType == CrestType.suffer && !_hSceneProc.flags.lockGugeFemale)
                         _hSceneProc.flags.gaugeFemale += speed * Time.deltaTime * 2;
                 }
             }
