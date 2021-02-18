@@ -57,7 +57,7 @@ namespace KK_Pregnancy
                         AddNewState(_leaveSprite);
                     }
 
-                    var heroineStatus = __instance.GetLeadingHeroine().GetHeroineStatus();
+                    var heroineStatus = __instance.GetLeadingHeroine().GetCharaStatus();
                     switch (heroineStatus)
                     {
                         case HeroineStatus.Unknown:

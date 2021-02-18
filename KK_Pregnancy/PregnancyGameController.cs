@@ -20,7 +20,7 @@ namespace KK_Pregnancy
             if (day == Cycle.Week.Holiday)
             {
                 // At start of each week increase pregnancy week counters of all pregnant characters
-                ApplyToAllDatas((heroine, data) => AddPregnancyWeek(data));
+                ApplyToAllDatas((chara, data) => AddPregnancyWeek(data));
             }
         }
 
@@ -86,9 +86,9 @@ namespace KK_Pregnancy
 
         private static void ProcessPendingChanges()
         {
-            ApplyToAllDatas((heroine, data) =>
+            ApplyToAllDatas((chara, data) =>
             {
-                if (_startedPregnancies.Contains(heroine) && !data.IsPregnant)
+                if (chara is SaveData.Heroine heroine && _startedPregnancies.Contains(heroine) && !data.IsPregnant)
                 {
                     data.StartPregnancy();
                     return true;
@@ -98,18 +98,23 @@ namespace KK_Pregnancy
             _startedPregnancies.Clear();
         }
 
-        private static void ApplyToAllDatas(Func<SaveData.Heroine, PregnancyData, bool> action)
+        private static void ApplyToAllDatas(Func<SaveData.CharaData, PregnancyData, bool> action)
         {
-            foreach (var heroine in Game.Instance.HeroineList)
+            void ApplyToDatas(SaveData.CharaData character)
             {
-                foreach (var chaFile in heroine.GetRelatedChaFiles())
+                var chafiles = character.GetRelatedChaFiles();
+                if (chafiles == null) return;
+                foreach (var chaFile in chafiles)
                 {
                     var data = ExtendedSave.GetExtendedDataById(chaFile, PregnancyPlugin.GUID);
                     var pd = PregnancyData.Load(data) ?? new PregnancyData();
-                    if (action(heroine, pd))
+                    if (action(character, pd))
                         ExtendedSave.SetExtendedDataById(chaFile, PregnancyPlugin.GUID, pd.Save());
                 }
             }
+
+            foreach (var heroine in Game.Instance.HeroineList) ApplyToDatas(heroine);
+            ApplyToDatas(Game.Instance.Player);
 
             // If controller exists then update its state so it gets any pregnancy week updates
             foreach (var controller in FindObjectsOfType<PregnancyCharaController>())

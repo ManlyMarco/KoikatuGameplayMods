@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ActionGame;
 using HarmonyLib;
+using Illusion.Extensions;
 using KKAPI.MainGame;
 using KKAPI.Utilities;
 using UnityEngine;
@@ -24,7 +25,7 @@ namespace KK_Pregnancy
 
             private const string ICON_NAME = "Pregnancy_Icon";
 
-            private static readonly List<KeyValuePair<SaveData.Heroine, RectTransform>> _currentHeroine = new List<KeyValuePair<SaveData.Heroine, RectTransform>>();
+            private static readonly List<KeyValuePair<SaveData.CharaData, RectTransform>> _currentHeroine = new List<KeyValuePair<SaveData.CharaData, RectTransform>>();
 
             internal static void Init(Harmony hi, Sprite unknownSprite, Sprite pregSprite, Sprite safeSprite, Sprite riskySprite, Sprite leaveSprite)
             {
@@ -63,9 +64,8 @@ namespace KK_Pregnancy
 
                     foreach (var chaEntry in entries)
                     {
-                        var baseImg = Traverse.Create(chaEntry).Field("_objHeart").GetValue<GameObject>();
                         // Need to call this every time in case characters get transferred/edited
-                        SetHeart(baseImg, chaEntry.data?.charFile?.GetHeroine(), -70f);
+                        SetHeart(chaEntry.rootObj, chaEntry.data, true);
                     }
                 }
 
@@ -91,12 +91,11 @@ namespace KK_Pregnancy
                     {
                         yield return new WaitForEndOfFrame();
 
-                        foreach (var chaStatusComponent in chaStatusScene.transform
-                            .GetComponentsInChildren<ChaStatusComponent>())
+                        foreach (var chaStatusComponent in chaStatusScene.transform.GetComponentsInChildren<ChaStatusComponent>())
                         {
-                            var heartObj = chaStatusComponent.objHeart;
-                            if (heartObj != null) // not present on mc and teacher 
-                                SetHeart(heartObj, chaStatusComponent.heroine, -91.1f);
+                            var chara = (SaveData.CharaData)chaStatusComponent.heroine ??
+                                        (chaStatusComponent.name == "status_m" ? Manager.Game.Instance.Player : null);
+                            SetHeart(chaStatusComponent.gameObject, chara, false);
                         }
                     }
 
@@ -105,7 +104,7 @@ namespace KK_Pregnancy
             }
 
             /// <summary>
-            ///     Handle char icon for quick status popup
+            ///     Handle char icon for top left quick status popup during roaming mode
             /// </summary>
             [HarmonyPostfix]
             [HarmonyPatch(typeof(ParamUI), "SetHeroine", typeof(SaveData.Heroine))]
@@ -138,15 +137,17 @@ namespace KK_Pregnancy
                 if (_currentHeroine.Count == 0) return;
 
                 var pos = new Vector2(Input.mousePosition.x, -(Input.mousePosition.y - Screen.height));
-                var heroineRect = _currentHeroine.FirstOrDefault(x => {
+                var heroineRect = _currentHeroine.FirstOrDefault(x =>
+                {
                     if (x.Value == null) return false;
                     return GetOccupiedScreenRect(x).Contains(pos);
                 });
-                var heroine = heroineRect.Key;
-                if (heroine == null) return;
+                var chara = heroineRect.Key;
+                if (chara == null) return;
 
-                var pregData = heroine.GetPregnancyData();
-                var status = heroine.GetHeroineStatus(pregData);
+                var pregData = chara.GetPregnancyData();
+                var status = chara.GetCharaStatus(pregData);
+                var heroine = chara as SaveData.Heroine;
 
                 var windowHeight = status == HeroineStatus.Unknown ? 100 : status == HeroineStatus.Pregnant || status == HeroineStatus.OnLeave ? 180 : 370;
                 var screenRect = new Rect((int)pos.x + 30, (int)pos.y - windowHeight / 2, 180, windowHeight);
@@ -174,7 +175,9 @@ namespace KK_Pregnancy
                             case HeroineStatus.Pregnant:
                                 GUILayout.Label($"This character is pregnant (on week {pregData.Week} / 40).");
                                 GUILayout.FlexibleSpace();
-                                GUILayout.Label("The character's body will slowly change, and at the end they will temporarily leave.");
+
+                                if (pregData.GameplayEnabled)
+                                    GUILayout.Label(heroine != null ? "The character's body will slowly change, and at the end they will temporarily leave." : "The character's body will slowly change.");
 
                                 GUILayout.FlexibleSpace();
                                 var previousPregcount = Mathf.Max(0, pregData.PregnancyCount - 1);
@@ -183,6 +186,8 @@ namespace KK_Pregnancy
 
                             case HeroineStatus.Safe:
                             case HeroineStatus.Risky:
+                                if (heroine == null) break;
+
                                 GUILayout.Label(status == HeroineStatus.Safe
                                     ? "This character is on a safe day, have fun!"
                                     : "This character is on a risky day, be careful!");
@@ -229,35 +234,41 @@ namespace KK_Pregnancy
             /// <summary>
             ///     Enable/disable pregnancy icon
             /// </summary>
-            /// <param name="heartObj">The lovers icon object</param>
-            /// <param name="heroine">Is the preg icon shown</param>
-            /// <param name="xOffset">Offset from the lovers icon</param>
-            private static void SetHeart(GameObject heartObj, SaveData.Heroine heroine, float xOffset)
+            private static void SetHeart(GameObject rootObj, SaveData.CharaData chara, bool classRoster)
             {
-                var owner = heartObj.transform.parent;
-                var existing = owner.Find(ICON_NAME);
+                var pregIconTr = rootObj.transform.Find(ICON_NAME);
 
-                if (heroine == null)
+                if (chara == null)
                 {
-                    if (existing != null)
-                        Destroy(existing.gameObject);
+                    if (pregIconTr != null)
+                        Destroy(pregIconTr.gameObject);
                 }
                 else
                 {
-                    if (existing == null)
+                    if (pregIconTr == null)
                     {
-                        var copy = Instantiate(heartObj, owner);
-                        copy.name = ICON_NAME;
-                        copy.SetActive(true);
-
-                        var rt = copy.GetComponent<RectTransform>();
-                        rt.anchoredPosition = new Vector2(rt.anchoredPosition.x + xOffset, rt.anchoredPosition.y);
-                        rt.sizeDelta = new Vector2(48, 48);
-
-                        existing = copy.transform;
+                        pregIconTr = new GameObject(ICON_NAME, typeof(RectTransform), typeof(CanvasRenderer), typeof(Image)).transform;
+                        pregIconTr.SetParent(rootObj.transform, false);
+                        var rt = pregIconTr.GetComponent<RectTransform>();
+                        if (classRoster)
+                        {
+                            rt.anchorMax = rt.anchorMin = rt.pivot = new Vector2(0, 1);
+                            rt.offsetMin = Vector2.zero;
+                            rt.offsetMax = new Vector2(48, 48);
+                            rt.localScale = Vector3.one;
+                            rt.localPosition = new Vector3(4, -115, 0);
+                        }
+                        else // status screen during roaming mode
+                        {
+                            rt.anchorMax = rt.anchorMin = rt.pivot = new Vector2(0.5f, 0.5f);
+                            rt.offsetMin = Vector2.zero;
+                            rt.offsetMax = new Vector2(48, 48);
+                            rt.localScale = Vector3.one;
+                            rt.localPosition = new Vector3(-273, -85, 0);
+                        }
                     }
 
-                    AddPregIcon(existing, heroine);
+                    AddPregIcon(pregIconTr, chara);
                 }
             }
 
@@ -301,13 +312,14 @@ namespace KK_Pregnancy
                 }
             }
 
-            private static void AddPregIcon(Transform pregIconTransform, SaveData.Heroine heroine)
+            private static void AddPregIcon(Transform pregIconTransform, SaveData.CharaData chara)
             {
                 var image = pregIconTransform.GetComponent<Image>();
 
-                _currentHeroine.Add(new KeyValuePair<SaveData.Heroine, RectTransform>(heroine, image.GetComponent<RectTransform>()));
+                _currentHeroine.Add(new KeyValuePair<SaveData.CharaData, RectTransform>(chara, image.GetComponent<RectTransform>()));
 
-                switch (heroine.GetHeroineStatus(heroine.GetPregnancyData()))
+                var status = chara.GetCharaStatus(chara.GetPregnancyData());
+                switch (status)
                 {
                     case HeroineStatus.Unknown:
                         image.sprite = _unknownSprite;
@@ -327,10 +339,12 @@ namespace KK_Pregnancy
                     default:
                         throw new ArgumentOutOfRangeException();
                 }
+
+                pregIconTransform.gameObject.SetActiveIfDifferent(chara is SaveData.Heroine || status == HeroineStatus.Pregnant);
             }
 
             private static readonly Vector3[] _worldCornersBuffer = new Vector3[4];
-            private static Rect GetOccupiedScreenRect(KeyValuePair<SaveData.Heroine, RectTransform> x)
+            private static Rect GetOccupiedScreenRect(KeyValuePair<SaveData.CharaData, RectTransform> x)
             {
                 x.Value.GetWorldCorners(_worldCornersBuffer);
                 var screenPos = new Rect(
