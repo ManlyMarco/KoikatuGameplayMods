@@ -96,7 +96,7 @@
     <Compile Include="..\Core_Pregnancy\PregnancyCharaController.cs" />
     <Compile Include="..\Core_Pregnancy\Data\PregnancyData.cs" />
     <Compile Include="..\Core_Pregnancy\Data\PregnancyDataUtils.cs" />
-    <!-- <Compile Include="..\Core_Pregnancy\PregnancyGameController.cs" /> -->
+    <Compile Include="..\Core_Pregnancy\PregnancyGameController.cs" />
     <Compile Include="..\Core_Pregnancy\GUI\PregnancyGui.cs" />
     <!-- <Compile Include="..\Core_Pregnancy\GUI\PregnancyGui.HSceneMenstrIconOverride.cs" /> -->
     <!-- <Compile Include="..\Core_Pregnancy\GUI\PregnancyGui.StatusIcons.cs" /> -->

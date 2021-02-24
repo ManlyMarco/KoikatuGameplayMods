@@ -5,9 +5,7 @@ using HarmonyLib;
 using KKABMX.Core;
 using KKAPI;
 using KKAPI.Chara;
-#if KK
-    using KKAPI.MainGame;
-#endif
+using KKAPI.MainGame;
 #if AI
     using AIChara;
 #endif
@@ -99,10 +97,10 @@ namespace KK_Pregnancy
                 "If enabled, all characters will lactate and have full capacity. If off, capacity depends on the pregnancy progress.");
 
             CharacterApi.RegisterExtraBehaviour<PregnancyCharaController>(GUID);
-            // GameAPI.RegisterExtraBehaviour<PregnancyGameController>(GUID);
+            GameAPI.RegisterExtraBehaviour<PregnancyGameController>(GUID);
 
             var hi = new Harmony(GUID);
-            // Hooks.InitHooks(hi);
+            // Hooks.InitHooks(hi); TODO
             PregnancyGui.Init(hi, this);
         }
     }
