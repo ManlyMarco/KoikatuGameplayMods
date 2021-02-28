@@ -29,6 +29,7 @@ namespace KK_Pregnancy
 
 
         #if KK
+        
             protected override void OnDayChange(Cycle.Week day)
             {
                 // Use Sunday for weekly stuff because it is always triggered (all other days can get skipped)
@@ -43,20 +44,18 @@ namespace KK_Pregnancy
 
             protected override void OnDayChange(int day)
             {
-                // Use Sunday for weekly stuff because it is always triggered (all other days can get skipped)
-                if (Manager.Map.Instance?.Simulator?.EnviroSky?.dateTime.DayOfWeek == DayOfWeek.Sunday)
-                {
-                    // At start of each week increase pregnancy week counters of all pregnant characters
-                    ApplyToAllDatas((heroine, data) => AddPregnancyWeek(data));
-                }
+                // 1 day = 1 week in AI
+                // At start of each week increase pregnancy week counters of all pregnant characters
+                ApplyToAllDatas((heroine, data) => AddPregnancyWeek(data));
             }
+
         #endif        
 
         #if KK
             protected override void OnStartH(HSceneProc proc, bool freeH)
             {
                 InsideHScene = true;
-                // proc.gameObject.AddComponent<LactationController>(); //TODO
+                proc.gameObject.AddComponent<LactationController>();
             }
         
         #elif AI
@@ -74,7 +73,7 @@ namespace KK_Pregnancy
             protected override void OnEndH(HSceneProc proc, bool freeH)
             {
                 InsideHScene = false;
-                // Destroy(proc.GetComponent<LactationController>()); //TODO
+                Destroy(proc.GetComponent<LactationController>());
 
                 // Figure out if conception happened at end of h scene
                 // bug Don't know which character is which
@@ -116,18 +115,15 @@ namespace KK_Pregnancy
                 // Destroy(proc.GetComponent<LactationController>()); //TODO
 
                 // Figure out if conception happened at end of h scene
-                // bug Don't know which character is which
-                // if (proc.flags.mode == HFlag.EMode.houshi3P || proc.flags.mode == HFlag.EMode.sonyu3P) return;
-
                 var heroine = Manager.HSceneManager.Instance?.Agent[0]?.AgentData;
                 if (heroine == null) return;
                 // var isDangerousDay = HFlag.GetMenstruation(heroine.MenstruationDay) == HFlag.MenstruationType.危険日;
                 // if (!isDangerousDay) return;
 
-                // var cameInside = PregnancyPlugin.ConceptionEnabled.Value && proc.flags.count.sonyuInside > 0;
-                // var cameInsideAnal = PregnancyPlugin.AnalConceptionEnabled.Value && proc.flags.count.sonyuAnalInside > 0;
-                // if (cameInside || cameInsideAnal)
-                // {
+                var cameInside = PregnancyPlugin.ConceptionEnabled.Value && proc.ctrlFlag.numInside > 0;
+                var cameInsideAnal = PregnancyPlugin.AnalConceptionEnabled.Value && proc.ctrlFlag.numAnal > 0;
+                if (cameInside || cameInsideAnal)
+                {
                     var controller = heroine.GetNPC().ChaControl.GetComponent<PregnancyCharaController>();
                     if (controller == null) throw new ArgumentNullException(nameof(controller));
 
@@ -145,7 +141,7 @@ namespace KK_Pregnancy
                         PregnancyPlugin.Logger.LogDebug("Preg - child lottery won, pregnancy will start");
                         _startedPregnancies.Add(heroine);
                     }
-                // }
+                }
             }
 
         #endif
@@ -161,6 +157,7 @@ namespace KK_Pregnancy
         }
 
         #if KK
+
             protected override void OnPeriodChange(Cycle.Type period)
             {
                 ProcessPendingChanges();
@@ -172,6 +169,7 @@ namespace KK_Pregnancy
             {
                 ProcessPendingChanges();
             }
+            
         #endif
 
         private static void ProcessPendingChanges()
@@ -258,23 +256,39 @@ namespace KK_Pregnancy
 
             if (pd.IsPregnant)
             {
-                if (pd.Week < PregnancyData.LeaveSchoolWeek)
-                {
-                    // Advance through in-school at full configured speed
-                    var weekChange = PregnancyPlugin.PregnancyProgressionSpeed.Value;
-                    pd.Week = Mathf.Min(PregnancyData.LeaveSchoolWeek, pd.Week + weekChange);
-                }
-                //TODO I don't know if we can remove characters in AI main game safely
-                // else if (pd.Week < PregnancyData.ReturnToSchoolWeek)
-                // {
-                //     // Make sure at least one week is spent out of school
-                //     var weekChange = Mathf.Min(PregnancyData.ReturnToSchoolWeek - PregnancyData.LeaveSchoolWeek - 1, PregnancyPlugin.PregnancyProgressionSpeed.Value);
-                //     pd.Week = pd.Week + weekChange;
-                // }
+                #if KK
+                    if (pd.Week < PregnancyData.LeaveSchoolWeek)
+                    {
+                        // Advance through in-school at full configured speed
+                        var weekChange = PregnancyPlugin.PregnancyProgressionSpeed.Value;
+                        pd.Week = Mathf.Min(PregnancyData.LeaveSchoolWeek, pd.Week + weekChange);
+                    }
+                    else if (pd.Week < PregnancyData.ReturnToSchoolWeek)
+                    {
+                        // Make sure at least one week is spent out of school
+                        var weekChange = Mathf.Min(PregnancyData.ReturnToSchoolWeek - PregnancyData.LeaveSchoolWeek - 1, PregnancyPlugin.PregnancyProgressionSpeed.Value);
+                        pd.Week = pd.Week + weekChange;
+                    }
 
-                // if (pd.Week >= PregnancyData.ReturnToSchoolWeek)
-                if (pd.Week >= PregnancyData.LeaveSchoolWeek)
-                    pd.Week = 0;
+                    if (pd.Week >= PregnancyData.ReturnToSchoolWeek)
+                        pd.Week = 0;
+
+                #elif AI
+
+                    //We probaly can't make characters "leave school" in AI
+
+                    if (pd.Week < PregnancyData.LeaveSchoolWeek)
+                    {
+                        // Advance through in-school at full configured speed
+                        var weekChange = PregnancyPlugin.PregnancyProgressionSpeed.Value;
+                        pd.Week = Mathf.Min(PregnancyData.LeaveSchoolWeek, pd.Week + weekChange);
+                    }
+                    else if (pd.Week >= PregnancyData.LeaveSchoolWeek)
+                    {
+                        pd.Week = 0;
+                    }
+
+                #endif
 
                 PregnancyPlugin.Logger.LogDebug($"Preg - pregnancy week is now {pd.Week}");
             }

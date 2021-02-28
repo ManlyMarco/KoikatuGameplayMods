@@ -34,47 +34,45 @@ namespace KK_Pregnancy
 
             #if KK
                 private static SaveData.Heroine _lastHeroine;
-            #elif AI
-                private static AgentActor _lastHeroine;
+                private static byte[] _menstruationsBackup;
+
+            
+                [HarmonyPostfix]
+                [HarmonyPatch(typeof(SaveData.Heroine), nameof(SaveData.Heroine.MenstruationDay), MethodType.Getter)]
+                private static void LastAccessedHeroinePatch(SaveData.Heroine __instance)
+                {
+                    _lastHeroine = __instance;
+                }
+
+                [HarmonyPrefix]
+                [HarmonyPatch(typeof(HFlag), nameof(HFlag.GetMenstruation), typeof(byte))]
+                private static void GetMenstruationOverridePrefix()
+                {
+                    if (_lastHeroine != null)
+                    {
+                        // Get a schedule directly this way since the controller is not spawned in class roster
+                        var schedule = _lastHeroine.GetRelatedChaFiles()
+                            .Select(c => PregnancyData.Load(ExtendedSave.GetExtendedDataById(c, GUID))?.MenstruationSchedule ?? MenstruationSchedule.Default)
+                            .FirstOrDefault(x => x != MenstruationSchedule.Default);
+
+                        _menstruationsBackup = HFlag.menstruations;
+                        HFlag.menstruations = PregnancyCharaController.GetMenstruationsArr(schedule);
+                    }
+                }
+
+                [HarmonyPostfix]
+                [HarmonyPatch(typeof(HFlag), nameof(HFlag.GetMenstruation), typeof(byte))]
+                private static void GetMenstruationOverridePostfix()
+                {
+                    if (_menstruationsBackup != null)
+                    {
+                        HFlag.menstruations = _menstruationsBackup;
+                        _menstruationsBackup = null;
+                    }
+                }
+                
             #endif
 
-            private static byte[] _menstruationsBackup;
-
-            //TODO
-            // [HarmonyPostfix]
-            // [HarmonyPatch(typeof(SaveData.Heroine), nameof(SaveData.Heroine.MenstruationDay), MethodType.Getter)]
-            // private static void LastAccessedHeroinePatch(SaveData.Heroine __instance)
-            // {
-            //     _lastHeroine = __instance;
-            // }
-
-            //TODO
-            // [HarmonyPrefix]
-            // [HarmonyPatch(typeof(HFlag), nameof(HFlag.GetMenstruation), typeof(byte))]
-            // private static void GetMenstruationOverridePrefix()
-            // {
-            //     if (_lastHeroine != null)
-            //     {
-            //         // Get a schedule directly this way since the controller is not spawned in class roster
-            //         var schedule = _lastHeroine.GetRelatedChaFiles()
-            //             .Select(c => PregnancyData.Load(ExtendedSave.GetExtendedDataById(c, GUID))?.MenstruationSchedule ?? MenstruationSchedule.Default)
-            //             .FirstOrDefault(x => x != MenstruationSchedule.Default);
-
-            //         _menstruationsBackup = HFlag.menstruations;
-            //         HFlag.menstruations = PregnancyCharaController.GetMenstruationsArr(schedule);
-            //     }
-            // }
-
-            // [HarmonyPostfix]
-            // [HarmonyPatch(typeof(HFlag), nameof(HFlag.GetMenstruation), typeof(byte))]
-            // private static void GetMenstruationOverridePostfix()
-            // {
-            //     if (_menstruationsBackup != null)
-            //     {
-            //         HFlag.menstruations = _menstruationsBackup;
-            //         _menstruationsBackup = null;
-            //     }
-            // }
 
             #endregion
 
@@ -169,15 +167,6 @@ namespace KK_Pregnancy
             #elif AI
 
                 //TODO copied from KKAPI
-                private static Actor GetNPC(AgentActor heroine)
-                {
-                    if (heroine == null) throw new ArgumentNullException(nameof(heroine));
-
-                    if (heroine.transform == null) return null;
-                    return heroine.transform.GetComponent<Actor>();
-                }
-
-                //TODO copied from KKAPI
                 private static IEnumerable<ChaFileControl> GetRelatedChaFiles(AgentActor heroine)
                 {
                     if (heroine == null) throw new ArgumentNullException(nameof(heroine));
@@ -187,7 +176,7 @@ namespace KK_Pregnancy
                     if (heroine.ChaControl != null && heroine.ChaControl.chaFile != null)
                         results.Add(heroine.ChaControl.chaFile);
 
-                    var npc = GetNPC(heroine);
+                    var npc = heroine.GetNPC();
                     if (npc != null && npc.ChaControl != null && npc.ChaControl.chaFile != null)
                         results.Add(npc.ChaControl.chaFile);
 
