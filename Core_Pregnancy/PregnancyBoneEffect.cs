@@ -71,27 +71,21 @@ namespace KK_Pregnancy
                 {"cf_s_leg02_R"  , new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
             #elif AI
                 // Breasts
-                {"cf_J_Mune00_L" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
-                {"cf_J_Mune00_R" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
-                {"cf_J_Mune_Nip01_L" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
-                {"cf_J_Mune_Nip01_R" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
+                {"cf_J_Mune00_s_L" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
+                {"cf_J_Mune00_s_R" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
+                {"cf_J_Mune_Nip01_s_L" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
+                {"cf_J_Mune_Nip01_s_R" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
                 // Butt
-                {"cf_J_SiriDam_L"   , new BoneModifierData(new Vector3(1.1f , 1f   , 1.2f) , 1f)},
-                {"cf_J_SiriDam_R"   , new BoneModifierData(new Vector3(1.1f , 1f   , 1.2f) , 1f)},
+                {"cf_J_Siri_s_L"   , new BoneModifierData(new Vector3(1.1f , 1f   , 1.2f) , 1f)},
+                {"cf_J_Siri_s_R"   , new BoneModifierData(new Vector3(1.1f , 1f   , 1.2f) , 1f)},
                 // Legs
-                //TODO
-                // {"cf_s_thigh00_L", new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
-                // {"cf_s_thigh00_R", new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
-                // {"cf_s_thigh01_L", new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
-                // {"cf_s_thigh01_R", new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
-                // {"cf_s_thigh02_L", new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
-                // {"cf_s_thigh02_R", new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
-                // {"cf_s_thigh03_L", new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
-                // {"cf_s_thigh03_R", new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
-                // {"cf_s_leg01_L"  , new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
-                // {"cf_s_leg01_R"  , new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
-                // {"cf_s_leg02_L"  , new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
-                // {"cf_s_leg02_R"  , new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
+                {"cf_J_LegUp01_s_L", new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
+                {"cf_J_LegUp01_s_R", new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
+                {"cf_J_LegUp02_s_L", new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
+                {"cf_J_LegUp02_s_R", new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
+                {"cf_J_LegUp03_s_L", new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
+                {"cf_J_LegUp03_s_R", new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
+                //TODO what is equivalent to thigh?
             #endif
         };
 

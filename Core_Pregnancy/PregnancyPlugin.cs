@@ -100,7 +100,7 @@ namespace KK_Pregnancy
             GameAPI.RegisterExtraBehaviour<PregnancyGameController>(GUID);
 
             var hi = new Harmony(GUID);
-            // Hooks.InitHooks(hi); TODO
+            Hooks.InitHooks(hi);
             PregnancyGui.Init(hi, this);
         }
     }

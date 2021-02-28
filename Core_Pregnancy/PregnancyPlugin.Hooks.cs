@@ -1,10 +1,5 @@
-﻿#if KK
-    using System;
-    using System.Collections.Generic;
-#elif AI
-    using System;
-    using System.Collections.Generic;
-#endif
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -217,42 +212,64 @@ namespace KK_Pregnancy
                     return filteredHeroines;
                 }       
 
-                #region InflationAI
+                #region InflationAI                
 
 
-                //TODO inflations stuff
-                // // todo separate anal/vag?
-                // [HarmonyPrefix]
-                // [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuInside))]
-                // [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuAnalInside))]
-                // [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddHoushiDrink))]
-                // public static void OnFinishInside(HFlag __instance)
-                // {
-                //     var heroine = GetLeadHeroine(__instance);
-                //     var controller = GetEffectController(heroine);
-                //     controller.AddInflation(1);
-                // }
 
-                // [HarmonyPrefix]
-                // [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuTare))]
-                // [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuAnalTare))]
-                // public static void OnDrain(HFlag __instance)
-                // {
-                //     var heroine = GetLeadHeroine(__instance);
-                //     var controller = GetEffectController(heroine);
-                //     controller.DrainInflation(Mathf.Max(3, Mathf.CeilToInt(InflationMaxCount.Value / 2.2f)));
-                // }
+                [HarmonyPrefix]
+                [HarmonyPatch(typeof(Sonyu), "Proc", typeof(int), typeof(HScene.AnimationListInfo))]
+                public static void Sonyu_Proc(Sonyu __instance)
+                {                    
+                    //Get current user button click type
+                    var ctrlFlag = Traverse.Create(__instance).Field("ctrlFlag").GetValue<HSceneFlagCtrl>();                                    
+                    DetermineInflationState(ctrlFlag);                   
+                }
 
-                // private static PregnancyCharaController GetEffectController(AgentActor heroine)
-                // {
-                //     return heroine?.ChaControl != null ? heroine.ChaControl.GetComponent<PregnancyCharaController>() : null;
-                // }
 
-                // private static AgentActor GetLeadHeroine(HFlag hflag)
-                // {
-                //     var id = hflag.mode == HFlag.EMode.houshi3P || hflag.mode == HFlag.EMode.sonyu3P ? hflag.nowAnimationInfo.id % 2 : 0;
-                //     return hflag.lstHeroine[id];
-                // }
+                [HarmonyPrefix]
+                [HarmonyPatch(typeof(Houshi), "Proc", typeof(int), typeof(HScene.AnimationListInfo))]
+                public static void Houshi_Proc(Houshi __instance)
+                {                    
+                    //Get current user button click type
+                    var ctrlFlag = Traverse.Create(__instance).Field("ctrlFlag").GetValue<HSceneFlagCtrl>(); 
+                    DetermineInflationState(ctrlFlag);                                   
+                }
+
+
+                //When user clicks finish button, set the inflation based on the button clicked
+                private static void DetermineInflationState(HSceneFlagCtrl ctrlFlag)
+                {
+                    //swallow
+                    if (ctrlFlag.click == HSceneFlagCtrl.ClickKind.FinishInSide 
+                        || ctrlFlag.click == HSceneFlagCtrl.ClickKind.FinishSame  
+                        || ctrlFlag.click == HSceneFlagCtrl.ClickKind.FinishDrink ) 
+                    {
+                        PregnancyPlugin.Logger.LogDebug($"Preg - Proc {ctrlFlag.click}");
+                        var heroine = GetLeadHeroine();
+                        var controller = GetEffectController(heroine);
+                        controller.AddInflation(1);                    
+                    }
+                    //spit
+                    else if (ctrlFlag.click == HSceneFlagCtrl.ClickKind.FinishOutSide 
+                        || ctrlFlag.click == HSceneFlagCtrl.ClickKind.FinishVomit) 
+                    {
+                        PregnancyPlugin.Logger.LogDebug($"Preg - Proc {ctrlFlag.click}");
+                        var heroine = GetLeadHeroine();
+                        var controller = GetEffectController(heroine);
+                        controller.DrainInflation(Mathf.Max(3, Mathf.CeilToInt(InflationMaxCount.Value / 2.2f)));
+                    }    
+                }
+                
+
+                private static PregnancyCharaController GetEffectController(AgentActor heroine)
+                {
+                    return heroine?.ChaControl != null ? heroine.ChaControl.GetComponent<PregnancyCharaController>() : null;
+                }
+
+                private static AgentActor GetLeadHeroine()
+                {
+                    return Manager.HSceneManager.Instance?.Agent[0];
+                }
 
                 #endregion                              
             #endif

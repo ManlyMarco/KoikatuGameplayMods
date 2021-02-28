@@ -48,6 +48,9 @@ namespace KK_Pregnancy
             var data = GetExtendedData();
             Data = PregnancyData.Load(data) ?? new PregnancyData();
 
+            PregnancyPlugin.Logger.LogDebug($"Preg - ReadData week {Data.Week} {ChaControl.name}");
+            PregnancyPlugin.Logger.LogDebug($"Preg - ReadData IsPregnant {Data.IsPregnant}");
+
             if (!CanGetDangerousDays())
             {
                 // Force the girl to always be on the safe day, happens every day after day of conception

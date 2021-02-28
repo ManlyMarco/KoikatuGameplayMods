@@ -36,7 +36,7 @@ namespace KK_Pregnancy
                 {
                     // At start of each week increase pregnancy week counters of all pregnant characters
                     ApplyToAllDatas((heroine, data) => AddPregnancyWeek(data));
-                }
+                }                                
             }
 
         #elif AI
@@ -112,7 +112,6 @@ namespace KK_Pregnancy
 
             protected override void OnEndH(HScene proc, bool freeH)
             {
-                PregnancyPlugin.Logger.LogDebug("Preg - HScene end");
                 InsideHScene = false;
                 // Destroy(proc.GetComponent<LactationController>()); //TODO
 
@@ -121,6 +120,7 @@ namespace KK_Pregnancy
                 // if (proc.flags.mode == HFlag.EMode.houshi3P || proc.flags.mode == HFlag.EMode.sonyu3P) return;
 
                 var heroine = Manager.HSceneManager.Instance?.Agent[0]?.AgentData;
+                if (heroine == null) return;
                 // var isDangerousDay = HFlag.GetMenstruation(heroine.MenstruationDay) == HFlag.MenstruationType.危険日;
                 // if (!isDangerousDay) return;
 

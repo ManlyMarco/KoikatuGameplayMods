@@ -91,7 +91,7 @@
   <ItemGroup>
     <Compile Include="..\Core_Pregnancy\Data\HeroineStatus.cs" />
     <!-- <Compile Include="..\Core_Pregnancy\LactationController.cs" /> -->
-    <!-- <Compile Include="..\Core_Pregnancy\Data\MenstruationSchedule.cs" /> -->
+    <Compile Include="..\Core_Pregnancy\Data\MenstruationSchedule.cs" />
     <Compile Include="..\Core_Pregnancy\PregnancyBoneEffect.cs" />
     <Compile Include="..\Core_Pregnancy\PregnancyCharaController.cs" />
     <Compile Include="..\Core_Pregnancy\Data\PregnancyData.cs" />
