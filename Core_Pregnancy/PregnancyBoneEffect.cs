@@ -18,7 +18,7 @@ namespace KK_Pregnancy
         private static readonly Dictionary<string, BoneModifierData> _bellyFullValues = new Dictionary<string, BoneModifierData>
         {
             #if KK
-                // Belly
+                // Belly                                :scale                                :position                           :rotation
                 {"cf_s_spine01"  , new BoneModifierData(new Vector3(1.62f, 1.50f, 1.90f), 1f, new Vector3( 0.00f, 0.00f , 0.05f), new Vector3( 10f, 0f, 0f))},
                 {"cf_s_spine02"  , new BoneModifierData(new Vector3(1.00f, 1.00f, 1.00f), 1f, new Vector3( 0.00f, 0.00f , 0.01f), new Vector3(-05f, 0f, 0f))},
                 {"cf_s_waist01"  , new BoneModifierData(new Vector3(1.25f, 1.55f, 1.70f), 1f, new Vector3( 0.00f, 0.02f , 0.12f), new Vector3( 15f, 0f, 0f))},
@@ -31,9 +31,9 @@ namespace KK_Pregnancy
                 {"cf_d_sk_02_00" , new BoneModifierData(new Vector3(1.00f, 1.00f, 1.00f), 1f, new Vector3( 0.03f, 0.00f , 0.05f), new Vector3(  0f, 0f, 0f))},
             #elif AI
                 // Belly
-                {"cf_J_Spine01_s"  , new BoneModifierData(new Vector3(1.62f, 1.50f, 1.90f), 1f, new Vector3( 0.00f, 0.00f , 0.05f), new Vector3( 10f, 0f, 0f))},
-                {"cf_J_Spine02_s"  , new BoneModifierData(new Vector3(1.00f, 1.00f, 1.00f), 1f, new Vector3( 0.00f, 0.00f , 0.01f), new Vector3(-05f, 0f, 0f))},
-                {"cf_J_Kosi01_s"  , new BoneModifierData(new Vector3(1.25f, 1.55f, 1.70f), 1f, new Vector3( 0.00f, 0.02f , 0.12f), new Vector3( 15f, 0f, 0f))},
+                {"cf_J_Spine01_s"  , new BoneModifierData(new Vector3(1.30f, 1.15f, 1.90f), 1f, new Vector3( 0.00f, 0.00f , 0.50f), new Vector3( 3f, 0f, 0f))},
+                {"cf_J_Spine02_s"  , new BoneModifierData(new Vector3(1.00f, 1.00f, 1.00f), 1f, new Vector3( 0.00f, 0.00f , 0.10f), new Vector3(-05f, 0f, 0f))},
+                {"cf_J_Kosi01_s"  , new BoneModifierData(new Vector3(1.00f, 1.55f, 1.70f), 1f, new Vector3( 0.00f, 0.20f , 0.90f), new Vector3( 7f, 0f, 0f))},
                 {"cf_J_Kosi02_s"  , new BoneModifierData(new Vector3(1.17f, 1.00f, 1.00f), 1f, new Vector3( 0.00f, 0.00f , 0.00f), new Vector3(  0f, 0f, 0f))},
                 // Skirt
                 //TODO
@@ -76,15 +76,15 @@ namespace KK_Pregnancy
                 {"cf_J_Mune_Nip01_s_L" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
                 {"cf_J_Mune_Nip01_s_R" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
                 // Butt
-                {"cf_J_Siri_s_L"   , new BoneModifierData(new Vector3(1.1f , 1f   , 1.2f) , 1f)},
-                {"cf_J_Siri_s_R"   , new BoneModifierData(new Vector3(1.1f , 1f   , 1.2f) , 1f)},
+                {"cf_J_Siri_s_L"   , new BoneModifierData(new Vector3(1.5f , 1.5f   , 1.75f) , 1f, new Vector3(-0.5f , 0f, -0.2f), Vector3.zero)},
+                {"cf_J_Siri_s_R"   , new BoneModifierData(new Vector3(1.5f , 1.5f   , 1.75f) , 1f, new Vector3(0.5f , 0f, -0.2f), Vector3.zero)},
                 // Legs
-                {"cf_J_LegUp01_s_L", new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
-                {"cf_J_LegUp01_s_R", new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
-                {"cf_J_LegUp02_s_L", new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
-                {"cf_J_LegUp02_s_R", new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
-                {"cf_J_LegUp03_s_L", new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
-                {"cf_J_LegUp03_s_R", new BoneModifierData(new Vector3(1.04f, 1f   , 1.04f), 1f)},
+                {"cf_J_LegUp01_s_L", new BoneModifierData(new Vector3(1.1f, 1f   , 1.1f), 1f)},
+                {"cf_J_LegUp01_s_R", new BoneModifierData(new Vector3(1.1f, 1f   , 1.1f), 1f)},
+                {"cf_J_LegUp02_s_L", new BoneModifierData(new Vector3(1.1f, 1f   , 1.1f), 1f)},
+                {"cf_J_LegUp02_s_R", new BoneModifierData(new Vector3(1.1f, 1f   , 1.1f), 1f)},
+                {"cf_J_LegUp03_s_L", new BoneModifierData(new Vector3(1.1f, 1f   , 1.1f), 1f)},
+                {"cf_J_LegUp03_s_R", new BoneModifierData(new Vector3(1.1f, 1f   , 1.1f), 1f)},
                 //TODO what is equivalent to thigh?
             #endif
         };
