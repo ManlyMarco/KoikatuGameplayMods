@@ -5,9 +5,7 @@ using System.Reflection;
 using System.Reflection.Emit;
 using ExtensibleSaveFormat;
 using HarmonyLib;
-#if KK
-    using KKAPI.MainGame;
-#endif
+using KKAPI.MainGame;
 using Manager;
 using UnityEngine;
 #if AI
@@ -166,26 +164,9 @@ namespace KK_Pregnancy
 
             #elif AI
 
-                //TODO copied from KKAPI
-                private static IEnumerable<ChaFileControl> GetRelatedChaFiles(AgentActor heroine)
-                {
-                    if (heroine == null) throw new ArgumentNullException(nameof(heroine));
-
-                    var results = new List<ChaFileControl>();
-
-                    if (heroine.ChaControl != null && heroine.ChaControl.chaFile != null)
-                        results.Add(heroine.ChaControl.chaFile);
-
-                    var npc = heroine.GetNPC();
-                    if (npc != null && npc.ChaControl != null && npc.ChaControl.chaFile != null)
-                        results.Add(npc.ChaControl.chaFile);
-
-                    return results;
-                }
-
                 private static bool CanGetSpawned(AgentActor heroine)
                 {
-                    var isOnLeave = GetRelatedChaFiles(heroine)
+                    var isOnLeave = heroine.GetRelatedChaFiles()
                         .Any(c =>
                         {
                             var pd = PregnancyData.Load(ExtendedSave.GetExtendedDataById(heroine.ChaControl.chaFile, GUID));
@@ -228,7 +209,7 @@ namespace KK_Pregnancy
                 //When user clicks finish button, set the inflation based on the button clicked
                 private static void DetermineInflationState(HSceneFlagCtrl ctrlFlag)
                 {
-                    //swallow
+                    //swallow clicked
                     if (ctrlFlag.click == HSceneFlagCtrl.ClickKind.FinishInSide 
                         || ctrlFlag.click == HSceneFlagCtrl.ClickKind.FinishSame  
                         || ctrlFlag.click == HSceneFlagCtrl.ClickKind.FinishDrink ) 
@@ -238,7 +219,7 @@ namespace KK_Pregnancy
                         var controller = GetEffectController(heroine);
                         controller.AddInflation(1);                    
                     }
-                    //spit
+                    //spit clicked
                     else if (ctrlFlag.click == HSceneFlagCtrl.ClickKind.FinishOutSide 
                         || ctrlFlag.click == HSceneFlagCtrl.ClickKind.FinishVomit) 
                     {
@@ -246,7 +227,7 @@ namespace KK_Pregnancy
                         var heroine = GetLeadHeroine();
                         var controller = GetEffectController(heroine);
                         controller.DrainInflation(Mathf.Max(3, Mathf.CeilToInt(InflationMaxCount.Value / 2.2f)));
-                    }    
+                    }                        
                 }
                 
 

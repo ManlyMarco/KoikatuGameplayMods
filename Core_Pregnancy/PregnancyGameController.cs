@@ -117,8 +117,6 @@ namespace KK_Pregnancy
                 // Figure out if conception happened at end of h scene
                 var heroine = Manager.HSceneManager.Instance?.Agent[0]?.AgentData;
                 if (heroine == null) return;
-                // var isDangerousDay = HFlag.GetMenstruation(heroine.MenstruationDay) == HFlag.MenstruationType.危険日;
-                // if (!isDangerousDay) return;
 
                 var cameInside = PregnancyPlugin.ConceptionEnabled.Value && proc.ctrlFlag.numInside > 0;
                 var cameInsideAnal = PregnancyPlugin.AnalConceptionEnabled.Value && proc.ctrlFlag.numAnal > 0;
@@ -229,7 +227,7 @@ namespace KK_Pregnancy
                     controller.ReadData();
             }
 
-
+            //TODO should add to AIAPI
             private static List<AgentData> GetHeroineList()
             {
                 var heroineList = new List<AgentData>();
@@ -275,11 +273,9 @@ namespace KK_Pregnancy
 
                 #elif AI
 
-                    //We probaly can't make characters "leave school" in AI
-
                     if (pd.Week < PregnancyData.LeaveSchoolWeek)
                     {
-                        // Advance through in-school at full configured speed
+                        // Advance through pregnancy at full configured speed
                         var weekChange = PregnancyPlugin.PregnancyProgressionSpeed.Value;
                         pd.Week = Mathf.Min(PregnancyData.LeaveSchoolWeek, pd.Week + weekChange);
                     }

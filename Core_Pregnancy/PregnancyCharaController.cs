@@ -1,9 +1,7 @@
 ﻿using KKABMX.Core;
 using KKAPI;
 using KKAPI.Chara;
-#if KK
-    using KKAPI.MainGame;
-#endif
+using KKAPI.MainGame;
 using KKAPI.Maker;
 using UnityEngine;
 #if AI
@@ -51,14 +49,15 @@ namespace KK_Pregnancy
             PregnancyPlugin.Logger.LogDebug($"Preg - ReadData week {Data.Week} {ChaControl.name}");
             PregnancyPlugin.Logger.LogDebug($"Preg - ReadData IsPregnant {Data.IsPregnant}");
 
-            if (!CanGetDangerousDays())
-            {
-                // Force the girl to always be on the safe day, happens every day after day of conception
-                //TODO
-                // var heroine = ChaControl.GetHeroine();
-                // if (heroine != null)
-                //     HFlag.SetMenstruation(heroine, HFlag.MenstruationType.安全日);
-            }
+            #if KK
+                if (!CanGetDangerousDays())
+                {
+                    // Force the girl to always be on the safe day, happens every day after day of conception
+                    var heroine = ChaControl.GetHeroine();
+                    if (heroine != null)
+                        HFlag.SetMenstruation(heroine, HFlag.MenstruationType.安全日);
+                }
+            #endif
         }
 
         protected override void OnCardBeingSaved(GameMode currentGameMode)
@@ -78,21 +77,22 @@ namespace KK_Pregnancy
             }
         }
 
-        //TODO
-        // internal static byte[] GetMenstruationsArr(MenstruationSchedule menstruationSchedule)
-        // {
-        //     switch (menstruationSchedule)
-        //     {
-        //         default:
-        //             return HFlag.menstruations;
-        //         case MenstruationSchedule.MostlyRisky:
-        //             return _menstruationsRisky;
-        //         case MenstruationSchedule.AlwaysSafe:
-        //             return _menstruationsAlwaysSafe;
-        //         case MenstruationSchedule.AlwaysRisky:
-        //             return _menstruationsAlwaysRisky;
-        //     }
-        // }
+        #if KK
+            internal static byte[] GetMenstruationsArr(MenstruationSchedule menstruationSchedule)
+            {
+                switch (menstruationSchedule)
+                {
+                    default:
+                        return HFlag.menstruations;
+                    case MenstruationSchedule.MostlyRisky:
+                        return _menstruationsRisky;
+                    case MenstruationSchedule.AlwaysSafe:
+                        return _menstruationsAlwaysSafe;
+                    case MenstruationSchedule.AlwaysRisky:
+                        return _menstruationsAlwaysRisky;
+                }
+            }
+        #endif
 
         private static readonly byte[] _menstruationsRisky = {
             0,

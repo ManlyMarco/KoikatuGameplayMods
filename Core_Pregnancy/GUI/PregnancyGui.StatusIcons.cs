@@ -4,9 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ActionGame;
 using HarmonyLib;
-#if KK
-    using KKAPI.MainGame;
-#endif
+using KKAPI.MainGame;
 using KKAPI.Utilities;
 using UnityEngine;
 using UnityEngine.SceneManagement;

@@ -31,7 +31,7 @@ namespace KK_Pregnancy
         /// </summary>
         public bool GameplayEnabled = true;
 
-        //TODO public MenstruationSchedule MenstruationSchedule = MenstruationSchedule.Default;
+        public MenstruationSchedule MenstruationSchedule = MenstruationSchedule.Default;
 
         /// <summary>
         /// If 0 or negative, the character is not pregant.

@@ -3,9 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using ExtensibleSaveFormat;
-#if KK
-    using KKAPI.MainGame;
-#endif
+using KKAPI.MainGame;
 #if AI
     using AIChara;
     using AIProject;
@@ -91,34 +89,7 @@ namespace KK_Pregnancy
                 return HeroineStatus.Unknown;
             }
 
-        #elif AI
-        
-            //TODO copied from KKAPI
-            public static Actor GetNPC(this AgentActor heroine)
-            {
-                if (heroine == null) throw new ArgumentNullException(nameof(heroine));
-
-                if (heroine.transform == null) return null;
-                return heroine.transform.GetComponent<Actor>();
-            }
-
-            //TODO copied from KKAPI
-            public static IEnumerable<ChaFileControl> GetRelatedChaFiles(AgentActor heroine)
-            {
-                if (heroine == null) throw new ArgumentNullException(nameof(heroine));
-
-                var results = new List<ChaFileControl>();
-
-                if (heroine.ChaControl != null && heroine.ChaControl.chaFile != null)
-                    results.Add(heroine.ChaControl.chaFile);
-
-                var npc = GetNPC(heroine);
-                if (npc != null && npc.ChaControl != null && npc.ChaControl.chaFile != null)
-                    results.Add(npc.ChaControl.chaFile);
-
-                return results;
-            }
-
+        #elif AI    
 
             public static PregnancyData GetPregnancyData(this AgentActor heroine)
             {
@@ -126,7 +97,7 @@ namespace KK_Pregnancy
 
                 // Figure out which data to take if there are multiple
                 // probably not necessary? null check should be enough? 
-                return GetRelatedChaFiles(heroine)
+                return heroine.GetRelatedChaFiles()
                     .Select(GetPregnancyData)
                     .Where(x => x != null)
                     .OrderByDescending(x => x.PregnancyCount)
