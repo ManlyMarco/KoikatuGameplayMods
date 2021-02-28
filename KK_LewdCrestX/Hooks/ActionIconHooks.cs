@@ -63,9 +63,6 @@ namespace KK_LewdCrestX
             // position above the small table
             iconRootTransform.position = new Vector3(-3.1f, -0.4f, 1.85f);
 
-            if (iconRootObject.GetComponent<ObservableUpdateTrigger>())
-                Console.WriteLine("was spawned -=--------------");
-
             var evt = iconRootObject.AddComponent<TriggerEnterExitEvent>();
             var animator = iconRootObject.GetComponentInChildren<Animator>();
             var rendererIcon = iconRootObject.GetComponentInChildren<SpriteRenderer>();
@@ -90,8 +87,17 @@ namespace KK_LewdCrestX
 
             var player = Singleton<Game>.Instance.actScene.Player;
             evt.UpdateAsObservable()
-                .Where(_ => playerInRange && ActionInput.isAction && !player.isActionNow)
-                .Subscribe(_ => ClubInterface.ShowWindow = true)
+                .Subscribe(_ =>
+                {
+                    // Hide in H scenes and other places
+                    var isVisible = Singleton<Game>.IsInstance() && !Singleton<Game>.Instance.IsRegulate(true);
+                    if (rendererIcon.enabled != isVisible)
+                        rendererIcon.enabled = isVisible;
+
+                    // Check if player clicked this point
+                    if (isVisible && playerInRange && ActionInput.isAction && !player.isActionNow)
+                        ClubInterface.ShowWindow = true;
+                })
                 .AddTo(evt);
             evt.OnGUIAsObservable()
                 .Subscribe(ClubInterface.OnGui)
