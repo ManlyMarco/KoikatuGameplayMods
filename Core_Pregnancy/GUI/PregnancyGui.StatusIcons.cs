@@ -2,7 +2,13 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using ActionGame;
+#if KK
+    using ActionGame;
+#elif AI
+    using AIProject;
+    using AIProject.UI;
+    using AIProject.SaveData;
+#endif
 using HarmonyLib;
 using KKAPI.MainGame;
 using KKAPI.Utilities;
@@ -24,7 +30,11 @@ namespace KK_Pregnancy
 
             private const string ICON_NAME = "Pregnancy_Icon";
 
-            private static readonly List<KeyValuePair<SaveData.Heroine, RectTransform>> _currentHeroine = new List<KeyValuePair<SaveData.Heroine, RectTransform>>();
+            #if KK
+                private static readonly List<KeyValuePair<SaveData.Heroine, RectTransform>> _currentHeroine = new List<KeyValuePair<SaveData.Heroine, RectTransform>>();
+            #elif AI
+                private static readonly List<KeyValuePair<AgentData, RectTransform>> _currentHeroine = new List<KeyValuePair<AgentData, RectTransform>>();
+            #endif
 
             internal static void Init(Harmony hi, Sprite unknownSprite, Sprite pregSprite, Sprite safeSprite, Sprite riskySprite, Sprite leaveSprite)
             {
@@ -34,98 +44,160 @@ namespace KK_Pregnancy
                 _safeSprite = safeSprite ? safeSprite : throw new ArgumentNullException(nameof(safeSprite));
                 _leaveSprite = leaveSprite ? leaveSprite : throw new ArgumentNullException(nameof(leaveSprite));
 
-                SceneManager.sceneLoaded += SceneManager_sceneLoaded;
-                SceneManager.sceneUnloaded += s =>
-                {
-                    if (_currentHeroine.Count > 0)
-                        SceneManager_sceneLoaded(s, LoadSceneMode.Additive);
-                };
+                #if KK
+                    SceneManager.sceneLoaded += SceneManager_sceneLoaded;
+                    SceneManager.sceneUnloaded += s =>
+                    {
+                        if (_currentHeroine.Count > 0)
+                            SceneManager_sceneLoaded(s, LoadSceneMode.Additive);
+                    };
+                #endif
 
                 hi.PatchAll(typeof(StatusIcons));
             }
 
-            /// <summary>
-            ///     Handle class roster
-            /// </summary>
-            [HarmonyPostfix]
-            [HarmonyPatch(typeof(ClassRoomList), "PreviewUpdate")]
-            public static void ClassroomPreviewUpdateHook(ClassRoomList __instance)
-            {
-                IEnumerator ClassroomPreviewUpdateCo()
+            #if KK
+
+                /// <summary>
+                ///     Handle class roster
+                /// </summary>
+                [HarmonyPostfix]
+                [HarmonyPatch(typeof(ClassRoomList), "PreviewUpdate")]
+                public static void ClassroomPreviewUpdateHook(ClassRoomList __instance)
                 {
-                    yield return new WaitForEndOfFrame();
-
-                    _currentHeroine.Clear();
-                    SpawnGUI();
-
-                    var entries = Traverse.Create(__instance).Property("charaPreviewList")
-                        .GetValue<List<PreviewClassData>>();
-
-                    foreach (var chaEntry in entries)
-                    {
-                        var baseImg = Traverse.Create(chaEntry).Field("_objHeart").GetValue<GameObject>();
-                        // Need to call this every time in case characters get transferred/edited
-                        SetHeart(baseImg, chaEntry.data?.charFile?.GetHeroine(), -70f);
-                    }
-                }
-
-                _pluginInstance.StartCoroutine(ClassroomPreviewUpdateCo());
-            }
-
-            /// <summary>
-            ///     Handle character list in roaming mode
-            /// </summary>
-            private static void SceneManager_sceneLoaded(Scene scene, LoadSceneMode mode)
-            {
-                if (mode == LoadSceneMode.Single || _pluginInstance == null)
-                    return;
-
-                _currentHeroine.Clear();
-
-                var chaStatusScene = FindObjectOfType<ChaStatusScene>();
-                if (chaStatusScene != null)
-                {
-                    SpawnGUI();
-
-                    IEnumerator CreatePregnancyIconCo()
+                    IEnumerator ClassroomPreviewUpdateCo()
                     {
                         yield return new WaitForEndOfFrame();
 
-                        foreach (var chaStatusComponent in chaStatusScene.transform
-                            .GetComponentsInChildren<ChaStatusComponent>())
+                        _currentHeroine.Clear();
+                        SpawnGUI();
+
+                        var entries = Traverse.Create(__instance).Property("charaPreviewList")
+                            .GetValue<List<PreviewClassData>>();
+
+                        foreach (var chaEntry in entries)
                         {
-                            var heartObj = chaStatusComponent.objHeart;
-                            if (heartObj != null) // not present on mc and teacher 
-                                SetHeart(heartObj, chaStatusComponent.heroine, -91.1f);
+                            var baseImg = Traverse.Create(chaEntry).Field("_objHeart").GetValue<GameObject>();
+                            // Need to call this every time in case characters get transferred/edited
+                            SetHeart(baseImg, chaEntry.data?.charFile?.GetHeroine(), -70f);
                         }
                     }
 
-                    _pluginInstance.StartCoroutine(CreatePregnancyIconCo());
+                    _pluginInstance.StartCoroutine(ClassroomPreviewUpdateCo());
                 }
-            }
 
-            /// <summary>
-            ///     Handle char icon for quick status popup
-            /// </summary>
-            [HarmonyPostfix]
-            [HarmonyPatch(typeof(ParamUI), "SetHeroine", typeof(SaveData.Heroine))]
-            private static void ParamUI_SetHeroine(ParamUI __instance, SaveData.Heroine _heroine)
-            {
-                var objFemaleRoot = Traverse.Create(__instance).Field("objFemaleRoot").GetValue<GameObject>();
-                if (objFemaleRoot == null) return;
-
-                SpawnGUI();
-
-                IEnumerator HeroineCanvasPreviewUpdateCo()
+                /// <summary>
+                ///     Handle character list in roaming mode
+                /// </summary>
+                private static void SceneManager_sceneLoaded(Scene scene, LoadSceneMode mode)
                 {
-                    yield return new WaitForEndOfFrame();
+                    if (mode == LoadSceneMode.Single || _pluginInstance == null)
+                        return;
 
                     _currentHeroine.Clear();
-                    SetQuickStatusIcon(objFemaleRoot, _heroine, -214f, -26f);
+
+                    var chaStatusScene = FindObjectOfType<ChaStatusScene>();
+                    if (chaStatusScene != null)
+                    {
+                        SpawnGUI();
+
+                        IEnumerator CreatePregnancyIconCo()
+                        {
+                            yield return new WaitForEndOfFrame();
+
+                            foreach (var chaStatusComponent in chaStatusScene.transform
+                                .GetComponentsInChildren<ChaStatusComponent>())
+                            {
+                                var heartObj = chaStatusComponent.objHeart;
+                                if (heartObj != null) // not present on mc and teacher 
+                                    SetHeart(heartObj, chaStatusComponent.heroine, -91.1f);
+                            }
+                        }
+
+                        _pluginInstance.StartCoroutine(CreatePregnancyIconCo());
+                    }
                 }
 
-                _pluginInstance.StartCoroutine(HeroineCanvasPreviewUpdateCo());
-            }
+            #endif
+
+
+            #if KK
+                /// <summary>
+                ///     Handle char icon for quick status popup
+                /// </summary>
+                [HarmonyPostfix]
+                [HarmonyPatch(typeof(ParamUI), "SetHeroine", typeof(SaveData.Heroine))]
+                private static void ParamUI_SetHeroine(ParamUI __instance, SaveData.Heroine _heroine)
+                {
+                    var objFemaleRoot = Traverse.Create(__instance).Field("objFemaleRoot").GetValue<GameObject>();
+                    if (objFemaleRoot == null) return;
+
+                    SpawnGUI();
+
+                    IEnumerator HeroineCanvasPreviewUpdateCo()
+                    {
+                        yield return new WaitForEndOfFrame();
+
+                        _currentHeroine.Clear();
+                        SetQuickStatusIcon(objFemaleRoot, _heroine, -214f, -26f);
+                    }
+
+                    _pluginInstance.StartCoroutine(HeroineCanvasPreviewUpdateCo());
+                }
+
+            #elif AI
+
+                /// <summary>
+                ///     Handle char icon for status menu
+                /// </summary>
+                [HarmonyPostfix]
+                [HarmonyPatch(typeof(StatusUI), "RefreshAgentContent", typeof(int))]
+                private static void StatusUI_RefreshAgentContent(StatusUI __instance, int id)
+                {
+
+                    PregnancyPlugin.Logger.LogDebug("Preg - StatusUI_RefreshAgentContent");
+                    var objImageRoot = Traverse.Create(__instance).Field("_cardRawImage").GetValue<RawImage>();
+                    if (objImageRoot == null) return;
+
+                    //Ignore player status tab, only want actors    
+                    if (id == 0) {
+                        var existingIcon = objImageRoot.transform.Find(ICON_NAME);
+                        if (existingIcon) Destroy(existingIcon.gameObject);
+                        return;
+                    }
+
+                    Singleton<Manager.Map>.Instance.AgentTable.TryGetValue((id -1), out AgentActor _heroine);
+                    if (_heroine == null) return;
+
+                    SpawnGUI();
+
+                    IEnumerator HeroineCanvasPreviewUpdateCo()
+                    {
+                        yield return new WaitForEndOfFrame();
+
+                        _currentHeroine.Clear();
+                        //                                                             :right :up
+                        SetQuickStatusIcon(objImageRoot.gameObject, _heroine.AgentData, 95f, -80f);
+                    }
+
+                    _pluginInstance.StartCoroutine(HeroineCanvasPreviewUpdateCo());
+                }
+
+                /// <summary>
+                ///     Clear icon if on player status menu
+                /// </summary>
+                [HarmonyPostfix]
+                [HarmonyPatch(typeof(StatusUI), "RefreshPlayerContent")]
+                private static void StatusUI_RefreshAgentContent(StatusUI __instance)
+                {
+                    var objImageRoot = Traverse.Create(__instance).Field("_cardRawImage").GetValue<RawImage>();
+                    if (objImageRoot == null) return;
+
+                    var existingIcon = objImageRoot.transform.Find(ICON_NAME);
+                    if (existingIcon) Destroy(existingIcon.gameObject);
+                }
+
+            #endif
 
             private static void SpawnGUI()
             {
@@ -189,17 +261,20 @@ namespace KK_Pregnancy
                                 //GUILayout.Space(5);
                                 GUILayout.FlexibleSpace();
 
-                                var day = Singleton<Cycle>.Instance.nowWeek;
+                                #if KK
+                                    var day = Singleton<Cycle>.Instance.nowWeek;
 
-                                GUILayout.Label("Forecast for this week:");
-                                GUILayout.Label($"Today ({day}): {status}");
+                                    GUILayout.Label("Forecast for this week:");
+                                    GUILayout.Label($"Today ({day}): {status}");
 
-                                for (var dayOffset = 1; dayOffset < 7; dayOffset++)
-                                {
-                                    var adjustedDay = (Cycle.Week)((int)(day + dayOffset) % Enum.GetValues(typeof(Cycle.Week)).Length);
-                                    var adjustedSafe = HFlag.GetMenstruation((byte)((heroine.MenstruationDay + dayOffset) % HFlag.menstruations.Length)) == HFlag.MenstruationType.安全日;
-                                    GUILayout.Label($"{adjustedDay}: {(adjustedSafe ? "Safe" : "Risky")}");
-                                }
+                                    for (var dayOffset = 1; dayOffset < 7; dayOffset++)
+                                    {
+                                        var adjustedDay = (Cycle.Week)((int)(day + dayOffset) % Enum.GetValues(typeof(Cycle.Week)).Length);
+                                        var adjustedSafe = HFlag.GetMenstruation((byte)((heroine.MenstruationDay + dayOffset) % HFlag.menstruations.Length)) == HFlag.MenstruationType.安全日;
+                                        GUILayout.Label($"{adjustedDay}: {(adjustedSafe ? "Safe" : "Risky")}");
+                                    }
+                                #endif
+                                
 
                                 var pregnancyCount = pregData.IsPregnant ? pregData.PregnancyCount - 1 : pregData.PregnancyCount;
                                 if (pregnancyCount > 0)
@@ -226,120 +301,211 @@ namespace KK_Pregnancy
                 GUILayout.EndArea();
             }
 
-            /// <summary>
-            ///     Enable/disable pregnancy icon
-            /// </summary>
-            /// <param name="heartObj">The lovers icon object</param>
-            /// <param name="heroine">Is the preg icon shown</param>
-            /// <param name="xOffset">Offset from the lovers icon</param>
-            private static void SetHeart(GameObject heartObj, SaveData.Heroine heroine, float xOffset)
-            {
-                var owner = heartObj.transform.parent;
-                var existing = owner.Find(ICON_NAME);
+            #if KK
 
-                if (heroine == null)
+                /// <summary>
+                ///     Enable/disable pregnancy icon
+                /// </summary>
+                /// <param name="heartObj">The lovers icon object</param>
+                /// <param name="heroine">Is the preg icon shown</param>
+                /// <param name="xOffset">Offset from the lovers icon</param>
+                private static void SetHeart(GameObject heartObj, SaveData.Heroine heroine, float xOffset)
                 {
-                    if (existing != null)
-                        Destroy(existing.gameObject);
-                }
-                else
-                {
-                    if (existing == null)
+                    var owner = heartObj.transform.parent;
+                    var existing = owner.Find(ICON_NAME);
+
+                    if (heroine == null)
                     {
-                        var copy = Instantiate(heartObj, owner);
-                        copy.name = ICON_NAME;
-                        copy.SetActive(true);
-
-                        var rt = copy.GetComponent<RectTransform>();
-                        rt.anchoredPosition = new Vector2(rt.anchoredPosition.x + xOffset, rt.anchoredPosition.y);
-                        rt.sizeDelta = new Vector2(48, 48);
-
-                        existing = copy.transform;
+                        if (existing != null)
+                            Destroy(existing.gameObject);
                     }
-
-                    AddPregIcon(existing, heroine);
-                }
-            }
-
-            /// <summary>
-            ///     Enable/disable pregnancy icon on quick status container
-            /// </summary>
-            /// <param name="characterImageObj">The heroine image object</param>
-            /// <param name="heroine">Is the preg icon shown</param>
-            /// <param name="xOffset">Offset from the character image</param>
-            /// <param name="yOffset">Offset from the character image</param>
-            private static void SetQuickStatusIcon(GameObject characterImageObj, SaveData.Heroine heroine, float xOffset, float yOffset)
-            {
-                var existing = characterImageObj.transform.Find(ICON_NAME);
-
-                if (heroine == null)
-                {
-                    if (existing != null)
-                        Destroy(existing.gameObject);
-                }
-                else
-                {
-                    if (existing == null)
+                    else
                     {
-                        var newChildIcon = new GameObject();
-                        newChildIcon.AddComponent<RectTransform>();
-                        newChildIcon.AddComponent<Image>();
+                        if (existing == null)
+                        {
+                            var copy = Instantiate(heartObj, owner);
+                            copy.name = ICON_NAME;
+                            copy.SetActive(true);
 
-                        var copy = Instantiate(newChildIcon, characterImageObj.transform);
-                        copy.name = ICON_NAME;
-                        copy.SetActive(true);
+                            var rt = copy.GetComponent<RectTransform>();
+                            rt.anchoredPosition = new Vector2(rt.anchoredPosition.x + xOffset, rt.anchoredPosition.y);
+                            rt.sizeDelta = new Vector2(48, 48);
 
-                        var charRt = characterImageObj.GetComponent<RectTransform>();
-                        var rt = copy.GetComponent<RectTransform>();
-                        rt.anchoredPosition = new Vector2(charRt.anchoredPosition.x + xOffset, charRt.anchoredPosition.y + yOffset);
-                        rt.sizeDelta = new Vector2(48, 48);
+                            existing = copy.transform;
+                        }
 
-                        existing = copy.transform;
+                        AddPregIcon(existing, heroine);
                     }
-
-                    AddPregIcon(existing, heroine);
                 }
-            }
 
-            private static void AddPregIcon(Transform pregIconTransform, SaveData.Heroine heroine)
-            {
-                var image = pregIconTransform.GetComponent<Image>();
-
-                _currentHeroine.Add(new KeyValuePair<SaveData.Heroine, RectTransform>(heroine, image.GetComponent<RectTransform>()));
-
-                switch (heroine.GetHeroineStatus(heroine.GetPregnancyData()))
+                /// <summary>
+                ///     Enable/disable pregnancy icon on quick status container
+                /// </summary>
+                /// <param name="characterImageObj">The heroine image object</param>
+                /// <param name="heroine">Is the preg icon shown</param>
+                /// <param name="xOffset">Offset from the character image</param>
+                /// <param name="yOffset">Offset from the character image</param>
+                private static void SetQuickStatusIcon(GameObject characterImageObj, SaveData.Heroine heroine, float xOffset, float yOffset)
                 {
-                    case HeroineStatus.Unknown:
-                        image.sprite = _unknownSprite;
-                        break;
-                    case HeroineStatus.OnLeave:
-                        image.sprite = _leaveSprite;
-                        break;
-                    case HeroineStatus.Safe:
-                        image.sprite = _safeSprite;
-                        break;
-                    case HeroineStatus.Risky:
-                        image.sprite = _riskySprite;
-                        break;
-                    case HeroineStatus.Pregnant:
-                        image.sprite = _pregSprite;
-                        break;
-                    default:
-                        throw new ArgumentOutOfRangeException();
+                    var existing = characterImageObj.transform.Find(ICON_NAME);
+
+                    if (heroine == null)
+                    {
+                        if (existing != null)
+                            Destroy(existing.gameObject);
+                    }
+                    else
+                    {
+                        if (existing == null)
+                        {
+                            var newChildIcon = new GameObject();
+                            newChildIcon.AddComponent<RectTransform>();
+                            newChildIcon.AddComponent<Image>();
+
+                            var copy = Instantiate(newChildIcon, characterImageObj.transform);
+                            copy.name = ICON_NAME;
+                            copy.SetActive(true);
+
+                            var charRt = characterImageObj.GetComponent<RectTransform>();
+                            var rt = copy.GetComponent<RectTransform>();
+                            rt.anchoredPosition = new Vector2(charRt.anchoredPosition.x + xOffset, charRt.anchoredPosition.y + yOffset);
+                            rt.sizeDelta = new Vector2(48, 48);
+
+                            existing = copy.transform;
+                        }
+
+                        AddPregIcon(existing, heroine);
+                    }
                 }
-            }
+
+            #elif AI
+
+                /// <summary>
+                ///     Enable/disable pregnancy icon on quick status container
+                /// </summary>
+                /// <param name="characterImageObj">The heroine image object</param>
+                /// <param name="heroine">Is the preg icon shown</param>
+                /// <param name="xOffset">Offset from the character image</param>
+                /// <param name="yOffset">Offset from the character image</param>
+                private static void SetQuickStatusIcon(GameObject characterImageObj, AgentData heroine, float xOffset, float yOffset)
+                {
+                    var existing = characterImageObj.transform.Find(ICON_NAME);
+
+                    if (heroine == null)
+                    {
+                        if (existing != null)
+                            Destroy(existing.gameObject);
+                    }
+                    else
+                    {
+                        if (existing == null)
+                        {
+                            var newChildIcon = new GameObject();
+                            newChildIcon.AddComponent<RectTransform>();
+                            newChildIcon.AddComponent<Image>();
+
+                            var copy = Instantiate(newChildIcon, characterImageObj.transform);
+                            copy.name = ICON_NAME;
+                            copy.SetActive(true);
+
+                            var charRt = characterImageObj.GetComponent<RectTransform>();
+                            var rt = copy.GetComponent<RectTransform>();
+                            rt.anchoredPosition = new Vector2(charRt.anchoredPosition.x + xOffset, charRt.anchoredPosition.y + yOffset);
+                            rt.sizeDelta = new Vector2(48, 48);
+
+                            existing = copy.transform;
+                        }
+
+                        AddPregIcon(existing, heroine);
+                    }
+                }
+
+            #endif
 
             private static readonly Vector3[] _worldCornersBuffer = new Vector3[4];
-            private static Rect GetOccupiedScreenRect(KeyValuePair<SaveData.Heroine, RectTransform> x)
-            {
-                x.Value.GetWorldCorners(_worldCornersBuffer);
-                var screenPos = new Rect(
-                    _worldCornersBuffer[0].x,
-                    Screen.height - _worldCornersBuffer[2].y,
-                    _worldCornersBuffer[2].x - _worldCornersBuffer[0].x,
-                    _worldCornersBuffer[2].y - _worldCornersBuffer[0].y);
-                return screenPos;
-            }
+
+            #if KK
+                private static void AddPregIcon(Transform pregIconTransform, SaveData.Heroine heroine)
+                {
+                    var image = pregIconTransform.GetComponent<Image>();
+
+                    _currentHeroine.Add(new KeyValuePair<SaveData.Heroine, RectTransform>(heroine, image.GetComponent<RectTransform>()));
+
+                    switch (heroine.GetHeroineStatus(heroine.GetPregnancyData()))
+                    {
+                        case HeroineStatus.Unknown:
+                            image.sprite = _unknownSprite;
+                            break;
+                        case HeroineStatus.OnLeave:
+                            image.sprite = _leaveSprite;
+                            break;
+                        case HeroineStatus.Safe:
+                            image.sprite = _safeSprite;
+                            break;
+                        case HeroineStatus.Risky:
+                            image.sprite = _riskySprite;
+                            break;
+                        case HeroineStatus.Pregnant:
+                            image.sprite = _pregSprite;
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
+
+                private static Rect GetOccupiedScreenRect(KeyValuePair<SaveData.Heroine, RectTransform> x)
+                {
+                    x.Value.GetWorldCorners(_worldCornersBuffer);
+                    var screenPos = new Rect(
+                        _worldCornersBuffer[0].x,
+                        Screen.height - _worldCornersBuffer[2].y,
+                        _worldCornersBuffer[2].x - _worldCornersBuffer[0].x,
+                        _worldCornersBuffer[2].y - _worldCornersBuffer[0].y);
+                    return screenPos;
+                }
+
+            #elif AI
+
+                 private static void AddPregIcon(Transform pregIconTransform, AgentData heroine)
+                {
+                    var image = pregIconTransform.GetComponent<Image>();
+
+                    _currentHeroine.Add(new KeyValuePair<AgentData, RectTransform>(heroine, image.GetComponent<RectTransform>()));
+
+                    switch (heroine.GetHeroineStatus(heroine.GetPregnancyData()))
+                    {
+                        case HeroineStatus.Unknown:
+                            image.sprite = _unknownSprite;
+                            break;
+                        case HeroineStatus.OnLeave:
+                            image.sprite = _leaveSprite;
+                            break;
+                        case HeroineStatus.Safe:
+                            image.sprite = _safeSprite;
+                            break;
+                        case HeroineStatus.Risky:
+                            image.sprite = _riskySprite;
+                            break;
+                        case HeroineStatus.Pregnant:
+                            image.sprite = _pregSprite;
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+                }
+
+                private static Rect GetOccupiedScreenRect(KeyValuePair<AgentData, RectTransform> x)
+                {
+                    x.Value.GetWorldCorners(_worldCornersBuffer);
+                    var screenPos = new Rect(
+                        _worldCornersBuffer[0].x,
+                        Screen.height - _worldCornersBuffer[2].y,
+                        _worldCornersBuffer[2].x - _worldCornersBuffer[0].x,
+                        _worldCornersBuffer[2].y - _worldCornersBuffer[0].y);
+                    return screenPos;
+                }
+
+            #endif
         }
     }
 }

@@ -7,6 +7,7 @@ using KKAPI.MainGame;
 #if AI
     using AIChara;
     using AIProject;
+    using AIProject.SaveData;
 #endif
 
 namespace KK_Pregnancy
@@ -91,7 +92,7 @@ namespace KK_Pregnancy
 
         #elif AI    
 
-            public static PregnancyData GetPregnancyData(this AgentActor heroine)
+            public static PregnancyData GetPregnancyData(this AgentData heroine)
             {
                 if (heroine == null) return new PregnancyData();
 
@@ -108,12 +109,13 @@ namespace KK_Pregnancy
                     .FirstOrDefault() ?? new PregnancyData();
             }
 
-            public static HeroineStatus GetHeroineStatus(this AgentActor heroine, PregnancyData pregData = null)
+            public static HeroineStatus GetHeroineStatus(this AgentData heroine, PregnancyData pregData = null)
             {
                 if (heroine == null) return HeroineStatus.Unknown;
 
                 if (pregData == null) pregData = heroine.GetPregnancyData();
 
+                //TODO
                 // Check if she wants to tell
                 // if (heroine.intimacy >= 80 ||
                 //     heroine.hCount >= 5 ||
@@ -127,11 +129,11 @@ namespace KK_Pregnancy
                         if (pregnancyWeek >= PregnancyData.LeaveSchoolWeek) return HeroineStatus.OnLeave;
                         if (PregnancyPlugin.ShowPregnancyIconEarly.Value) return HeroineStatus.Pregnant;
                         // Different personalities notice at different times
-                        if (_earlyDetectPersonalities.Contains(heroine.ChaControl.fileParam.personality))
+                        if (_earlyDetectPersonalities.Contains(heroine.GetNPC().ChaControl.fileParam.personality))
                         {
                             if (pregnancyWeek > 1) return HeroineStatus.Pregnant;
                         }
-                        else if (_lateDetectPersonalities.Contains(heroine.ChaControl.fileParam.personality))
+                        else if (_lateDetectPersonalities.Contains(heroine.GetNPC().ChaControl.fileParam.personality))
                         {
                             if (pregnancyWeek > 11) return HeroineStatus.Pregnant;
                         }

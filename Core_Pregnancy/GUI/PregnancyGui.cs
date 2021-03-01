@@ -29,25 +29,28 @@ namespace KK_Pregnancy
             {
                 MakerAPI.RegisterCustomSubCategories += MakerAPI_MakerBaseLoaded;
 
-                //TODO
-                // Sprite LoadIcon(string resourceFileName)
-                // {
-                //     var iconTex = new Texture2D(2, 2, TextureFormat.DXT5, false);
-                //     Object.DontDestroyOnLoad(iconTex);
-                //     iconTex.LoadImage(ResourceUtils.GetEmbeddedResource(resourceFileName));
-                //     var sprite = Sprite.Create(iconTex, new Rect(0f, 0f, iconTex.width, iconTex.height),
-                //         new Vector2(0.5f, 0.5f), 100f, 0u, SpriteMeshType.FullRect);
-                //     Object.DontDestroyOnLoad(sprite);
-                //     return sprite;
-                // }
-                // var pregSprite = LoadIcon("pregnant.png");
-                // var riskySprite = LoadIcon("risky.png");
-                // var safeSprite = LoadIcon("safe.png");
-                // var unknownSprite = LoadIcon("unknown.png");
-                // var leaveSprite = LoadIcon("leave.png");
+                Sprite LoadIcon(string resourceFileName)
+                {
+                    var iconTex = new Texture2D(2, 2, TextureFormat.DXT5, false);
+                    Object.DontDestroyOnLoad(iconTex);
+                    iconTex.LoadImage(ResourceUtils.GetEmbeddedResource(resourceFileName));
+                    
+                    var sprite = Sprite.Create(iconTex, new Rect(0f, 0f, iconTex.width, iconTex.height),
+                        new Vector2(0.5f, 0.5f), 100f, 0u, SpriteMeshType.FullRect);
+                    Object.DontDestroyOnLoad(sprite);
+                    return sprite;
+                }
+                var pregSprite = LoadIcon("pregnant.png");
+                var riskySprite = LoadIcon("risky.png");
+                var safeSprite = LoadIcon("safe.png");
+                var unknownSprite = LoadIcon("unknown.png");
+                var leaveSprite = LoadIcon("leave.png");
 
-                // StatusIcons.Init(hi, unknownSprite, pregSprite, safeSprite, riskySprite, leaveSprite);
-                // HSceneMenstrIconOverride.Init(hi, unknownSprite, pregSprite, safeSprite, riskySprite, leaveSprite);
+                StatusIcons.Init(hi, unknownSprite, pregSprite, safeSprite, riskySprite, leaveSprite);
+                
+                #if KK
+                    HSceneMenstrIconOverride.Init(hi, unknownSprite, pregSprite, safeSprite, riskySprite, leaveSprite);
+                #endif
             }
         }
 
@@ -98,11 +101,12 @@ namespace KK_Pregnancy
 
             e.AddControl(new MakerText("If the character is pregnant when added to the game, the pregnancy will continue from this point.", cat, _pluginInstance) { TextColor = hintColor });
 
-            //TODO
-            // var scheduleToggle = e.AddControl(new MakerRadioButtons(cat, _pluginInstance, "Menstruation schedule", "Default", "More risky", "Always safe", "Always risky"));
-            // scheduleToggle.BindToFunctionController<PregnancyCharaController, int>(controller => (int)controller.Data.MenstruationSchedule, (controller, value) => controller.Data.MenstruationSchedule = (MenstruationSchedule)value);
+            #if KK
+                var scheduleToggle = e.AddControl(new MakerRadioButtons(cat, _pluginInstance, "Menstruation schedule", "Default", "More risky", "Always safe", "Always risky"));
+                scheduleToggle.BindToFunctionController<PregnancyCharaController, int>(controller => (int)controller.Data.MenstruationSchedule, (controller, value) => controller.Data.MenstruationSchedule = (MenstruationSchedule)value);
 
-            // e.AddControl(new MakerText("Changes how many risky days the character has in a cycle. Default is more safe days than risky days.", cat, _pluginInstance) { TextColor = hintColor });
+                e.AddControl(new MakerText("Changes how many risky days the character has in a cycle. Default is more safe days than risky days.", cat, _pluginInstance) { TextColor = hintColor });
+            #endif
 
             var lactatToggle = e.AddControl(new MakerToggle(cat, "Always lactates", _pluginInstance));
             lactatToggle.BindToFunctionController<PregnancyCharaController, bool>(controller => controller.Data.AlwaysLactates, (controller, value) => controller.Data.AlwaysLactates = value);

@@ -87,6 +87,14 @@
       <HintPath>..\packages\IllusionLibs.AIGirl.UnityEngine.UI.2018.2.21.3\lib\net46\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="UnityEngine.IMGUIModule,  Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\IllusionLibs.AIGirl.UnityEngine.IMGUIModule.2018.2.21.3\lib\net46\UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule,  Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\IllusionLibs.AIGirl.UnityEngine.ImageConversionModule.2018.2.21.3\lib\net46\UnityEngine.ImageConversionModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="..\Core_Pregnancy\Data\HeroineStatus.cs" />
@@ -99,7 +107,7 @@
     <Compile Include="..\Core_Pregnancy\PregnancyGameController.cs" />
     <Compile Include="..\Core_Pregnancy\GUI\PregnancyGui.cs" />
     <!-- <Compile Include="..\Core_Pregnancy\GUI\PregnancyGui.HSceneMenstrIconOverride.cs" /> -->
-    <!-- <Compile Include="..\Core_Pregnancy\GUI\PregnancyGui.StatusIcons.cs" /> -->
+    <Compile Include="..\Core_Pregnancy\GUI\PregnancyGui.StatusIcons.cs" />
     <Compile Include="..\Core_Pregnancy\PregnancyPlugin.cs" />
     <Compile Include="..\Core_Pregnancy\PregnancyPlugin.Hooks.cs" />
     <Compile Include="..\Core_Pregnancy\Properties\AssemblyInfo.cs" />
