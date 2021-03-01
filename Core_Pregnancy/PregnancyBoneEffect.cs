@@ -98,7 +98,7 @@ namespace KK_Pregnancy
 
         public override IEnumerable<string> GetAffectedBones(BoneController origin)
         {
-            if (_controller.Data.IsPregnant || MakerAPI.InsideMaker || StudioAPI.InsideStudio)//TODO || PregnancyGameController.InsideHScene)
+            if (_controller.Data.IsPregnant || MakerAPI.InsideMaker || StudioAPI.InsideStudio || PregnancyGameController.InsideHScene)
                 return _affectedBoneNames;
 
             return Enumerable.Empty<string>();
