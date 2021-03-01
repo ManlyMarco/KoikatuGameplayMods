@@ -36,7 +36,7 @@ namespace KK_Pregnancy
                 if (day == Cycle.Week.Holiday)
                 {
                     // At start of each week increase pregnancy week counters of all pregnant characters
-                    ApplyToAllDatas((heroine, data) => AddPregnancyWeek(data));
+                    ApplyToAllDatas((chara, data) => AddPregnancyWeek(data));
                 }                                
             }
 
@@ -161,43 +161,62 @@ namespace KK_Pregnancy
                 ProcessPendingChanges();
             }
 
+            private static void ProcessPendingChanges()
+            {
+                ApplyToAllDatas((chara, data) =>
+                {
+                    if (chara is SaveData.Heroine heroine && _startedPregnancies.Contains(heroine) && !data.IsPregnant)
+                    {
+                        data.StartPregnancy();
+                        return true;
+                    }
+                    return false;
+                });
+                _startedPregnancies.Clear();
+            }
+
         #elif AI
 
             protected override void OnPeriodChange(AIProject.TimeZone period)
             {
                 ProcessPendingChanges();
             }
+
+            private static void ProcessPendingChanges()
+            {
+                ApplyToAllDatas((chara, data) =>
+                {
+                    if (chara is AgentData heroine && _startedPregnancies.Contains(chara) && !data.IsPregnant)
+                    {
+                        data.StartPregnancy();
+                        return true;
+                    }
+                    return false;
+                });
+                _startedPregnancies.Clear();
+            }
             
         #endif
 
-        private static void ProcessPendingChanges()
-        {
-            ApplyToAllDatas((heroine, data) =>
-            {
-                if (_startedPregnancies.Contains(heroine) && !data.IsPregnant)
-                {
-                    data.StartPregnancy();
-                    return true;
-                }
-                return false;
-            });
-            _startedPregnancies.Clear();
-        }
-
 
         #if KK
-            private static void ApplyToAllDatas(Func<SaveData.Heroine, PregnancyData, bool> action)
+            private static void ApplyToAllDatas(Func<SaveData.CharaData, PregnancyData, bool> action)
             {
-                foreach (var heroine in Game.Instance.HeroineList)
+                void ApplyToDatas(SaveData.CharaData character)
                 {
-                    foreach (var chaFile in heroine.GetRelatedChaFiles())
+                    var chafiles = character.GetRelatedChaFiles();
+                    if (chafiles == null) return;
+                    foreach (var chaFile in chafiles)
                     {
                         var data = ExtendedSave.GetExtendedDataById(chaFile, PregnancyPlugin.GUID);
                         var pd = PregnancyData.Load(data) ?? new PregnancyData();
-                        if (action(heroine, pd))
+                        if (action(character, pd))
                             ExtendedSave.SetExtendedDataById(chaFile, PregnancyPlugin.GUID, pd.Save());
                     }
                 }
+
+                foreach (var heroine in Game.Instance.HeroineList) ApplyToDatas(heroine);
+                ApplyToDatas(Game.Instance.Player);
 
                 // If controller exists then update its state so it gets any pregnancy week updates
                 foreach (var controller in FindObjectsOfType<PregnancyCharaController>())
@@ -208,19 +227,29 @@ namespace KK_Pregnancy
 
             private static void ApplyToAllDatas(Func<AgentData, PregnancyData, bool> action)
             {
+
+                void ApplyToDatas(AgentData character)
+                {
+                    var chafiles = character.GetRelatedChaFiles();
+                    if (chafiles == null) return;
+
+                    foreach (var chaFile in chafiles)
+                    {
+                        var data = ExtendedSave.GetExtendedDataById(chaFile, PregnancyPlugin.GUID);
+                        var pd = PregnancyData.Load(data) ?? new PregnancyData();
+                        if (action(character, pd))
+                            ExtendedSave.SetExtendedDataById(chaFile, PregnancyPlugin.GUID, pd.Save());
+                    }
+                }
+
                 var heroineList = GetHeroineList();
                 if (heroineList == null) return;
 
                 foreach (var heroine in heroineList)
-                {
-                    foreach (var chaFile in heroine.GetRelatedChaFiles())
-                    {
-                        var data = ExtendedSave.GetExtendedDataById(chaFile, PregnancyPlugin.GUID);
-                        var pd = PregnancyData.Load(data) ?? new PregnancyData();
-                        if (action(heroine, pd))
-                            ExtendedSave.SetExtendedDataById(chaFile, PregnancyPlugin.GUID, pd.Save());
-                    }
+                {                   
+                    ApplyToDatas(heroine);                    
                 }
+                // ApplyToDatas(Singleton<Map>.Instance.Player.AgentPartner.AgentData);  TODO find male AgentData
 
                 // If controller exists then update its state so it gets any pregnancy week updates
                 foreach (var controller in FindObjectsOfType<PregnancyCharaController>())

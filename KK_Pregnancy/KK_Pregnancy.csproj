@@ -97,9 +97,6 @@
     <Compile Include="..\Core_Pregnancy\Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="..\Core_Pregnancy\Resources\leave.png" />
   </ItemGroup>
   <ItemGroup>
