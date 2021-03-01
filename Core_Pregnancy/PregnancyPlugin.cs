@@ -26,7 +26,7 @@ namespace KK_Pregnancy
         #elif AI
             public const string GUID = "AI_Pregnancy";
         #endif
-        public const string Version = "2.3.1";
+        public const string Version = "2.4";
 
         public static ConfigEntry<bool> ConceptionEnabled { get; private set; }
         public static ConfigEntry<float> FertilityOverride { get; private set; }

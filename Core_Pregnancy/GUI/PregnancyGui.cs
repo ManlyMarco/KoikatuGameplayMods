@@ -69,8 +69,7 @@ namespace KK_Pregnancy
 
         private static void MakerAPI_MakerBaseLoaded(object sender, RegisterSubCategoriesEvent e)
         {
-            // Only female characters
-            if (MakerAPI.GetMakerSex() == 0) return;
+            var female = MakerAPI.GetMakerSex() != 0;
 
             // This category is inaccessible from class maker
             
@@ -86,32 +85,45 @@ namespace KK_Pregnancy
 
             var gameplayToggle = e.AddControl(new MakerToggle(cat, "Enable pregnancy progression", true, _pluginInstance));
             gameplayToggle.BindToFunctionController<PregnancyCharaController, bool>(controller => controller.Data.GameplayEnabled, (controller, value) => controller.Data.GameplayEnabled = value);
+            e.AddControl(new MakerText(female ?
+                "If off, the character can't get pregnant and current pregnancy will stop progressing." :
+                "If on, belly will progressively get bigger. No other effects.",
+                cat, _pluginInstance)
+            { TextColor = hintColor });
 
-            e.AddControl(new MakerText("If off, the character can't get pregnant and current pregnancy will stop progressing.", cat, _pluginInstance) { TextColor = hintColor });
+            if (female)
+            {
+                var fertilityToggle = e.AddControl(new MakerSlider(cat, "Fertility", 0f, 1f, PregnancyData.DefaultFertility, _pluginInstance));
+                fertilityToggle.BindToFunctionController<PregnancyCharaController, float>(controller => controller.Data.Fertility, (controller, value) => controller.Data.Fertility = value);
 
-            var fertilityToggle = e.AddControl(new MakerSlider(cat, "Fertility", 0f, 1f, PregnancyData.DefaultFertility, _pluginInstance));
-            fertilityToggle.BindToFunctionController<PregnancyCharaController, float>(controller => controller.Data.Fertility, (controller, value) => controller.Data.Fertility = value);
-
-            e.AddControl(new MakerText("How likely this character is to get pregnant.", cat, _pluginInstance) { TextColor = hintColor });
+                e.AddControl(new MakerText("How likely this character is to get pregnant.", cat, _pluginInstance) { TextColor = hintColor });
+            }
 
             var weeksSlider = e.AddControl(new MakerSlider(cat, "Week of pregnancy", 0f, PregnancyData.LeaveSchoolWeek - 1f, 0f, _pluginInstance));
             weeksSlider.ValueToString = f => Mathf.RoundToInt(f).ToString();
             weeksSlider.StringToValue = s => int.Parse(s);
             weeksSlider.BindToFunctionController<PregnancyCharaController, float>(controller => controller.Data.Week, (controller, value) => controller.Data.Week = Mathf.RoundToInt(value));
 
-            e.AddControl(new MakerText("If the character is pregnant when added to the game, the pregnancy will continue from this point.", cat, _pluginInstance) { TextColor = hintColor });
+            e.AddControl(new MakerText(female ?
+                "If the character is pregnant when added to the game, the pregnancy will continue from this point." :
+                "The only way for male characters to get pregnant is to manually set this slider above 0.",
+                cat, _pluginInstance)
+            { TextColor = hintColor });
 
             #if KK
-                var scheduleToggle = e.AddControl(new MakerRadioButtons(cat, _pluginInstance, "Menstruation schedule", "Default", "More risky", "Always safe", "Always risky"));
-                scheduleToggle.BindToFunctionController<PregnancyCharaController, int>(controller => (int)controller.Data.MenstruationSchedule, (controller, value) => controller.Data.MenstruationSchedule = (MenstruationSchedule)value);
+                if (female)
+                {
+                    var scheduleToggle = e.AddControl(new MakerRadioButtons(cat, _pluginInstance, "Menstruation schedule", "Default", "More risky", "Always safe", "Always risky"));
+                    scheduleToggle.BindToFunctionController<PregnancyCharaController, int>(controller => (int)controller.Data.MenstruationSchedule, (controller, value) => controller.Data.MenstruationSchedule = (MenstruationSchedule)value);
 
-                e.AddControl(new MakerText("Changes how many risky days the character has in a cycle. Default is more safe days than risky days.", cat, _pluginInstance) { TextColor = hintColor });
+                    e.AddControl(new MakerText("Changes how many risky days the character has in a cycle. Default is more safe days than risky days.", cat, _pluginInstance) { TextColor = hintColor });
+
+                    var lactatToggle = e.AddControl(new MakerToggle(cat, "Always lactates", _pluginInstance));
+                    lactatToggle.BindToFunctionController<PregnancyCharaController, bool>(controller => controller.Data.AlwaysLactates, (controller, value) => controller.Data.AlwaysLactates = value);
+
+                    e.AddControl(new MakerText("Makes the character always have milk, even when not pregnant.", cat, _pluginInstance) { TextColor = hintColor });
+                }
             #endif
-
-            var lactatToggle = e.AddControl(new MakerToggle(cat, "Always lactates", _pluginInstance));
-            lactatToggle.BindToFunctionController<PregnancyCharaController, bool>(controller => controller.Data.AlwaysLactates, (controller, value) => controller.Data.AlwaysLactates = value);
-            
-            e.AddControl(new MakerText("Makes the character always have milk, even when not pregnant.", cat, _pluginInstance) { TextColor = hintColor });
         }
     }
 }

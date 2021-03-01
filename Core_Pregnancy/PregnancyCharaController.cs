@@ -67,6 +67,12 @@ namespace KK_Pregnancy
 
         protected override void OnReload(GameMode currentGameMode)
         {
+            if (!GameAPI.InsideHScene)
+            {
+                _inflationChange = 0;
+                _inflationAmount = 0;
+            }
+
             // Parameters are false by default in class chara maker, so we need to load them the 1st time to not lose progress
             // !MakerAPI.InsideAndLoaded is true when the initial card is being loaded into maker so we can use that
             if (!MakerAPI.InsideAndLoaded || MakerAPI.GetCharacterLoadFlags()?.Parameters != false)
@@ -191,36 +197,39 @@ namespace KK_Pregnancy
         {
             base.Update();
 
-            if (PregnancyPlugin.InflationEnable.Value)
+            if (GameAPI.InsideHScene)
             {
-                float GetInflationChange()
+                if (PregnancyPlugin.InflationEnable.Value)
                 {
-                    //var inflationChange = Time.deltaTime / 2 + Time.deltaTime * _inflationChange / 3;
-                    return Mathf.Max((0.1f * PregnancyPlugin.InflationSpeed.Value) * Time.deltaTime,
-                        Mathf.Abs(Time.deltaTime * (_inflationChange * PregnancyPlugin.InflationSpeed.Value) / 4));
-                }
-
-                if (_inflationChange > 0.05f)
-                {
-                    _inflationChange = Mathf.Max(0, _inflationChange - GetInflationChange());
-                }
-                else if (_inflationChange < -0.05f)
-                {
-                    _inflationChange = Mathf.Min(0, _inflationChange + GetInflationChange());
-
-                    if (PregnancyPlugin.InflationOpenClothAtMax.Value &&
-                        InflationAmount >= PregnancyPlugin.InflationMaxCount.Value)
+                    float GetInflationChange()
                     {
-                        // 0 is fully on
-                        if (ChaControl.fileStatus.clothesState[(int)ChaFileDefine.ClothesKind.top] == 0)
-                            ChaControl.SetClothesStateNext((int)ChaFileDefine.ClothesKind.top);
+                        //var inflationChange = Time.deltaTime / 2 + Time.deltaTime * _inflationChange / 3;
+                        return Mathf.Max((0.1f * PregnancyPlugin.InflationSpeed.Value) * Time.deltaTime,
+                            Mathf.Abs(Time.deltaTime * (_inflationChange * PregnancyPlugin.InflationSpeed.Value) / 4));
+                    }
+
+                    if (_inflationChange > 0.05f)
+                    {
+                        _inflationChange = Mathf.Max(0, _inflationChange - GetInflationChange());
+                    }
+                    else if (_inflationChange < -0.05f)
+                    {
+                        _inflationChange = Mathf.Min(0, _inflationChange + GetInflationChange());
+
+                        if (PregnancyPlugin.InflationOpenClothAtMax.Value &&
+                            InflationAmount >= PregnancyPlugin.InflationMaxCount.Value)
+                        {
+                            // 0 is fully on
+                            if (ChaControl.fileStatus.clothesState[(int)ChaFileDefine.ClothesKind.top] == 0)
+                                ChaControl.SetClothesStateNext((int)ChaFileDefine.ClothesKind.top);
+                        }
                     }
                 }
-            }
-            else
-            {
-                _inflationChange = 0;
-                _inflationAmount = 0;
+                else
+                {
+                    _inflationChange = 0;
+                    _inflationAmount = 0;
+                }
             }
         }
 
