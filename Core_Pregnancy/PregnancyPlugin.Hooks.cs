@@ -28,10 +28,12 @@ namespace KK_Pregnancy
                 #endif
             }
 
+            private static bool _lastPullProc;
+
             #region Custom safe day schedule
 
             #if KK
-                private static SaveData.Heroine _lastHeroine;
+                private static SaveData.Heroine _lastHeroine;                
                 private static byte[] _menstruationsBackup;
 
             
@@ -228,6 +230,26 @@ namespace KK_Pregnancy
                         var controller = GetEffectController(heroine);
                         controller.DrainInflation(Mathf.Max(3, Mathf.CeilToInt(InflationMaxCount.Value / 2.2f)));
                     }                        
+                }
+
+
+                //pulling out
+                [HarmonyPrefix]
+                [HarmonyPatch(typeof(Sonyu), "PullProc", typeof(float), typeof(int))]
+                public static void Sonyu_PullProc(Sonyu __instance)
+                {                    
+                    //Get current inserted state
+                    var ctrlFlag = Traverse.Create(__instance).Field("ctrlFlag").GetValue<HSceneFlagCtrl>();                                    
+                    PregnancyPlugin.Logger.LogDebug($"Preg - PullProc {ctrlFlag.isInsert}");
+
+                    if (ctrlFlag.isInsert && _lastPullProc != ctrlFlag.isInsert)
+                    {
+                        var heroine = GetLeadHeroine();
+                        var controller = GetEffectController(heroine);
+                        controller.DrainInflation(Mathf.Max(3, Mathf.CeilToInt(InflationMaxCount.Value / 2.2f)));
+                    }
+
+                    _lastPullProc = ctrlFlag.isInsert;                   
                 }
                 
 
