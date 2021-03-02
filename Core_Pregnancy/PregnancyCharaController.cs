@@ -46,8 +46,7 @@ namespace KK_Pregnancy
             var data = GetExtendedData();
             Data = PregnancyData.Load(data) ?? new PregnancyData();
 
-            PregnancyPlugin.Logger.LogDebug($"Preg - ReadData week {Data.Week} {ChaControl.name}");
-            PregnancyPlugin.Logger.LogDebug($"Preg - ReadData IsPregnant {Data.IsPregnant}");
+            // PregnancyPlugin.Logger.LogDebug($"Preg - ReadData week {Data.Week} {ChaControl.name}");
 
             #if KK
                 if (!CanGetDangerousDays())

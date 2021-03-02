@@ -63,7 +63,7 @@ namespace KK_Pregnancy
             protected override void OnStartH(HScene proc, bool freeH)
             {
                 InsideHScene = true;
-                // proc.gameObject.AddComponent<LactationController>(); //TODO  
+                // proc.gameObject.AddComponent<LactationController>(); //Add later  
             }
 
         #endif
@@ -112,7 +112,7 @@ namespace KK_Pregnancy
             protected override void OnEndH(HScene proc, bool freeH)
             {
                 InsideHScene = false;
-                // Destroy(proc.GetComponent<LactationController>()); //TODO
+                // Destroy(proc.GetComponent<LactationController>()); //Add later
 
                 // Figure out if conception happened at end of h scene
                 var heroine = Manager.HSceneManager.Instance?.Agent[0]?.AgentData;
@@ -136,8 +136,12 @@ namespace KK_Pregnancy
                     var wonAChild = winThreshold >= childLottery;
                     if (wonAChild)
                     {
-                        PregnancyPlugin.Logger.LogDebug("Preg - child lottery won, pregnancy will start");
+                        // PregnancyPlugin.Logger.LogDebug("Preg - child lottery won, pregnancy will start");                        
+                        //In AI we have to immediately set the preg state, or we lose it if the user saves and exits before PeriodChange
                         _startedPregnancies.Add(heroine);
+                        ProcessPendingChanges();
+                        //Keep charaCtrl's copy in sync
+                        controller.Data.StartPregnancy();
                     }
                 }
             }
@@ -249,14 +253,13 @@ namespace KK_Pregnancy
                 {                   
                     ApplyToDatas(heroine);                    
                 }
-                // ApplyToDatas(Singleton<Map>.Instance.Player.AgentPartner.AgentData);  TODO find male AgentData
+                // ApplyToDatas(Singleton<Map>.Instance.Player.AgentPartner.AgentData);  TODO find male AgentData, if we want to match what KK is now doing
 
                 // If controller exists then update its state so it gets any pregnancy week updates
                 foreach (var controller in FindObjectsOfType<PregnancyCharaController>())
                     controller.ReadData();
             }
 
-            //TODO should add to AIAPI
             private static List<AgentData> GetHeroineList()
             {
                 var heroineList = new List<AgentData>();
@@ -315,7 +318,7 @@ namespace KK_Pregnancy
 
                 #endif
 
-                PregnancyPlugin.Logger.LogDebug($"Preg - pregnancy week is now {pd.Week}");
+                // PregnancyPlugin.Logger.LogDebug($"Preg - pregnancy week is now {pd.Week}");
             }
             else if (pd.PregnancyCount > 0)
             {

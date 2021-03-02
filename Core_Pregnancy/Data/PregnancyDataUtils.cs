@@ -123,7 +123,6 @@ namespace KK_Pregnancy
                     .OrderByDescending(x => x.PregnancyCount)
                     .ThenByDescending(x => x.WeeksSinceLastPregnancy)
                     .ThenByDescending(x => x.Week)
-                    // .ThenByDescending(x => x.MenstruationSchedule) //TODO
                     .ThenByDescending(x => x.GameplayEnabled)
                     .FirstOrDefault() ?? new PregnancyData();
             }
@@ -133,41 +132,29 @@ namespace KK_Pregnancy
                 if (heroine == null) return HeroineStatus.Unknown;
 
                 if (pregData == null) pregData = heroine.GetPregnancyData();
-
-                //TODO
-                // Check if she wants to tell
-                // if (heroine.intimacy >= 80 ||
-                //     heroine.hCount >= 5 ||
-                //     heroine.parameter.attribute.bitch && heroine.favor > 50 ||
-                //     (heroine.isGirlfriend || heroine.favor >= 90) &&
-                //     (!heroine.isVirgin || heroine.hCount >= 2 || heroine.intimacy >= 40))
-                // {
-                    var pregnancyWeek = pregData.Week;
-                    if (pregnancyWeek > 0)
+                
+                //Always risky in AI for now
+                var pregnancyWeek = pregData.Week;
+                if (pregnancyWeek > 0)
+                {
+                    if (PregnancyPlugin.ShowPregnancyIconEarly.Value) return HeroineStatus.Pregnant;
+                    // Different personalities notice at different times
+                    if (_earlyDetectPersonalities.Contains(heroine.GetNPC().ChaControl.fileParam.personality))
                     {
-                        if (pregnancyWeek >= PregnancyData.LeaveSchoolWeek) return HeroineStatus.OnLeave;
-                        if (PregnancyPlugin.ShowPregnancyIconEarly.Value) return HeroineStatus.Pregnant;
-                        // Different personalities notice at different times
-                        if (_earlyDetectPersonalities.Contains(heroine.GetNPC().ChaControl.fileParam.personality))
-                        {
-                            if (pregnancyWeek > 1) return HeroineStatus.Pregnant;
-                        }
-                        else if (_lateDetectPersonalities.Contains(heroine.GetNPC().ChaControl.fileParam.personality))
-                        {
-                            if (pregnancyWeek > 11) return HeroineStatus.Pregnant;
-                        }
-                        else
-                        {
-                            if (pregnancyWeek > 5) return HeroineStatus.Pregnant;
-                        }
+                        if (pregnancyWeek > 1) return HeroineStatus.Pregnant;
                     }
+                    else if (_lateDetectPersonalities.Contains(heroine.GetNPC().ChaControl.fileParam.personality))
+                    {
+                        if (pregnancyWeek > 11) return HeroineStatus.Pregnant;
+                    }
+                    else
+                    {
+                        if (pregnancyWeek > 5) return HeroineStatus.Pregnant;
+                    }
+                }
 
-                    //TODO  use random chance?
-                    return HeroineStatus.Risky;
-
-                // }
-
-                // return HeroineStatus.Unknown;
+                return HeroineStatus.Risky;
+                                
             }
         #endif
         

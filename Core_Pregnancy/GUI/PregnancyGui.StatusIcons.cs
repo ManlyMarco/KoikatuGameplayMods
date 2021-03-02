@@ -150,7 +150,7 @@ namespace KK_Pregnancy
                 private static void StatusUI_RefreshAgentContent(StatusUI __instance, int id)
                 {
 
-                    PregnancyPlugin.Logger.LogDebug("Preg - StatusUI_RefreshAgentContent");
+                    // PregnancyPlugin.Logger.LogDebug("Preg - StatusUI_RefreshAgentContent");
                     var objImageRoot = Traverse.Create(__instance).Field("_cardRawImage").GetValue<RawImage>();
                     if (objImageRoot == null) return;
 

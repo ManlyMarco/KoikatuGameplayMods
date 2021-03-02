@@ -216,7 +216,7 @@ namespace KK_Pregnancy
                         || ctrlFlag.click == HSceneFlagCtrl.ClickKind.FinishSame  
                         || ctrlFlag.click == HSceneFlagCtrl.ClickKind.FinishDrink ) 
                     {
-                        PregnancyPlugin.Logger.LogDebug($"Preg - Proc {ctrlFlag.click}");
+                        // PregnancyPlugin.Logger.LogDebug($"Preg - Proc {ctrlFlag.click}");
                         var heroine = GetLeadHeroine();
                         var controller = GetEffectController(heroine);
                         controller.AddInflation(1);                    
@@ -225,7 +225,7 @@ namespace KK_Pregnancy
                     else if (ctrlFlag.click == HSceneFlagCtrl.ClickKind.FinishOutSide 
                         || ctrlFlag.click == HSceneFlagCtrl.ClickKind.FinishVomit) 
                     {
-                        PregnancyPlugin.Logger.LogDebug($"Preg - Proc {ctrlFlag.click}");
+                        // PregnancyPlugin.Logger.LogDebug($"Preg - Proc {ctrlFlag.click}");
                         var heroine = GetLeadHeroine();
                         var controller = GetEffectController(heroine);
                         controller.DrainInflation(Mathf.Max(3, Mathf.CeilToInt(InflationMaxCount.Value / 2.2f)));
@@ -240,7 +240,7 @@ namespace KK_Pregnancy
                 {                    
                     //Get current inserted state
                     var ctrlFlag = Traverse.Create(__instance).Field("ctrlFlag").GetValue<HSceneFlagCtrl>();                                    
-                    PregnancyPlugin.Logger.LogDebug($"Preg - PullProc {ctrlFlag.isInsert}");
+                    // PregnancyPlugin.Logger.LogDebug($"Preg - PullProc {ctrlFlag.isInsert}");
 
                     if (ctrlFlag.isInsert && _lastPullProc != ctrlFlag.isInsert)
                     {
