@@ -21,6 +21,21 @@ namespace KK_LewdCrestX
         private static readonly HashSet<SaveData.Heroine> _tempPreggers = new HashSet<SaveData.Heroine>();
         private List<LewdCrestXController> _existingControllers;
 
+        private readonly Dictionary<SaveData.Heroine, float> _actionCooldowns = new Dictionary<SaveData.Heroine, float>();
+
+        private void SetActionCooldown(SaveData.Heroine heroine, int seconds)
+        {
+            _actionCooldowns[heroine] = seconds;
+        }
+
+        private float AdvanceAndGetActionCooldown(SaveData.Heroine heroine)
+        {
+            _actionCooldowns.TryGetValue(heroine, out var timeLeft);
+            timeLeft = Mathf.Max(0, timeLeft - Time.deltaTime);
+            _actionCooldowns[heroine] = timeLeft;
+            return timeLeft;
+        }
+
         public static void ApplyTempPreggers(SaveData.Heroine heroine)
         {
             if (_tempPreggers.Add(heroine))
@@ -83,6 +98,8 @@ namespace KK_LewdCrestX
 
         private void Update()
         {
+            if (Manager.Scene.Instance.IsNowLoadingFade) return;
+
             if (_hSceneHeroines != null)
             {
                 var speed = _hSceneProc.flags.IsSonyu() && _hSceneProc.flags.speedCalc > 0.7f
@@ -110,13 +127,32 @@ namespace KK_LewdCrestX
                         var player = actScene.Player;
                         if (player == null) continue;
 
-                        if (player.chaser == null)
+                        var heroine = controller.Heroine;
+                        var timeLeft = AdvanceAndGetActionCooldown(heroine);
+                        if (timeLeft <= 0)
                         {
-                            var npc = controller.Heroine.GetNPC();
+                            SetActionCooldown(heroine, 3);
+                            var npc = heroine.GetNPC();
                             if (player.mapNo == npc.mapNo)
                             {
-                                LewdCrestXPlugin.Logger.LogInfo("Chasing player because of mantraction crest: " + controller.Heroine.charFile?.parameter?.fullname);
-                                player.ChaserSet(npc);
+                                if (Vector3.Distance(player.position, npc.position) > 3)
+                                {
+                                    LewdCrestXPlugin.Logger.LogInfo("Chasing player because of mantraction crest: " + controller.Heroine.charFile?.parameter?.fullname);
+                                    npc.ItemClear();
+                                    npc.AI.ChaseAction();
+                                    SetActionCooldown(heroine, 10);
+                                }
+                            }
+                            else
+                            {
+                                if (npc.AI.actionNo == 23) // 23 - chase action
+                                {
+                                    LewdCrestXPlugin.Logger.LogDebug("Stopping NPC from chasing because of mantraction crest: " + controller.Heroine.charFile?.parameter?.fullname);
+                                    npc.AI.Reset(true);
+                                    npc.AI.FirstAction();
+                                    npc.AI.Start();
+                                    SetActionCooldown(heroine, 10);
+                                }
                             }
                         }
                     }
