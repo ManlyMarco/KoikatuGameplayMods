@@ -5,6 +5,7 @@ using ExtensibleSaveFormat;
 #if KK
     using ActionGame;    
 #endif
+using KKAPI.Chara;
 using KKAPI.MainGame;
 using Manager;
 using UnityEngine;
@@ -47,6 +48,21 @@ namespace KK_Pregnancy
                 // 1 day = 1 week in AI
                 // At start of each week increase pregnancy week counters of all pregnant characters
                 ApplyToAllDatas((heroine, data) => AddPregnancyWeek(data));
+                SetCharsDangerousDay();
+            }
+
+            //In AI we set Dangerous day by 20% chance on any new day
+            private void SetCharsDangerousDay()
+            {
+                var handlers = CharacterApi.GetRegisteredBehaviour(PregnancyPlugin.GUID);
+                var random = new System.Random();
+        
+                foreach (PregnancyCharaController charCustFunCtrl in handlers.Instances)
+                {                 
+                    //Set each characters risky day randomly
+                    charCustFunCtrl.isDangerousDay = random.Next(0, 100) <= 20;          
+                    PregnancyPlugin.Logger.LogDebug($"Preg - isDangerousDay {charCustFunCtrl.isDangerousDay}  {charCustFunCtrl.ChaControl.name}");          
+                } 
             }
 
         #endif        
@@ -79,7 +95,7 @@ namespace KK_Pregnancy
                 // bug Don't know which character is which
                 if (proc.flags.mode == HFlag.EMode.houshi3P || proc.flags.mode == HFlag.EMode.sonyu3P) return;
 
-                var heroine = proc. flags.lstHeroine.First(x => x != null);
+                var heroine = proc.flags.lstHeroine.First(x => x != null);
                 var isDangerousDay = HFlag.GetMenstruation(heroine.MenstruationDay) == HFlag.MenstruationType.危険日;
                 if (!isDangerousDay) return;
 
@@ -118,13 +134,16 @@ namespace KK_Pregnancy
                 var heroine = Manager.HSceneManager.Instance?.Agent[0]?.AgentData;
                 if (heroine == null) return;
 
+                var controller = heroine.GetNPC().ChaControl.GetComponent<PregnancyCharaController>();
+                if (controller == null) throw new ArgumentNullException(nameof(controller));
+
+                //In AI see if the current day is a risky day
+                if (!controller.isDangerousDay) return;
+
                 var cameInside = PregnancyPlugin.ConceptionEnabled.Value && proc.ctrlFlag.numInside > 0;
                 var cameInsideAnal = PregnancyPlugin.AnalConceptionEnabled.Value && proc.ctrlFlag.numAnal > 0;
                 if (cameInside || cameInsideAnal)
                 {
-                    var controller = heroine.GetNPC().ChaControl.GetComponent<PregnancyCharaController>();
-                    if (controller == null) throw new ArgumentNullException(nameof(controller));
-
                     //Allow pregnancy if enabled, or overridden, and is not currently pregnant
                     if (!controller.Data.GameplayEnabled || controller.Data.IsPregnant) return;
 
@@ -136,7 +155,7 @@ namespace KK_Pregnancy
                     var wonAChild = winThreshold >= childLottery;
                     if (wonAChild)
                     {
-                        // PregnancyPlugin.Logger.LogDebug("Preg - child lottery won, pregnancy will start");                        
+                        PregnancyPlugin.Logger.LogDebug("Preg - child lottery won, pregnancy will start");                        
                         //In AI we have to immediately set the preg state, or we lose it if the user saves and exits before PeriodChange
                         _startedPregnancies.Add(heroine);
                         ProcessPendingChanges();

@@ -8,6 +8,7 @@ using KKAPI.MainGame;
     using AIChara;
     using AIProject;
     using AIProject.SaveData;
+    using AIProject.Definitions;
 #endif
 
 namespace KK_Pregnancy
@@ -130,31 +131,43 @@ namespace KK_Pregnancy
             public static HeroineStatus GetHeroineStatus(this AgentData heroine, PregnancyData pregData = null)
             {
                 if (heroine == null) return HeroineStatus.Unknown;
-
                 if (pregData == null) pregData = heroine.GetPregnancyData();
                 
-                //Always risky in AI for now
-                var pregnancyWeek = pregData.Week;
-                if (pregnancyWeek > 0)
+                // Check if she wants to tell
+                if (heroine.SickState.ID == AIProject.Definitions.Sickness.GoodHealthID && !heroine.IsWet && 
+                    ( heroine.GetNPC().ChaControl.fileGameInfo.phase > 2 
+                      || heroine.StatsTable[(int)Status.Type.Mood] > 95 
+                      || heroine.StatsTable[(int)Status.Type.Immoral] > 95 
+                      || heroine.StatsTable[(int)Status.Type.Motivation] > 140 ))
                 {
-                    if (PregnancyPlugin.ShowPregnancyIconEarly.Value) return HeroineStatus.Pregnant;
-                    // Different personalities notice at different times
-                    if (_earlyDetectPersonalities.Contains(heroine.GetNPC().ChaControl.fileParam.personality))
-                    {
-                        if (pregnancyWeek > 1) return HeroineStatus.Pregnant;
-                    }
-                    else if (_lateDetectPersonalities.Contains(heroine.GetNPC().ChaControl.fileParam.personality))
-                    {
-                        if (pregnancyWeek > 11) return HeroineStatus.Pregnant;
-                    }
-                    else
-                    {
-                        if (pregnancyWeek > 5) return HeroineStatus.Pregnant;
-                    }
-                }
 
-                return HeroineStatus.Risky;
-                                
+                    var pregnancyWeek = pregData.Week;
+                    if (pregnancyWeek > 0)
+                    {
+                        if (PregnancyPlugin.ShowPregnancyIconEarly.Value) return HeroineStatus.Pregnant;
+                        // Different personalities notice at different times
+                        if (_earlyDetectPersonalities.Contains(heroine.GetNPC().ChaControl.fileParam.personality))
+                        {
+                            if (pregnancyWeek > 1) return HeroineStatus.Pregnant;
+                        }
+                        else if (_lateDetectPersonalities.Contains(heroine.GetNPC().ChaControl.fileParam.personality))
+                        {
+                            if (pregnancyWeek > 11) return HeroineStatus.Pregnant;
+                        }
+                        else
+                        {
+                            if (pregnancyWeek > 5) return HeroineStatus.Pregnant;
+                        }
+                    }
+
+                    var pregCharCtrl = heroine.GetNPC().ChaControl.GetComponent<PregnancyCharaController>();
+                    return !pregCharCtrl.isDangerousDay
+                        ? HeroineStatus.Safe
+                        : HeroineStatus.Risky;
+                }     
+
+                return HeroineStatus.Unknown;  
+
             }
         #endif
         

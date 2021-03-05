@@ -15,6 +15,11 @@ namespace KK_Pregnancy
         private readonly PregnancyBoneEffect _boneEffect;
         public PregnancyData Data { get; private set; }
 
+        #if AI
+            //Set by game controller by random chance each day    
+            public bool isDangerousDay = new System.Random().Next(0, 100) <= 20;
+        #endif
+
         public PregnancyCharaController()
         {
             Data = new PregnancyData();
