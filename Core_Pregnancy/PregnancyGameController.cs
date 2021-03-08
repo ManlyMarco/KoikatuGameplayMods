@@ -48,20 +48,58 @@ namespace KK_Pregnancy
                 // 1 day = 1 week in AI
                 // At start of each week increase pregnancy week counters of all pregnant characters
                 ApplyToAllDatas((heroine, data) => AddPregnancyWeek(data));
-                SetCharsDangerousDay();
+                SetCharsDangerousDay(day);
             }
 
             //In AI we set Dangerous day by 20% chance on any new day
-            private void SetCharsDangerousDay()
+            private void SetCharsDangerousDay(int day)
             {
                 var handlers = CharacterApi.GetRegisteredBehaviour(PregnancyPlugin.GUID);
                 var random = new System.Random();
         
                 foreach (PregnancyCharaController charCustFunCtrl in handlers.Instances)
-                {                 
+                {              
+                    //Check always or never risky settings
+                    if (charCustFunCtrl.Data.MenstruationSchedule == MenstruationSchedule.AlwaysSafe)
+                    {
+                        charCustFunCtrl.Data.StopMenstration();  
+                        charCustFunCtrl.isDangerousDay = false;
+                        charCustFunCtrl.SetExtendedData(charCustFunCtrl.Data.Save());
+                        continue;
+                    }                                          
+                    if (charCustFunCtrl.Data.MenstruationSchedule == MenstruationSchedule.AlwaysRisky)         
+                    {
+                        charCustFunCtrl.Data.StartMenstration(day);   
+                        charCustFunCtrl.isDangerousDay = true;
+                        charCustFunCtrl.SetExtendedData(charCustFunCtrl.Data.Save());
+                        continue;
+                    }                                   
+
+                    //If already menstrating then check if it should end
+                    if (charCustFunCtrl.Data.MenstrationStartDay > -1)
+                    {
+                        var daysSinceStart = day - charCustFunCtrl.Data.MenstrationStartDay;
+                        var totalDaysAllowed = charCustFunCtrl.Data.MenstruationSchedule == MenstruationSchedule.Default ? 2 : 3;
+
+                        //Stop menstration when x days passed based on the menstration schedule
+                        if (daysSinceStart >= totalDaysAllowed)
+                        {
+                            charCustFunCtrl.Data.StopMenstration();
+                            charCustFunCtrl.isDangerousDay = false;
+                            charCustFunCtrl.SetExtendedData(charCustFunCtrl.Data.Save());
+                        }
+
+                        continue;
+                    }
+
                     //Set each characters risky day randomly
-                    charCustFunCtrl.isDangerousDay = random.Next(0, 100) <= 20;          
-                    PregnancyPlugin.Logger.LogDebug($"Preg - isDangerousDay {charCustFunCtrl.isDangerousDay}  {charCustFunCtrl.ChaControl.name}");          
+                    if (random.Next(0, 100) <= 20)
+                    {
+                        charCustFunCtrl.Data.StartMenstration(day);  
+                        charCustFunCtrl.isDangerousDay = true;
+                        charCustFunCtrl.SetExtendedData(charCustFunCtrl.Data.Save());
+                        // PregnancyPlugin.Logger.LogDebug($"Preg - StartMenstration {charCustFunCtrl.isDangerousDay}  {charCustFunCtrl.ChaControl.name}");
+                    }                              
                 } 
             }
 
@@ -155,7 +193,7 @@ namespace KK_Pregnancy
                     var wonAChild = winThreshold >= childLottery;
                     if (wonAChild)
                     {
-                        PregnancyPlugin.Logger.LogDebug("Preg - child lottery won, pregnancy will start");                        
+                        // PregnancyPlugin.Logger.LogDebug("Preg - child lottery won, pregnancy will start");                        
                         //In AI we have to immediately set the preg state, or we lose it if the user saves and exits before PeriodChange
                         _startedPregnancies.Add(heroine);
                         ProcessPendingChanges();

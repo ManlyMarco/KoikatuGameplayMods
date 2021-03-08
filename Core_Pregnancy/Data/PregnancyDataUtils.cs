@@ -132,10 +132,13 @@ namespace KK_Pregnancy
             {
                 if (heroine == null) return HeroineStatus.Unknown;
                 if (pregData == null) pregData = heroine.GetPregnancyData();
+
+                var chaControl = heroine.GetNPC()?.ChaControl;
+                if (chaControl == null) return HeroineStatus.Unknown;
                 
                 // Check if she wants to tell
                 if (heroine.SickState.ID == AIProject.Definitions.Sickness.GoodHealthID && !heroine.IsWet && 
-                    ( heroine.GetNPC().ChaControl.fileGameInfo.phase > 2 
+                    ( chaControl.fileGameInfo.phase > 2 
                       || heroine.StatsTable[(int)Status.Type.Mood] > 95 
                       || heroine.StatsTable[(int)Status.Type.Immoral] > 95 
                       || heroine.StatsTable[(int)Status.Type.Motivation] > 140 ))
@@ -146,11 +149,11 @@ namespace KK_Pregnancy
                     {
                         if (PregnancyPlugin.ShowPregnancyIconEarly.Value) return HeroineStatus.Pregnant;
                         // Different personalities notice at different times
-                        if (_earlyDetectPersonalities.Contains(heroine.GetNPC().ChaControl.fileParam.personality))
+                        if (_earlyDetectPersonalities.Contains(chaControl.fileParam.personality))
                         {
                             if (pregnancyWeek > 1) return HeroineStatus.Pregnant;
                         }
-                        else if (_lateDetectPersonalities.Contains(heroine.GetNPC().ChaControl.fileParam.personality))
+                        else if (_lateDetectPersonalities.Contains(chaControl.fileParam.personality))
                         {
                             if (pregnancyWeek > 11) return HeroineStatus.Pregnant;
                         }
@@ -160,7 +163,7 @@ namespace KK_Pregnancy
                         }
                     }
 
-                    var pregCharCtrl = heroine.GetNPC().ChaControl.GetComponent<PregnancyCharaController>();
+                    var pregCharCtrl = chaControl.GetComponent<PregnancyCharaController>();
                     return !pregCharCtrl.isDangerousDay
                         ? HeroineStatus.Safe
                         : HeroineStatus.Risky;

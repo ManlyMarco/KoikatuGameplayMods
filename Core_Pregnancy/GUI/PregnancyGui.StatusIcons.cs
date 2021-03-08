@@ -483,12 +483,13 @@ namespace KK_Pregnancy
             #elif AI
 
                  private static void AddPregIcon(Transform pregIconTransform, AgentData heroine)
-                {
+                {                    
                     var image = pregIconTransform.GetComponent<Image>();
 
                     _currentHeroine.Add(new KeyValuePair<AgentData, RectTransform>(heroine, image.GetComponent<RectTransform>()));
 
-                    switch (heroine.GetHeroineStatus(heroine.GetPregnancyData()))
+                    var status = heroine.GetHeroineStatus(heroine.GetPregnancyData());
+                    switch (status)
                     {
                         case HeroineStatus.Unknown:
                             image.sprite = _unknownSprite;
