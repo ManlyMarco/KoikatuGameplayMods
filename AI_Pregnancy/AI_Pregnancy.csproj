@@ -1,0 +1,128 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{930A00A6-2935-4EA0-81F0-C16D3E71B74C}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>KK_Pregnancy</RootNamespace>
+    <AssemblyName>AI_Pregnancy</AssemblyName>
+    <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>embedded</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>..\bin\BepInEx\plugins\</OutputPath>
+    <DefineConstants>TRACE;DEBUG;AI</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>embedded</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>..\bin\BepInEx\plugins\</OutputPath>
+    <DefineConstants>TRACE;AI</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <DebugSymbols>true</DebugSymbols>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="0Harmony,  Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\packages\IllusionLibs.BepInEx.Harmony.2.2.0.1\lib\net35\0Harmony.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Assembly-CSharp,  Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\IllusionLibs.AIGirl.Assembly-CSharp.2020.5.29.2\lib\net46\Assembly-CSharp.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="BepInEx,  Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\IllusionLibs.BepInEx.5.4.4\lib\net35\BepInEx.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="BepInEx.Harmony,  Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\IllusionLibs.BepInEx.Harmony.2.0.3.1\lib\net35\BepInEx.Harmony.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AI_ExtensibleSaveFormat,  Culture=neutral, processorArchitecture=MSIL" >
+      <HintPath>..\packages\ExtensibleSaveFormat.AIGirl.16.2.0.2\lib\net46\AI_ExtensibleSaveFormat.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AIABMX,  Culture=neutral, processorArchitecture=MSIL" >
+      <HintPath>..\packages\ABMX.AIABMX.4.4.1\lib\net46\AIABMX.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="AIAPI,  Culture=neutral, processorArchitecture=MSIL" >
+      <HintPath>..\packages\IllusionModdingAPI.AIAPI.1.15.0\lib\net46\AIAPI.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="Sirenix.Serialization,   Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\IllusionLibs.AIGirl.Sirenix.Serialization.2020.5.29.2\lib\net46\Sirenix.Serialization.dll</HintPath>
+      <SpecificVersion>False</SpecificVersion>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UniRx,  Culture=neutral, processorArchitecture=MSIL" >
+      <HintPath>..\packages\IllusionLibs.AIGirl.UniRx.2020.5.29.2\lib\net46\UniRx.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine,  Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\IllusionLibs.AIGirl.UnityEngine.CoreModule.2018.2.21.3\lib\net46\UnityEngine.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.CoreModule,  Culture=neutral, processorArchitecture=MSIL" >
+      <HintPath>..\packages\IllusionLibs.AIGirl.UnityEngine.CoreModule.2018.2.21.3\lib\net46\UnityEngine.CoreModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.UI,  Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\IllusionLibs.AIGirl.UnityEngine.UI.2018.2.21.3\lib\net46\UnityEngine.UI.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.IMGUIModule,  Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\IllusionLibs.AIGirl.UnityEngine.IMGUIModule.2018.2.21.3\lib\net46\UnityEngine.IMGUIModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+    <Reference Include="UnityEngine.ImageConversionModule,  Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\IllusionLibs.AIGirl.UnityEngine.ImageConversionModule.2018.2.21.3\lib\net46\UnityEngine.ImageConversionModule.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="..\Core_Pregnancy\Data\HeroineStatus.cs" />
+    <!-- <Compile Include="..\Core_Pregnancy\LactationController.cs" /> -->
+    <Compile Include="..\Core_Pregnancy\Data\MenstruationSchedule.cs" />
+    <Compile Include="..\Core_Pregnancy\PregnancyBoneEffect.cs" />
+    <Compile Include="..\Core_Pregnancy\PregnancyCharaController.cs" />
+    <Compile Include="..\Core_Pregnancy\Data\PregnancyData.cs" />
+    <Compile Include="..\Core_Pregnancy\Data\PregnancyDataUtils.cs" />
+    <Compile Include="..\Core_Pregnancy\PregnancyGameController.cs" />
+    <Compile Include="..\Core_Pregnancy\GUI\PregnancyGui.cs" />
+    <!-- <Compile Include="..\Core_Pregnancy\GUI\PregnancyGui.HSceneMenstrIconOverride.cs" /> -->
+    <Compile Include="..\Core_Pregnancy\GUI\PregnancyGui.StatusIcons.cs" />
+    <Compile Include="..\Core_Pregnancy\PregnancyPlugin.cs" />
+    <Compile Include="..\Core_Pregnancy\PregnancyPlugin.Hooks.cs" />
+    <Compile Include="..\Core_Pregnancy\Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\Core_Pregnancy\Resources\leave.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\Core_Pregnancy\Resources\pregnant.png" />
+    <EmbeddedResource Include="..\Core_Pregnancy\Resources\risky.png" />
+    <EmbeddedResource Include="..\Core_Pregnancy\Resources\safe.png" />
+    <EmbeddedResource Include="..\Core_Pregnancy\Resources\unknown.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+</Project>

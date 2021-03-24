@@ -33,6 +33,13 @@ namespace KK_Pregnancy
 
         public MenstruationSchedule MenstruationSchedule = MenstruationSchedule.Default;
 
+        #if AI
+            /// <summary>
+            /// The first day that menstraion started in AI
+            /// </summary>
+            public int MenstrationStartDay = -1;
+        #endif
+
         /// <summary>
         /// If 0 or negative, the character is not pregant.
         /// If between 0 and <see cref="LeaveSchoolWeek"/> the character is pregant and the belly is proportionately sized.
@@ -118,5 +125,20 @@ namespace KK_Pregnancy
                 WeeksSinceLastPregnancy = 0;
             }
         }
+
+        #if AI
+            public void StartMenstration(int currentDay)
+            {
+                if (!IsPregnant)
+                {
+                    MenstrationStartDay = currentDay;                    
+                }
+            }
+
+            public void StopMenstration()
+            {
+                MenstrationStartDay = -1;
+            }
+        #endif
     }
 }
