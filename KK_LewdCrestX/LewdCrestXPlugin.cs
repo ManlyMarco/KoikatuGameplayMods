@@ -36,7 +36,7 @@ namespace KK_LewdCrestX
         public const string Version = "1.0.2";
 
         public static Dictionary<CrestType, CrestInfo> CrestInfos { get; } = new Dictionary<CrestType, CrestInfo>();
-        
+
         internal static new ManualLogSource Logger;
         internal static AssetBundle Bundle;
         internal static Type SkinEffectsType;
@@ -75,7 +75,7 @@ namespace KK_LewdCrestX
                 var effType = Type.GetType("KK_SkinEffects.SkinEffectsController, KK_SkinEffects", false);
                 if (effType != null)
                     SkinEffectsType = effType;
-                else 
+                else
                     Logger.LogWarning("Could not find KK_SkinEffects.SkinEffectsController, some features might not work until you install KK_SkinEffects (please report this if you do have latest version of KK_SkinEffects installed)");
 
 
@@ -164,6 +164,9 @@ namespace KK_LewdCrestX
                 dropdownControl.BindToFunctionController<LewdCrestXController, int>(
                     controller => list.GetIndex(controller.CurrentCrest),
                     (controller, value) => controller.CurrentCrest = list.GetType(value));
+
+                e.AddControl(new MakerToggle(category, "Hide crest graphic", this))
+                    .BindToFunctionController<LewdCrestXController, bool>(controller => controller.HideCrestGraphic, (controller, value) => controller.HideCrestGraphic = value);
 
                 _descTxtControl = e.AddControl(new MakerText("Description", category, this));
                 var implementedTxtControl = e.AddControl(new MakerText("", category, this));

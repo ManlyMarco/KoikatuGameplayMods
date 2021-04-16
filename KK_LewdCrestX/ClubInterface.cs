@@ -13,7 +13,7 @@ namespace KK_LewdCrestX
     {
         private static GUIStyle _btnStyleDeselected, _btnStyleSelected;
 
-        private static Rect _screenRect,_windowRect;
+        private static Rect _screenRect, _windowRect;
         private static Vector2 _scrollPos1, _scrollPos2;
         private static int _rowCount = 3;
         private static int _charaListWidth = 380;
@@ -21,15 +21,15 @@ namespace KK_LewdCrestX
 
         private static List<HeroineData> _crestableHeroines;
         private static CrestInterfaceList _crestlist;
-        
+
         private static int _selHeroine;
         private static int _selCrest;
 
         private static bool _mouseDown;
-        
+
         private static bool _showWindow;
         private static bool _showOnlyImplemented;
-        
+
         public static bool ShowWindow
         {
             get => _showWindow;
@@ -52,7 +52,7 @@ namespace KK_LewdCrestX
                         const int windowHeight = 530;
                         _windowRect = new Rect((_screenRect.width - windowWidth) / 2,
                             (_screenRect.height - windowHeight) / 2, windowWidth, windowHeight);
-                        
+
                         if (_crestableHeroines != null)
                         {
                             foreach (var heroine in _crestableHeroines)
@@ -146,6 +146,9 @@ namespace KK_LewdCrestX
 
         private static void DrawColumns()
         {
+            var selectedHeroine = _crestableHeroines[_selHeroine];
+            var selectedController = selectedHeroine.Controller;
+
             GUILayout.BeginHorizontal();
             {
                 // Left column ----------------------------------------------------------------------------------------
@@ -187,7 +190,7 @@ namespace KK_LewdCrestX
                                     if (ClickedInsideLastElement())
                                     {
                                         _selHeroine = i;
-                                        _selCrest = _crestlist.GetIndex(_crestableHeroines[_selHeroine].Controller.CurrentCrest);
+                                        _selCrest = _crestlist.GetIndex(selectedController.CurrentCrest);
                                     }
                                 }
                                 GUILayout.EndHorizontal();
@@ -225,7 +228,7 @@ namespace KK_LewdCrestX
                             _selCrest = GUILayout.SelectionGrid(_selCrest, _crestlist.GetInterfaceNames(), 3, _btnStyleDeselected, GUILayout.ExpandWidth(true));
                             if (GUI.changed)
                             {
-                                _crestableHeroines[_selHeroine].Controller.CurrentCrest = _crestlist.GetType(_selCrest);
+                                selectedController.CurrentCrest = _crestlist.GetType(_selCrest);
                                 GUI.changed = false;
                             }
                         }
@@ -236,18 +239,21 @@ namespace KK_LewdCrestX
 
                     GUILayout.BeginVertical(GUI.skin.box, GUILayout.ExpandHeight(true));
                     {
-                        GUILayout.Label("Currently selected heroine: " + _crestableHeroines[_selHeroine].HeroineName);
+                        GUILayout.Label("Currently selected heroine: " + selectedHeroine.HeroineName);
                         var currentCrest = _crestlist.GetInfo(_selCrest);
                         GUILayout.Label("Currently selected crest: " + (currentCrest?.Name ?? "None"));
-                        GUILayout.Label(currentCrest != null
-                            ? "Description: " + currentCrest.Description
-                            : "No crest selected. Choose a crest on the left see its description and give it to the selected character.");
                         if (currentCrest != null)
                         {
+                            GUILayout.Label("Description: " + currentCrest.Description);
+                            selectedController.HideCrestGraphic = GUILayout.Toggle(selectedController.HideCrestGraphic, "Hide crest graphic (effect is still applied)");
                             GUILayout.FlexibleSpace();
                             GUILayout.Label(currentCrest.Implemented
                                 ? "Gameplay will be changed roughly as described."
                                 : "Only for looks and lore, it won't change gameplay.");
+                        }
+                        else
+                        {
+                            GUILayout.Label("No crest selected. Choose a crest on the left see its description and give it to the selected character.");
                         }
                     }
                     GUILayout.EndVertical();

@@ -5,17 +5,19 @@ using KKAPI;
 using KKAPI.Chara;
 using KKAPI.MainGame;
 using KoiSkinOverlayX;
-using UnityEngine;
 
 namespace KK_LewdCrestX
 {
     public class LewdCrestXController : CharaCustomFunctionController
     {
-        private CrestType _currentCrest;
+        internal SaveData.Heroine Heroine { get; private set; }
+
         private KoiSkinOverlayController _overlayCtrl;
         private BoneController _boneCtrl;
+        private bool _pauseUpdates;
 
-        internal SaveData.Heroine Heroine { get; private set; }
+        private CrestType _currentCrest;
+        private bool _hideCrestGraphic;
 
         public CrestType CurrentCrest
         {
@@ -25,7 +27,20 @@ namespace KK_LewdCrestX
                 if (_currentCrest != value)
                 {
                     _currentCrest = value;
-                    ApplyCrestTexture();
+                    if (!_pauseUpdates) ApplyCrestTexture();
+                }
+            }
+        }
+
+        public bool HideCrestGraphic
+        {
+            get => _hideCrestGraphic;
+            set
+            {
+                if (_hideCrestGraphic != value)
+                {
+                    _hideCrestGraphic = value;
+                    if (!_pauseUpdates) ApplyCrestTexture();
                 }
             }
         }
@@ -64,28 +79,24 @@ namespace KK_LewdCrestX
 
         public void SaveData()
         {
-            // todo save null if default
-            var data = new PluginData();
-            data.data[nameof(CurrentCrest)] = CurrentCrest;
-            SetExtendedData(data);
+            var data = new PluginData { version = 1 };
+
+            this.SaveToData(data, nameof(CurrentCrest), CrestType.None);
+            this.SaveToData(data, nameof(HideCrestGraphic), false);
+
+            SetExtendedData(data.data.Count > 0 ? data : null);
         }
 
         public void ReadData()
         {
-            // todo better handling
-            var data = GetExtendedData()?.data;
-            if (data != null && data.TryGetValue(nameof(CurrentCrest), out var cr))
-            {
-                try
-                {
-                    CurrentCrest = (CrestType)cr;
-                }
-                catch (Exception e)
-                {
-                    LewdCrestXPlugin.Logger.LogError(e);
-                    CurrentCrest = CrestType.None;
-                }
-            }
+            var data = GetExtendedData();
+
+            _pauseUpdates = true;
+            this.ReadFromData(data, nameof(CurrentCrest), CrestType.None);
+            this.ReadFromData(data, nameof(HideCrestGraphic), false);//todo implement in ui and test savingloading
+            _pauseUpdates = false;
+
+            ApplyCrestTexture();
         }
 
         private void ApplyCrestTexture()
@@ -97,7 +108,7 @@ namespace KK_LewdCrestX
 
             if (CurrentCrest > CrestType.None)
             {
-                if (LewdCrestXPlugin.CrestInfos.TryGetValue(CurrentCrest, out var info))
+                if (!HideCrestGraphic && LewdCrestXPlugin.CrestInfos.TryGetValue(CurrentCrest, out var info))
                 {
                     var tex = new AdditionalTexture(info.GetTexture(), TexType.BodyOver, this, 1010);
                     _overlayCtrl.AdditionalTextures.Add(tex);
