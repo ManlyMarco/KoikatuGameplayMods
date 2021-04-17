@@ -25,6 +25,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KK_Bulge", "KK_Bulge\KK_Bul
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KK_LewdCrestX", "KK_LewdCrestX\KK_LewdCrestX.csproj", "{5B1134DE-7840-4309-83F9-843606F01727}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Pregnancy", "Pregnancy", "{1C61B7E0-3603-4193-9B05-A5FF0CAFBD11}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -78,6 +80,10 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{930A00A6-2935-4EA0-81F0-B16D3E71B74C} = {1C61B7E0-3603-4193-9B05-A5FF0CAFBD11}
+		{930A00A6-2935-4EA0-81F0-C16D3E71B74C} = {1C61B7E0-3603-4193-9B05-A5FF0CAFBD11}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {19B0272D-3305-4C60-8DD9-E15889B2FF54}
