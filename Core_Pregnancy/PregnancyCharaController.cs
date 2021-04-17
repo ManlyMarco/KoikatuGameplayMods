@@ -1,4 +1,5 @@
-﻿using KKABMX.Core;
+﻿using System;
+using KKABMX.Core;
 using KKAPI;
 using KKAPI.Chara;
 using KKAPI.MainGame;
@@ -15,10 +16,10 @@ namespace KK_Pregnancy
         private readonly PregnancyBoneEffect _boneEffect;
         public PregnancyData Data { get; private set; }
 
-        #if AI
+#if AI
             //Set by game controller by random chance each day    
             public bool isDangerousDay = new System.Random().Next(0, 100) <= 20;
-        #endif
+#endif
 
         public PregnancyCharaController()
         {
@@ -26,15 +27,8 @@ namespace KK_Pregnancy
             _boneEffect = new PregnancyBoneEffect(this);
         }
 
-        /// <summary>
-        /// 0-1
-        /// </summary>
-        public float GetPregnancyEffectPercent()
-        {
-            if (Data.Week > PregnancyData.LeaveSchoolWeek) return 0;
-            // Don't show any effect at week 1 since it begins right after winning a child lottery
-            return Mathf.Clamp01((Data.Week - 1f) / (PregnancyData.LeaveSchoolWeek - 1f));
-        }
+        [Obsolete]
+        public float GetPregnancyEffectPercent() => _boneEffect.GetPregnancyEffectPercent();
 
         public bool CanGetDangerousDays()
         {
@@ -53,15 +47,15 @@ namespace KK_Pregnancy
 
             // PregnancyPlugin.Logger.LogDebug($"Preg - ReadData week {Data.Week} {ChaControl.name}");
 
-            #if KK
-                if (!CanGetDangerousDays())
-                {
-                    // Force the girl to always be on the safe day, happens every day after day of conception
-                    var heroine = ChaControl.GetHeroine();
-                    if (heroine != null)
-                        HFlag.SetMenstruation(heroine, HFlag.MenstruationType.安全日);
-                }
-            #endif
+#if KK
+            if (!CanGetDangerousDays())
+            {
+                // Force the girl to always be on the safe day, happens every day after day of conception
+                var heroine = ChaControl.GetHeroine();
+                if (heroine != null)
+                    HFlag.SetMenstruation(heroine, HFlag.MenstruationType.安全日);
+            }
+#endif
         }
 
         protected override void OnCardBeingSaved(GameMode currentGameMode)
@@ -87,22 +81,22 @@ namespace KK_Pregnancy
             }
         }
 
-        #if KK
-            internal static byte[] GetMenstruationsArr(MenstruationSchedule menstruationSchedule)
+#if KK
+        internal static byte[] GetMenstruationsArr(MenstruationSchedule menstruationSchedule)
+        {
+            switch (menstruationSchedule)
             {
-                switch (menstruationSchedule)
-                {
-                    default:
-                        return HFlag.menstruations;
-                    case MenstruationSchedule.MostlyRisky:
-                        return _menstruationsRisky;
-                    case MenstruationSchedule.AlwaysSafe:
-                        return _menstruationsAlwaysSafe;
-                    case MenstruationSchedule.AlwaysRisky:
-                        return _menstruationsAlwaysRisky;
-                }
+                default:
+                    return HFlag.menstruations;
+                case MenstruationSchedule.MostlyRisky:
+                    return _menstruationsRisky;
+                case MenstruationSchedule.AlwaysSafe:
+                    return _menstruationsAlwaysSafe;
+                case MenstruationSchedule.AlwaysRisky:
+                    return _menstruationsAlwaysRisky;
             }
-        #endif
+        }
+#endif
 
         private static readonly byte[] _menstruationsRisky = {
             0,

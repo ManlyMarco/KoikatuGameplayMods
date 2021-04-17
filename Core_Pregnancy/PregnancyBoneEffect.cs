@@ -112,7 +112,7 @@ namespace KK_Pregnancy
                 {
                     if (_pregnancyFullValues.TryGetValue(bone, out var mod))
                     {
-                        var prEffect = _controller.GetPregnancyEffectPercent();
+                        var prEffect = GetPregnancyEffectPercent();
                         return LerpModifier(mod, prEffect);
                     }
                 }
@@ -121,7 +121,7 @@ namespace KK_Pregnancy
                 {
                     if (_bellyFullValues.TryGetValue(bone, out var mod))
                     {
-                        var prEffect = _controller.GetPregnancyEffectPercent();
+                        var prEffect = GetPregnancyEffectPercent();
                         var infEffect = _controller.GetInflationEffectPercent() + prEffect / 2;
 
                         var bellySize = Mathf.Max(prEffect, infEffect);
@@ -142,7 +142,7 @@ namespace KK_Pregnancy
                 {
                     if (_pregnancyFullValues.TryGetValue(bone, out var mod))
                     {
-                        var prEffect = _controller.GetPregnancyEffectPercent();
+                        var prEffect = GetPregnancyEffectPercent();
                         return LerpModifier(mod, prEffect);
                     }
                 }
@@ -151,7 +151,7 @@ namespace KK_Pregnancy
                 {
                     if (_bellyFullValues.TryGetValue(bone, out var mod))
                     {
-                        var prEffect = _controller.GetPregnancyEffectPercent();
+                        var prEffect = GetPregnancyEffectPercent();
                         var infEffect = _controller.GetInflationEffectPercent() + prEffect / 2;
 
                         var bellySize = Mathf.Max(prEffect, infEffect);
@@ -180,6 +180,18 @@ namespace KK_Pregnancy
                     Mathf.Lerp(0f, mod.RotationModifier.x, bellySize),
                     Mathf.Lerp(0f, mod.RotationModifier.y, bellySize),
                     Mathf.Lerp(0f, mod.RotationModifier.z, bellySize)));
+        }
+
+        /// <summary>
+        /// 0-1
+        /// </summary>
+        public float GetPregnancyEffectPercent()
+        {
+            if (_controller.Data.Week > PregnancyData.LeaveSchoolWeek) return 0;
+            // Don't show any effect at week 1 since it begins right after winning a child lottery
+            // also reduce belly size in the 2nd week based on the time step to avoid huge bellies causing a large belly to appear out of nowhere very early
+            var progressionSpeed = Mathf.Ceil(PregnancyPlugin.PregnancyProgressionSpeed.Value / 2f);
+            return Mathf.Clamp01((_controller.Data.Week - progressionSpeed) / (PregnancyData.LeaveSchoolWeek - progressionSpeed));
         }
     }
 }
