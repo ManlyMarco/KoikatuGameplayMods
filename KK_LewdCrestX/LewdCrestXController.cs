@@ -106,9 +106,9 @@ namespace KK_LewdCrestX
 
             var any = _overlayCtrl.AdditionalTextures.RemoveAll(texture => ReferenceEquals(texture.Tag, this)) > 0;
 
-            if (CurrentCrest > CrestType.None)
+            if (CurrentCrest > CrestType.None && !HideCrestGraphic)
             {
-                if (!HideCrestGraphic && LewdCrestXPlugin.CrestInfos.TryGetValue(CurrentCrest, out var info))
+                if (LewdCrestXPlugin.CrestInfos.TryGetValue(CurrentCrest, out var info))
                 {
                     var tex = new AdditionalTexture(info.GetTexture(), TexType.BodyOver, this, 1010);
                     _overlayCtrl.AdditionalTextures.Add(tex);
