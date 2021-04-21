@@ -119,23 +119,25 @@ namespace KK_LewdCrestX
 
         private static void CreateStudioControls()
         {
-            var list = CrestInterfaceList.Create(false, false);
+            var currentStateCategory = StudioAPI.GetOrCreateCurrentStateCategory(null);
 
+            var list = CrestInterfaceList.Create(false, false);
             int ReadValue(OCIChar c)
             {
                 var crest = c.GetChaControl().GetComponent<LewdCrestXController>().CurrentCrest;
                 return list.GetIndex(crest);
             }
-
             void SetValue(int i)
             {
                 var crest = list.GetType(i);
                 foreach (var controller in StudioAPI.GetSelectedControllers<LewdCrestXController>())
                     controller.CurrentCrest = crest;
             }
+            currentStateCategory.AddControl(new CurrentStateCategoryDropdown("Lewd Crest", list.GetInterfaceNames(), ReadValue)).Value.Subscribe(SetValue);
 
-            StudioAPI.GetOrCreateCurrentStateCategory(null).AddControl(
-                new CurrentStateCategoryDropdown("Lewd Crest", list.GetInterfaceNames(), ReadValue)).Value.Subscribe(SetValue);
+            currentStateCategory.AddControl(new CurrentStateCategorySwitch("Lewd Crest visible",
+                c => c.GetChaControl().GetComponent<LewdCrestXController>().HideCrestGraphic)).Value.Subscribe(
+                b => StudioAPI.GetSelectedControllers<LewdCrestXController>().Do(ctrl => ctrl.HideCrestGraphic = b));
         }
 
         private void MakerAPIOnMakerFinishedLoading(object sender, EventArgs e)
