@@ -253,14 +253,14 @@ namespace KK_Pregnancy
                 }
                 
 
-                private static PregnancyCharaController GetEffectController(AgentActor heroine)
+                private static PregnancyCharaController GetEffectController(Actor heroine)
                 {
                     return heroine?.ChaControl != null ? heroine.ChaControl.GetComponent<PregnancyCharaController>() : null;
                 }
 
-                private static AgentActor GetLeadHeroine()
+                private static Actor GetLeadHeroine()
                 {
-                    return Manager.HSceneManager.Instance?.Agent[0];
+                    return Manager.HSceneManager.Instance?.females[0];
                 }
 
                 #endregion                              
