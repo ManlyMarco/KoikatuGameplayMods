@@ -18,8 +18,10 @@ namespace KK_NightDarkener
         private const string GameProcessName = "Koikatu";
         private const string GameProcessNameSteam = "Koikatsu Party";
 
-        public static ConfigEntry<bool> UseFog { get; private set; }
+        private static readonly int[] _allowedMaps = { 0, 3, 4, 8, 9, 11, 15, 16, 17, 18, 20, 21, 22, 26, 28, 31, 32, 33, 34, 36, 37, 38, 45, 46, 47 };
 
+        public static ConfigEntry<bool> BeSmart { get; private set; }
+        public static ConfigEntry<bool> UseFog { get; private set; }
         public static ConfigEntry<float> Exposure { get; private set; }
 
         private static void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
@@ -31,8 +33,7 @@ namespace KK_NightDarkener
             var time = (SunLightInfo.Info.Type)proc.dataH.timezoneFreeH;
             if (time != SunLightInfo.Info.Type.Night) return;
 
-            var allowedMaps = new[] { 0, 3, 4, 8, 9, 11, 15, 16, 17, 18, 20, 21, 22, 26, 28, 31, 32, 33, 34, 36, 37, 38, 45, 46, 47 };
-            if (!allowedMaps.Contains(proc.dataH.mapNoFreeH)) return;
+            if (BeSmart.Value && !_allowedMaps.Contains(proc.dataH.mapNoFreeH)) return;
 
             var amplifyColorEffect = Camera.main?.gameObject.GetComponent<AmplifyColorEffect>();
             if (amplifyColorEffect != null)
@@ -61,6 +62,7 @@ namespace KK_NightDarkener
         {
             UseFog = Config.Bind("General", "Enable dark fog at night", false, "Horror game effect.\nChanges take effect next time you load a night map.");
             Exposure = Config.Bind("General", "Exposure at night", 0.3f, new ConfigDescription("The lower the exposure, the darker the game will be.\nChanges take effect next time you load a night map.", new AcceptableValueRange<float>(0, 1)));
+            BeSmart = Config.Bind("General", "Only on specific maps", true, "Only darken maps that are unlikely to have lights turned on at night (likely to be vacant). Turn off to make all maps dark at night.");
 
             Harmony.CreateAndPatchAll(typeof(NightDarkener));
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
