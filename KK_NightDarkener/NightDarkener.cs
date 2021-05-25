@@ -13,7 +13,7 @@ namespace KK_NightDarkener
     public class NightDarkener : BaseUnityPlugin
     {
         public const string GUID = "Marco.NightDarkener";
-        internal const string Version = "1.1.1";
+        internal const string Version = "1.2";
 
         private const string GameProcessName = "Koikatu";
         private const string GameProcessNameSteam = "Koikatsu Party";
