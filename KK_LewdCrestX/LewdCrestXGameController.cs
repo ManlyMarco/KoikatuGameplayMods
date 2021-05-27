@@ -127,29 +127,23 @@ namespace KK_LewdCrestX
                         if (player == null) continue;
 
                         var heroine = controller.Heroine;
-                        var timeLeft = AdvanceAndGetActionCooldown(heroine);
-                        if (timeLeft <= 0)
+
+                        var npc = heroine.GetNPC();
+                        if (player.mapNo == npc.mapNo)
                         {
-                            SetActionCooldown(heroine, 3);
-                            var npc = heroine.GetNPC();
-                            if (player.mapNo == npc.mapNo)
+                            var cooldownTimeLeft = AdvanceAndGetActionCooldown(heroine);
+                            if (cooldownTimeLeft <= 0)
                             {
                                 if (Vector3.Distance(player.position, npc.position) > 3)
                                 {
                                     LewdCrestXPlugin.Logger.LogInfo("Chasing player because of mantraction crest: " + controller.Heroine.charFile?.parameter?.fullname);
                                     npc.ItemClear();
                                     npc.AI.ChaseAction();
-                                    SetActionCooldown(heroine, 10);
-                                }
-                            }
-                            else
-                            {
-                                if (npc.AI.actionNo == 23) // 23 - chase action
-                                {
-                                    LewdCrestXPlugin.Logger.LogDebug("Stopping NPC from chasing because of mantraction crest: " + controller.Heroine.charFile?.parameter?.fullname);
-                                    npc.AI.Reset(true);
-                                    npc.AI.FirstAction();
-                                    npc.AI.Start();
+                                    // Need to replace this from the default chase id because that disables the talk to bubble
+                                    // This action is triggered when character approaches player
+                                    // 28 - wanting to talk to player. If too annoying might want to replace with actions in range 10 - 16, maybe randomized
+                                    npc.AI.actResult.value.actionNo = 28;
+
                                     SetActionCooldown(heroine, 10);
                                 }
                             }
