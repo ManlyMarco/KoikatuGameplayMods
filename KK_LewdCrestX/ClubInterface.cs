@@ -174,10 +174,10 @@ namespace KK_LewdCrestX
                                 GUILayout.BeginHorizontal(GUILayout.ExpandWidth(true), GUILayout.ExpandHeight(false));
                                 for (int r = 0; r < _rowCount && i < _crestableHeroines.Count; i++, r++)
                                 {
+                                    var heroine = _crestableHeroines[i];
                                     var style = _selHeroine == i ? _btnStyleSelected : _btnStyleDeselected;
                                     GUILayout.BeginVertical(style, GUILayout.Width(_singleItemSize), GUILayout.ExpandHeight(false));
                                     {
-                                        var heroine = _crestableHeroines[i];
                                         GUILayout.Label(heroine.GetFaceTex());
                                         GUILayout.Label(heroine.HeroineName);
                                         GUILayout.Label(heroine.GetCrestName());
@@ -190,7 +190,7 @@ namespace KK_LewdCrestX
                                     if (ClickedInsideLastElement())
                                     {
                                         _selHeroine = i;
-                                        _selCrest = _crestlist.GetIndex(selectedController.CurrentCrest);
+                                        _selCrest = _crestlist.GetIndex(heroine.Controller.CurrentCrest);
                                     }
                                 }
                                 GUILayout.EndHorizontal();
