@@ -127,6 +127,7 @@ namespace KK_LewdCrestX
                         if (player == null) continue;
 
                         var heroine = controller.Heroine;
+                        if(heroine == null) continue;
 
                         var npc = heroine.GetNPC();
                         if (player.mapNo == npc.mapNo)
