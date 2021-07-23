@@ -169,10 +169,10 @@ namespace KK_Pregnancy
                 // Destroy(proc.GetComponent<LactationController>()); //Add later
 
                 // Figure out if conception happened at end of h scene
-                var heroine = Manager.HSceneManager.Instance?.Agent[0]?.AgentData;
+                var heroine = Manager.HSceneManager.Instance?.females[0];//In AI Agent actor list does not contain merchant, use females list instead
                 if (heroine == null) return;
 
-                var controller = heroine.GetNPC().ChaControl.GetComponent<PregnancyCharaController>();
+                var controller = heroine.ChaControl.GetComponent<PregnancyCharaController>();
                 if (controller == null) throw new ArgumentNullException(nameof(controller));
 
                 //In AI see if the current day is a risky day
@@ -189,13 +189,13 @@ namespace KK_Pregnancy
 
                     var winThreshold = Mathf.RoundToInt(fertility * 100);
                     var childLottery = Random.Range(1, 100);
-                    //Logger.Log(LogLevel.Debug, $"Preg - OnEndH calc pregnancy chance {childLottery} to {winThreshold}");
+                    // PregnancyPlugin.Logger.LogDebug($"Preg - OnEndH calc pregnancy chance {childLottery} to {winThreshold}");
                     var wonAChild = winThreshold >= childLottery;
                     if (wonAChild)
                     {
                         // PregnancyPlugin.Logger.LogDebug("Preg - child lottery won, pregnancy will start");                        
                         //In AI we have to immediately set the preg state, or we lose it if the user saves and exits before PeriodChange
-                        _startedPregnancies.Add(heroine);
+                        _startedPregnancies.Add(heroine.ChaControl.GetHeroine());
                         ProcessPendingChanges();
                         //Keep charaCtrl's copy in sync
                         controller.Data.StartPregnancy();
