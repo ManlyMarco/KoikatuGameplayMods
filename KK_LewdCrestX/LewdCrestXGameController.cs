@@ -15,7 +15,7 @@ namespace KK_LewdCrestX
     public sealed class LewdCrestXGameController : GameCustomFunctionController
     {
         private HsceneHeroineInfo[] _hSceneHeroines;
-        private HSceneProc _hSceneProc;
+        private HFlag _hFlag;
 
         private static readonly HashSet<SaveData.Heroine> _tempPreggers = new HashSet<SaveData.Heroine>();
         private List<LewdCrestXController> _existingControllers;
@@ -55,10 +55,10 @@ namespace KK_LewdCrestX
             _tempPreggers.Clear();
         }
 
-        protected override void OnStartH(HSceneProc proc, bool freeH)
+        protected override void OnStartH(BaseLoader proc, HFlag hFlag, bool vr)
         {
-            _hSceneProc = proc;
-            _hSceneHeroines = proc.flags.lstHeroine.Select(x => new HsceneHeroineInfo(x)).ToArray();
+            _hFlag = hFlag;
+            _hSceneHeroines = hFlag.lstHeroine.Select(x => new HsceneHeroineInfo(x)).ToArray();
 
             foreach (var heroine in _hSceneHeroines)
             {
@@ -74,7 +74,7 @@ namespace KK_LewdCrestX
             }
         }
 
-        protected override void OnEndH(HSceneProc proc, bool freeH)
+        protected override void OnEndH(BaseLoader proc, HFlag hFlag, bool vr)
         {
             foreach (var heroine in _hSceneHeroines)
             {
@@ -91,7 +91,7 @@ namespace KK_LewdCrestX
                     heroine.GetRegenProp().Value = false;
             }
 
-            _hSceneProc = null;
+            _hFlag = null;
             _hSceneHeroines = null;
         }
 
@@ -101,17 +101,17 @@ namespace KK_LewdCrestX
 
             if (_hSceneHeroines != null)
             {
-                var speed = _hSceneProc.flags.IsSonyu() && _hSceneProc.flags.speedCalc > 0.7f
-                    ? (_hSceneProc.flags.speedCalc - 0.7f) * 3.3f
-                    : (_hSceneProc.flags.speedItem > 1.4f ? 0.33f : 0);
+                var speed = _hFlag.IsSonyu() && _hFlag.speedCalc > 0.7f
+                    ? (_hFlag.speedCalc - 0.7f) * 3.3f
+                    : (_hFlag.speedItem > 1.4f ? 0.33f : 0);
                 if (speed > 0)
                 {
-                    var id = _hSceneProc.flags.GetLeadingHeroineId();
+                    var id = _hFlag.GetLeadingHeroineId();
                     var heroineInfo = _hSceneHeroines[id];
                     heroineInfo.TotalRoughTime += Time.deltaTime;
 
-                    if (heroineInfo.CrestType == CrestType.suffer && !_hSceneProc.flags.lockGugeFemale)
-                        _hSceneProc.flags.gaugeFemale += speed * Time.deltaTime * 2;
+                    if (heroineInfo.CrestType == CrestType.suffer && !_hFlag.lockGugeFemale)
+                        _hFlag.gaugeFemale += speed * Time.deltaTime * 2;
                 }
             }
             else if (_existingControllers != null)
