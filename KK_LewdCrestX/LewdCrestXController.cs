@@ -10,7 +10,7 @@ namespace KK_LewdCrestX
 {
     public class LewdCrestXController : CharaCustomFunctionController
     {
-        internal SaveData.Heroine Heroine { get; private set; }
+        internal SaveData.Heroine Heroine { get; set; }
 
         private KoiSkinOverlayController _overlayCtrl;
         private BoneController _boneCtrl;

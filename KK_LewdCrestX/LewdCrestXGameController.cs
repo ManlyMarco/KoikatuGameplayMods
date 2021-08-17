@@ -243,7 +243,12 @@ namespace KK_LewdCrestX
             public HsceneHeroineInfo(SaveData.Heroine heroine)
             {
                 Heroine = heroine;
-                if (heroine != null) Controller = heroine.GetCrestController();
+                if (heroine != null)
+                {
+                    Controller = heroine.GetCrestController();
+                    // Needed in free H because GetHeroine used in the Controller doesn't work outside main game
+                    if (Controller != null) Controller.Heroine = heroine;
+                }
             }
 
             public Traverse<bool> GetRegenProp()
