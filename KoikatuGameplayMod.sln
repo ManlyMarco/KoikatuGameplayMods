@@ -33,8 +33,11 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Bulge", "Bulge", "{C75FFBF1
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Core_Bulge", "Core_Bulge\Core_Bulge.shproj", "{3E03B28F-BC65-459F-89E5-70D89905D636}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KKS_Bulge", "KKS_Bulge\KKS_Bulge.csproj", "{0F6B651E-D1F9-467F-A8F3-D1006C277E51}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Core_Bulge\Core_Bulge.projitems*{0f6b651e-d1f9-467f-a8f3-d1006c277e51}*SharedItemsImports = 4
 		Core_Bulge\Core_Bulge.projitems*{3e03b28f-bc65-459f-89e5-70d89905d636}*SharedItemsImports = 13
 		Core_Bulge\Core_Bulge.projitems*{49cad984-906a-4b18-9982-e003d8668fe4}*SharedItemsImports = 4
 		Core_Bulge\Core_Bulge.projitems*{904b04c0-5095-40f9-915a-005f80bc2cb1}*SharedItemsImports = 4
@@ -92,6 +95,10 @@ Global
 		{49CAD984-906A-4B18-9982-E003D8668FE4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{49CAD984-906A-4B18-9982-E003D8668FE4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{49CAD984-906A-4B18-9982-E003D8668FE4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F6B651E-D1F9-467F-A8F3-D1006C277E51}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F6B651E-D1F9-467F-A8F3-D1006C277E51}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F6B651E-D1F9-467F-A8F3-D1006C277E51}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F6B651E-D1F9-467F-A8F3-D1006C277E51}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -102,6 +109,7 @@ Global
 		{904B04C0-5095-40F9-915A-005F80BC2CB1} = {C75FFBF1-9DCE-4BC4-9F20-F95B243ABEE3}
 		{49CAD984-906A-4B18-9982-E003D8668FE4} = {C75FFBF1-9DCE-4BC4-9F20-F95B243ABEE3}
 		{3E03B28F-BC65-459F-89E5-70D89905D636} = {C75FFBF1-9DCE-4BC4-9F20-F95B243ABEE3}
+		{0F6B651E-D1F9-467F-A8F3-D1006C277E51} = {C75FFBF1-9DCE-4BC4-9F20-F95B243ABEE3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {19B0272D-3305-4C60-8DD9-E15889B2FF54}

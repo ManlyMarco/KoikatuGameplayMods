@@ -42,7 +42,13 @@ namespace KK_Bulge
         {
             Logger = base.Logger;
 
-            DefaultBulgeSize = Config.Bind("Default settings", "Default bulge size", 0.5f,
+#if KKS
+            // 0.5 Doesn't work well with default male clothes in KKS
+            const float defaultBulgeSizeVal = 0.4f;
+#else
+            const float defaultBulgeSizeVal = 0.5f;
+#endif
+            DefaultBulgeSize = Config.Bind("Default settings", "Default bulge size", defaultBulgeSizeVal,
                 new ConfigDescription("Default size of bulges if not specified per-character (in Body/Genitals tab in character maker).", new AcceptableValueRange<float>(0, 1)));
             DefaultBulgeState = Config.Bind("Default settings", "Enable bulge by default", BulgeEnableLevel.Auto,
                 "Should bulges be enabled if not specified per-character (in Body/Genitals tab in character maker).\nAuto will only apply bulges to characters with shlogns. Always will apply no matter what, and Never will not apply unless you enable it per-character.");
@@ -58,7 +64,7 @@ namespace KK_Bulge
             {
                 MakerAPI.MakerBaseLoaded += (sender, e) =>
                 {
-#if KK
+#if KK || KKS
                     var cat = KKABMX.GUI.InterfaceData.BodyGenitals;
 #elif AI
                     var cat = MakerConstants.Body.Lower;
@@ -123,7 +129,7 @@ namespace KK_Bulge
 
             if (_bulgeBoneEffect == null)
             {
-#if KK
+#if KK || KKS
                 // BodyTop/p_cf_body_00/cf_o_root/n_body/n_dankon
                 // BodyTop/p_cf_body_00 can be disabled in kkp in some cases, somehow, so need a full scan
                 var sonGo = transform.FindChildDeep("n_dankon");
@@ -156,7 +162,7 @@ namespace KK_Bulge
 
     internal class BulgeBoneEffect : BoneEffect
     {
-#if KK
+#if KK || KKS
         private const string BulgeBoneName = "cf_j_kokan";
 #elif AI
         private const string BulgeBoneName = "cf_J_Kokan"; // BUG this does not affect male body only female (no other bones seem to have a similar effect), so since females can't be set male uncensors in US this makes the plugin useless
@@ -183,6 +189,8 @@ namespace KK_Bulge
             return !Manager.Config.EtcData.VisibleSon;
 #elif AI
             return !Manager.Config.HData.Son;
+#elif KKS
+            return !Manager.Config.HData.VisibleSon;
 #endif
         }
 
