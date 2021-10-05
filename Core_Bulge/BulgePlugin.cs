@@ -7,6 +7,7 @@ using ExtensibleSaveFormat;
 using KKABMX.Core;
 using KKAPI;
 using KKAPI.Chara;
+using KKAPI.MainGame;
 using KKAPI.Maker;
 using KKAPI.Maker.UI;
 using KKAPI.Studio;
@@ -14,10 +15,8 @@ using KKAPI.Studio.UI;
 using UniRx;
 using UnityEngine;
 
-#if AI
-
-
-#elif KK
+// BUG this plugin is useless in AI because it doesn't work on male body and females can't be given male uncensors
+#if !AI
 using CoordinateType = ChaFileDefine.CoordinateType;
 #endif
 
@@ -33,7 +32,6 @@ namespace KK_Bulge
 
         internal static ConfigEntry<float> DefaultBulgeSize;
         internal static ConfigEntry<BulgeEnableLevel> DefaultBulgeState;
-        internal static bool DuringH;
 
         private void Awake()
         {
@@ -45,13 +43,6 @@ namespace KK_Bulge
             CharacterApi.RegisterExtraBehaviour<BulgeController>(GUID);
 
             CreateInterface();
-
-#if KK
-            KKAPI.MainGame.GameAPI.StartH += (sender, args) => DuringH = true;
-            KKAPI.MainGame.GameAPI.EndH += (sender, args) => DuringH = false;
-#elif AI
-            //TODO Detect h scene in ai
-#endif
         }
 
         private void CreateInterface()
@@ -146,7 +137,7 @@ namespace KK_Bulge
 #if KK
         private const string BulgeBoneName = "cf_j_kokan";
 #elif AI
-        private const string BulgeBoneName = //TODO CRITICAL no working bone with this effect? kokan bones don't work
+        private const string BulgeBoneName = "cf_J_Kokan"; // BUG this does not affect male body only female (no other bones seem to have a similar effect), so since females can't be set male uncensors in US this makes the plugin useless
 #endif
         private static readonly string[] _affectedBones = { BulgeBoneName };
         private static readonly Vector3 _maxScale = new Vector3(2, 3, 3.3f);
@@ -161,22 +152,19 @@ namespace KK_Bulge
             if (ctrl == null) throw new ArgumentNullException(nameof(ctrl));
             _ctrl = ctrl;
 #if KK
-
             _son = _ctrl.ChaControl.GetReferenceInfo(ChaReference.RefObjKey.S_Son);
 #elif AI
-            _son = _ctrl.ChaControl.cmpSimpleBody.targetEtc.objDanTop;
+            _son = _ctrl.ChaControl.cmpBody.targetEtc.objDanTop;
 #endif
         }
 
         private bool GetBulgeVisible()
         {
-            //if (_ctrl == null || _son == null) return false;
-
             switch (_ctrl.EnableBulge)
             {
                 case BulgeEnableLevel.Auto:
                 default:
-                    if (BulgePlugin.DuringH)
+                    if (GameAPI.InsideHScene)
                     {
 #if KK
                         if (!Manager.Config.EtcData.VisibleSon)
