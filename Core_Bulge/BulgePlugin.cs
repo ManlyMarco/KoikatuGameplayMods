@@ -6,7 +6,6 @@ using BepInEx.Configuration;
 using BepInEx.Logging;
 using ExtensibleSaveFormat;
 using KKABMX.Core;
-using KKABMX.GUI;
 using KKAPI;
 using KKAPI.Chara;
 using KKAPI.MainGame;
@@ -14,9 +13,15 @@ using KKAPI.Maker;
 using KKAPI.Maker.UI;
 using KKAPI.Studio;
 using KKAPI.Studio.UI;
-using StrayTech;
+using KKAPI.Utilities;
 using UniRx;
 using UnityEngine;
+
+// BUG this plugin is useless in AI because it doesn't work on male body and females can't be given male uncensors
+#if !AI
+using CoordinateType = ChaFileDefine.CoordinateType;
+using StrayTech;
+#endif
 
 namespace KK_Bulge
 {
@@ -32,7 +37,6 @@ namespace KK_Bulge
 
         internal static ConfigEntry<float> DefaultBulgeSize;
         internal static ConfigEntry<BulgeEnableLevel> DefaultBulgeState;
-        internal static bool DuringH;
 
         private void Awake()
         {
@@ -46,9 +50,6 @@ namespace KK_Bulge
             CharacterApi.RegisterExtraBehaviour<BulgeController>(GUID);
 
             CreateInterface();
-
-            GameAPI.StartH += (sender, args) => DuringH = true;
-            GameAPI.EndH += (sender, args) => DuringH = false;
         }
 
         private void CreateInterface()
@@ -57,7 +58,11 @@ namespace KK_Bulge
             {
                 MakerAPI.MakerBaseLoaded += (sender, e) =>
                 {
-                    var cat = InterfaceData.BodyGenitals;
+#if KK
+                    var cat = KKABMX.GUI.InterfaceData.BodyGenitals;
+#elif AI
+                    var cat = MakerConstants.Body.Lower;
+#endif
 
                     e.AddControl(new MakerRadioButtons(cat, this, "Enable crotch bulge", (int)DefaultBulgeState.Value, "Auto", "Always", "Never"))
                         .BindToFunctionController<BulgeController, int>(controller => (int)controller.EnableBulge, (controller, value) => controller.EnableBulge = (BulgeEnableLevel)value);
@@ -118,19 +123,23 @@ namespace KK_Bulge
 
             if (_bulgeBoneEffect == null)
             {
+#if KK
                 // BodyTop/p_cf_body_00/cf_o_root/n_body/n_dankon
                 // BodyTop/p_cf_body_00 can be disabled in kkp in some cases, somehow, so need a full scan
                 var sonGo = transform.FindChildDeep("n_dankon");
+#elif AI
+                var sonGo = ChaControl.cmpBody.targetEtc.objDanTop;
+#endif
                 if (sonGo)
                 {
-                    BulgePlugin.Logger.LogDebug("Found n_dankon bone GameObject at " + sonGo.FullPath());
+                    BulgePlugin.Logger.LogDebug("Found n_dankon bone GameObject at " + sonGo.GetFullPath());
                     _bulgeBoneEffect = new BulgeBoneEffect(this, sonGo.gameObject);
                     var bc = GetComponent<BoneController>();
                     bc.AddBoneEffect(_bulgeBoneEffect);
                 }
                 else
                 {
-                    BulgePlugin.Logger.LogDebug("Did not find n_dankon bone GameObject under " + gameObject.FullPath());
+                    BulgePlugin.Logger.LogDebug("Did not find n_dankon bone GameObject under " + gameObject.GetFullPath());
                 }
             }
 
@@ -147,7 +156,12 @@ namespace KK_Bulge
 
     internal class BulgeBoneEffect : BoneEffect
     {
-        private static readonly string[] _affectedBones = { "cf_j_kokan" };
+#if KK
+        private const string BulgeBoneName = "cf_j_kokan";
+#elif AI
+        private const string BulgeBoneName = "cf_J_Kokan"; // BUG this does not affect male body only female (no other bones seem to have a similar effect), so since females can't be set male uncensors in US this makes the plugin useless
+#endif
+        private static readonly string[] _affectedBones = { BulgeBoneName };
         private static readonly Vector3 _maxScale = new Vector3(2, 3, 3.3f);
         private static readonly Vector3 _maxPosition = new Vector3(0, -0.040f, 0);
         private static readonly BoneModifierData _boneModifierData = new BoneModifierData(_maxScale, 1, _maxPosition, Vector3.zero);
@@ -163,16 +177,24 @@ namespace KK_Bulge
             _son = son;
         }
 
+        private static bool IsSonDisabledInConfig()
+        {
+#if KK
+            return !Manager.Config.EtcData.VisibleSon;
+#elif AI
+            return !Manager.Config.HData.Son;
+#endif
+        }
+
         private bool GetBulgeVisible()
         {
-            //if (_ctrl == null || _son == null) return false;
-
             switch (_ctrl.EnableBulge)
             {
                 case BulgeEnableLevel.Auto:
                 default:
-                    if (BulgePlugin.DuringH && !Manager.Config.EtcData.VisibleSon)
+                    if (GameAPI.InsideHScene && IsSonDisabledInConfig())
                         return false;
+
                     var status = _ctrl.ChaControl.fileStatus;
                     var bulgeVisible = status.visibleSonAlways && !_son.activeSelf;
                     return bulgeVisible;
@@ -188,9 +210,9 @@ namespace KK_Bulge
             return GetBulgeVisible() ? _affectedBones : Enumerable.Empty<string>();
         }
 
-        public override BoneModifierData GetEffect(string bone, BoneController origin, ChaFileDefine.CoordinateType coordinate)
+        public override BoneModifierData GetEffect(string bone, BoneController origin, CoordinateType coordinate)
         {
-            if (GetBulgeVisible() && bone == "cf_j_kokan")
+            if (GetBulgeVisible() && bone == BulgeBoneName)
             {
                 _boneModifierData.ScaleModifier = Vector3.Lerp(Vector3.one, _maxScale, _ctrl.BulgeSize);
                 _boneModifierData.PositionModifier = Vector3.Lerp(Vector3.zero, _maxPosition, _ctrl.BulgeSize);
