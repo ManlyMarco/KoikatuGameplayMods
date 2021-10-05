@@ -5,6 +5,9 @@ using HarmonyLib;
 using Illusion.Game;
 using UnityEngine;
 using Random = UnityEngine.Random;
+#if AI
+    using AIChara;
+#endif
 
 namespace KK_Pregnancy
 {
@@ -19,7 +22,7 @@ namespace KK_Pregnancy
 
         private void Start()
         {
-            if(!PregnancyPlugin.LactationEnabled.Value)
+            if (!PregnancyPlugin.LactationEnabled.Value)
             {
                 enabled = false;
                 return;
@@ -41,7 +44,8 @@ namespace KK_Pregnancy
         {
             // figure out when to fire
             var animatorStateInfo = _charas[0].ChaControl.getAnimatorStateInfo(0);
-            var orgasmloop = _proc.flags.mode == HFlag.EMode.aibu
+            var hFlag = _proc.flags;
+            var orgasmloop = hFlag.mode == HFlag.EMode.aibu
                 ? animatorStateInfo.IsName("Orgasm_Start")
                 : animatorStateInfo.IsName("OLoop") || animatorStateInfo.IsName("A_OLoop");
 
@@ -57,7 +61,7 @@ namespace KK_Pregnancy
             }
             else
             {
-                if (_proc.flags.drag && _proc.flags.speed > 0.6)
+                if (hFlag.drag && hFlag.speedItem > hFlag.speedUpItemClac.y * 0.8f)
                 {
                     if (_touchingDelayTimer <= 0)
                     {

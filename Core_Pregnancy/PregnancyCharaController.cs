@@ -1,9 +1,13 @@
-﻿using KKABMX.Core;
+﻿using System;
+using KKABMX.Core;
 using KKAPI;
 using KKAPI.Chara;
 using KKAPI.MainGame;
 using KKAPI.Maker;
 using UnityEngine;
+#if AI
+    using AIChara;
+#endif
 
 namespace KK_Pregnancy
 {
@@ -12,21 +16,19 @@ namespace KK_Pregnancy
         private readonly PregnancyBoneEffect _boneEffect;
         public PregnancyData Data { get; private set; }
 
+#if AI
+            //Set by game controller by random chance each day    
+            public bool isDangerousDay = new System.Random().Next(0, 100) <= 20;
+#endif
+
         public PregnancyCharaController()
         {
             Data = new PregnancyData();
             _boneEffect = new PregnancyBoneEffect(this);
         }
 
-        /// <summary>
-        /// 0-1
-        /// </summary>
-        public float GetPregnancyEffectPercent()
-        {
-            if (Data.Week > PregnancyData.LeaveSchoolWeek) return 0;
-            // Don't show any effect at week 1 since it begins right after winning a child lottery
-            return Mathf.Clamp01((Data.Week - 1f) / (PregnancyData.LeaveSchoolWeek - 1f));
-        }
+        [Obsolete]
+        public float GetPregnancyEffectPercent() => _boneEffect.GetPregnancyEffectPercent();
 
         public bool CanGetDangerousDays()
         {
@@ -43,6 +45,9 @@ namespace KK_Pregnancy
             var data = GetExtendedData();
             Data = PregnancyData.Load(data) ?? new PregnancyData();
 
+            // PregnancyPlugin.Logger.LogDebug($"Preg - ReadData week {Data.Week} {ChaControl.name}");
+
+#if KK
             if (!CanGetDangerousDays())
             {
                 // Force the girl to always be on the safe day, happens every day after day of conception
@@ -50,6 +55,7 @@ namespace KK_Pregnancy
                 if (heroine != null)
                     HFlag.SetMenstruation(heroine, HFlag.MenstruationType.安全日);
             }
+#endif
         }
 
         protected override void OnCardBeingSaved(GameMode currentGameMode)
@@ -59,6 +65,12 @@ namespace KK_Pregnancy
 
         protected override void OnReload(GameMode currentGameMode)
         {
+            if (!GameAPI.InsideHScene)
+            {
+                _inflationChange = 0;
+                _inflationAmount = 0;
+            }
+
             // Parameters are false by default in class chara maker, so we need to load them the 1st time to not lose progress
             // !MakerAPI.InsideAndLoaded is true when the initial card is being loaded into maker so we can use that
             if (!MakerAPI.InsideAndLoaded || MakerAPI.GetCharacterLoadFlags()?.Parameters != false)
@@ -69,6 +81,7 @@ namespace KK_Pregnancy
             }
         }
 
+#if KK
         internal static byte[] GetMenstruationsArr(MenstruationSchedule menstruationSchedule)
         {
             switch (menstruationSchedule)
@@ -83,6 +96,7 @@ namespace KK_Pregnancy
                     return _menstruationsAlwaysRisky;
             }
         }
+#endif
 
         private static readonly byte[] _menstruationsRisky = {
             0,
@@ -181,36 +195,39 @@ namespace KK_Pregnancy
         {
             base.Update();
 
-            float GetInflationChange()
+            if (GameAPI.InsideHScene)
             {
-                //var inflationChange = Time.deltaTime / 2 + Time.deltaTime * _inflationChange / 3;
-                return Mathf.Max((0.1f * PregnancyPlugin.InflationSpeed.Value) * Time.deltaTime,
-                    Mathf.Abs(Time.deltaTime * (_inflationChange * PregnancyPlugin.InflationSpeed.Value) / 4));
-            }
-
-            if (PregnancyPlugin.InflationEnable.Value)
-            {
-                if (_inflationChange > 0.05f)
+                if (PregnancyPlugin.InflationEnable.Value)
                 {
-                    _inflationChange = Mathf.Max(0, _inflationChange - GetInflationChange());
-                }
-                else if (_inflationChange < -0.05f)
-                {
-                    _inflationChange = Mathf.Min(0, _inflationChange + GetInflationChange());
-
-                    if (PregnancyPlugin.InflationOpenClothAtMax.Value &&
-                        InflationAmount >= PregnancyPlugin.InflationMaxCount.Value)
+                    float GetInflationChange()
                     {
-                        // 0 is fully on
-                        if (ChaControl.fileStatus.clothesState[(int)ChaFileDefine.ClothesKind.top] == 0)
-                            ChaControl.SetClothesStateNext((int)ChaFileDefine.ClothesKind.top);
+                        //var inflationChange = Time.deltaTime / 2 + Time.deltaTime * _inflationChange / 3;
+                        return Mathf.Max((0.1f * PregnancyPlugin.InflationSpeed.Value) * Time.deltaTime,
+                            Mathf.Abs(Time.deltaTime * (_inflationChange * PregnancyPlugin.InflationSpeed.Value) / 4));
+                    }
+
+                    if (_inflationChange > 0.05f)
+                    {
+                        _inflationChange = Mathf.Max(0, _inflationChange - GetInflationChange());
+                    }
+                    else if (_inflationChange < -0.05f)
+                    {
+                        _inflationChange = Mathf.Min(0, _inflationChange + GetInflationChange());
+
+                        if (PregnancyPlugin.InflationOpenClothAtMax.Value &&
+                            InflationAmount >= PregnancyPlugin.InflationMaxCount.Value)
+                        {
+                            // 0 is fully on
+                            if (ChaControl.fileStatus.clothesState[(int)ChaFileDefine.ClothesKind.top] == 0)
+                                ChaControl.SetClothesStateNext((int)ChaFileDefine.ClothesKind.top);
+                        }
                     }
                 }
-            }
-            else
-            {
-                _inflationChange = 0;
-                _inflationAmount = 0;
+                else
+                {
+                    _inflationChange = 0;
+                    _inflationAmount = 0;
+                }
             }
         }
 

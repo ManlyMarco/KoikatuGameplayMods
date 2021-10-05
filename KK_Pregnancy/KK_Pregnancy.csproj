@@ -12,6 +12,8 @@
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -21,6 +23,7 @@
     <DefineConstants>TRACE;DEBUG;KK</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>embedded</DebugType>
@@ -30,81 +33,102 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DebugSymbols>true</DebugSymbols>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="0Harmony, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\IllusionLibs.BepInEx.Harmony.2.0.3.1\lib\net35\0Harmony.dll</HintPath>
+    <Reference Include="0Harmony, Version=2.5.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\IllusionLibs.BepInEx.Harmony.2.5.1\lib\net35\0Harmony.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\IllusionLibs.Koikatu.Assembly-CSharp.2019.4.27\lib\net35\Assembly-CSharp.dll</HintPath>
+      <HintPath>..\packages\IllusionLibs.Koikatu.Assembly-CSharp.2019.4.27.2\lib\net35\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Assembly-CSharp-firstpass, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\IllusionLibs.Koikatu.Assembly-CSharp-firstpass.2019.4.27\lib\net35\Assembly-CSharp-firstpass.dll</HintPath>
+      <HintPath>..\packages\IllusionLibs.Koikatu.Assembly-CSharp-firstpass.2019.4.27.2\lib\net35\Assembly-CSharp-firstpass.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="BepInEx, Version=5.1.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\IllusionLibs.BepInEx.5.1.0\lib\net35\BepInEx.dll</HintPath>
+    <Reference Include="BepInEx, Version=5.4.12.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\IllusionLibs.BepInEx.5.4.12\lib\net35\BepInEx.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="BepInEx.Harmony, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\IllusionLibs.BepInEx.Harmony.2.0.3.1\lib\net35\BepInEx.Harmony.dll</HintPath>
+      <HintPath>..\packages\IllusionLibs.BepInEx.Harmony.2.5.1\lib\net35\BepInEx.Harmony.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="ExtensibleSaveFormat, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ExtensibleSaveFormat.Koikatu.15.1.2\lib\net35\ExtensibleSaveFormat.dll</HintPath>
+      <HintPath>..\packages\ExtensibleSaveFormat.Koikatu.16.4.0\lib\net35\ExtensibleSaveFormat.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="KKABMX, Version=4.3.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ABMX.KKABMX.4.3.0\lib\net35\KKABMX.dll</HintPath>
+    <Reference Include="KKABMX, Version=4.4.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ABMX.KKABMX.4.4.1\lib\net35\KKABMX.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="KKAPI, Version=1.12.3.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\IllusionModdingAPI.KKAPI.1.12.3\lib\net35\KKAPI.dll</HintPath>
+    <Reference Include="KKAPI, Version=1.22.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\IllusionModdingAPI.KKAPI.1.22.0\lib\net35\KKAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Sirenix.Serialization, Version=1.0.5.1, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\IllusionLibs.Koikatu.Sirenix.Serialization.2019.4.27\lib\net35\Sirenix.Serialization.dll</HintPath>
+      <HintPath>..\packages\IllusionLibs.Koikatu.Sirenix.Serialization.2019.4.27.2\lib\net35\Sirenix.Serialization.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System.Core" />
     <Reference Include="UnityEngine, Version=0.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\IllusionLibs.Koikatu.UnityEngine.5.6.2\lib\net35\UnityEngine.dll</HintPath>
+      <HintPath>..\packages\IllusionLibs.Koikatu.UnityEngine.5.6.2.2\lib\net35\UnityEngine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UnityEngine.UI, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\IllusionLibs.Koikatu.UnityEngine.UI.5.6.2\lib\net35\UnityEngine.UI.dll</HintPath>
+      <HintPath>..\packages\IllusionLibs.Koikatu.UnityEngine.UI.5.6.2.2\lib\net35\UnityEngine.UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Data\HeroineStatus.cs" />
-    <Compile Include="LactationController.cs" />
-    <Compile Include="Data\MenstruationSchedule.cs" />
-    <Compile Include="PregnancyBoneEffect.cs" />
-    <Compile Include="PregnancyCharaController.cs" />
-    <Compile Include="Data\PregnancyData.cs" />
-    <Compile Include="Data\PregnancyDataUtils.cs" />
-    <Compile Include="PregnancyGameController.cs" />
-    <Compile Include="GUI\PregnancyGui.cs" />
-    <Compile Include="GUI\PregnancyGui.HSceneMenstrIconOverride.cs" />
-    <Compile Include="GUI\PregnancyGui.StatusIcons.cs" />
-    <Compile Include="PregnancyPlugin.cs" />
-    <Compile Include="PregnancyPlugin.Hooks.cs" />
-    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="..\Core_Pregnancy\Data\HeroineStatus.cs" />
+    <Compile Include="..\Core_Pregnancy\LactationController.cs" />
+    <Compile Include="..\Core_Pregnancy\Data\MenstruationSchedule.cs" />
+    <Compile Include="..\Core_Pregnancy\PregnancyBoneEffect.cs" />
+    <Compile Include="..\Core_Pregnancy\PregnancyCharaController.cs" />
+    <Compile Include="..\Core_Pregnancy\Data\PregnancyData.cs" />
+    <Compile Include="..\Core_Pregnancy\Data\PregnancyDataUtils.cs" />
+    <Compile Include="..\Core_Pregnancy\PregnancyGameController.cs" />
+    <Compile Include="..\Core_Pregnancy\GUI\PregnancyGui.cs" />
+    <Compile Include="..\Core_Pregnancy\GUI\PregnancyGui.HSceneMenstrIconOverride.cs" />
+    <Compile Include="..\Core_Pregnancy\GUI\PregnancyGui.StatusIcons.cs" />
+    <Compile Include="..\Core_Pregnancy\PregnancyPlugin.cs" />
+    <Compile Include="..\Core_Pregnancy\PregnancyPlugin.Hooks.cs" />
+    <Compile Include="..\Core_Pregnancy\Properties\AssemblyInfo.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\Core_Pregnancy\Resources\leave.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="..\Core_Pregnancy\Resources\pregnant.png" />
+    <EmbeddedResource Include="..\Core_Pregnancy\Resources\risky.png" />
+    <EmbeddedResource Include="..\Core_Pregnancy\Resources\safe.png" />
+    <EmbeddedResource Include="..\Core_Pregnancy\Resources\unknown.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\leave.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="Resources\pregnant.png" />
-    <EmbeddedResource Include="Resources\risky.png" />
-    <EmbeddedResource Include="Resources\safe.png" />
-    <EmbeddedResource Include="Resources\unknown.png" />
+    <Analyzer Include="..\packages\KoikatuCompatibilityAnalyzer.1.0.1\analyzers\dotnet\cs\KoikatuCompatibilityAnalyzer.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\IllusionLibs.Koikatu.Assembly-CSharp-firstpass.2019.4.27.2\build\IllusionLibs.Koikatu.Assembly-CSharp-firstpass.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\IllusionLibs.Koikatu.Assembly-CSharp-firstpass.2019.4.27.2\build\IllusionLibs.Koikatu.Assembly-CSharp-firstpass.targets'))" />
+    <Error Condition="!Exists('..\packages\IllusionLibs.Koikatu.Sirenix.Serialization.2019.4.27.2\build\IllusionLibs.Koikatu.Sirenix.Serialization.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\IllusionLibs.Koikatu.Sirenix.Serialization.2019.4.27.2\build\IllusionLibs.Koikatu.Sirenix.Serialization.targets'))" />
+    <Error Condition="!Exists('..\packages\IllusionLibs.Koikatu.UnityEngine.5.6.2.2\build\IllusionLibs.Koikatu.UnityEngine.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\IllusionLibs.Koikatu.UnityEngine.5.6.2.2\build\IllusionLibs.Koikatu.UnityEngine.targets'))" />
+    <Error Condition="!Exists('..\packages\IllusionLibs.Koikatu.UnityEngine.UI.5.6.2.2\build\IllusionLibs.Koikatu.UnityEngine.UI.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\IllusionLibs.Koikatu.UnityEngine.UI.5.6.2.2\build\IllusionLibs.Koikatu.UnityEngine.UI.targets'))" />
+    <Error Condition="!Exists('..\packages\IllusionLibs.Koikatu.Assembly-CSharp.2019.4.27.2\build\IllusionLibs.Koikatu.Assembly-CSharp.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\IllusionLibs.Koikatu.Assembly-CSharp.2019.4.27.2\build\IllusionLibs.Koikatu.Assembly-CSharp.targets'))" />
+    <Error Condition="!Exists('..\packages\IllusionLibs.BepInEx.Harmony.2.5.1\build\IllusionLibs.BepInEx.Harmony.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\IllusionLibs.BepInEx.Harmony.2.5.1\build\IllusionLibs.BepInEx.Harmony.targets'))" />
+  </Target>
+  <Import Project="..\packages\IllusionLibs.Koikatu.Assembly-CSharp-firstpass.2019.4.27.2\build\IllusionLibs.Koikatu.Assembly-CSharp-firstpass.targets" Condition="Exists('..\packages\IllusionLibs.Koikatu.Assembly-CSharp-firstpass.2019.4.27.2\build\IllusionLibs.Koikatu.Assembly-CSharp-firstpass.targets')" />
+  <Import Project="..\packages\IllusionLibs.Koikatu.Sirenix.Serialization.2019.4.27.2\build\IllusionLibs.Koikatu.Sirenix.Serialization.targets" Condition="Exists('..\packages\IllusionLibs.Koikatu.Sirenix.Serialization.2019.4.27.2\build\IllusionLibs.Koikatu.Sirenix.Serialization.targets')" />
+  <Import Project="..\packages\IllusionLibs.Koikatu.UnityEngine.5.6.2.2\build\IllusionLibs.Koikatu.UnityEngine.targets" Condition="Exists('..\packages\IllusionLibs.Koikatu.UnityEngine.5.6.2.2\build\IllusionLibs.Koikatu.UnityEngine.targets')" />
+  <Import Project="..\packages\IllusionLibs.Koikatu.UnityEngine.UI.5.6.2.2\build\IllusionLibs.Koikatu.UnityEngine.UI.targets" Condition="Exists('..\packages\IllusionLibs.Koikatu.UnityEngine.UI.5.6.2.2\build\IllusionLibs.Koikatu.UnityEngine.UI.targets')" />
+  <Import Project="..\packages\IllusionLibs.Koikatu.Assembly-CSharp.2019.4.27.2\build\IllusionLibs.Koikatu.Assembly-CSharp.targets" Condition="Exists('..\packages\IllusionLibs.Koikatu.Assembly-CSharp.2019.4.27.2\build\IllusionLibs.Koikatu.Assembly-CSharp.targets')" />
+  <Import Project="..\packages\IllusionLibs.BepInEx.Harmony.2.5.1\build\IllusionLibs.BepInEx.Harmony.targets" Condition="Exists('..\packages\IllusionLibs.BepInEx.Harmony.2.5.1\build\IllusionLibs.BepInEx.Harmony.targets')" />
 </Project>

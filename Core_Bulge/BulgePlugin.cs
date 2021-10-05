@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using BepInEx;
 using BepInEx.Configuration;
+using BepInEx.Logging;
 using ExtensibleSaveFormat;
 using KKABMX.Core;
 using KKAPI;
@@ -12,12 +13,14 @@ using KKAPI.Maker;
 using KKAPI.Maker.UI;
 using KKAPI.Studio;
 using KKAPI.Studio.UI;
+using KKAPI.Utilities;
 using UniRx;
 using UnityEngine;
 
 // BUG this plugin is useless in AI because it doesn't work on male body and females can't be given male uncensors
 #if !AI
 using CoordinateType = ChaFileDefine.CoordinateType;
+using StrayTech;
 #endif
 
 namespace KK_Bulge
@@ -28,13 +31,17 @@ namespace KK_Bulge
     public class BulgePlugin : BaseUnityPlugin
     {
         public const string GUID = "Bulge";
-        public const string Version = "1.0";
+        public const string Version = "1.0.2";
+
+        internal static new ManualLogSource Logger;
 
         internal static ConfigEntry<float> DefaultBulgeSize;
         internal static ConfigEntry<BulgeEnableLevel> DefaultBulgeState;
 
         private void Awake()
         {
+            Logger = base.Logger;
+
             DefaultBulgeSize = Config.Bind("Default settings", "Default bulge size", 0.5f,
                 new ConfigDescription("Default size of bulges if not specified per-character (in Body/Genitals tab in character maker).", new AcceptableValueRange<float>(0, 1)));
             DefaultBulgeState = Config.Bind("Default settings", "Enable bulge by default", BulgeEnableLevel.Auto,
@@ -116,9 +123,24 @@ namespace KK_Bulge
 
             if (_bulgeBoneEffect == null)
             {
-                _bulgeBoneEffect = new BulgeBoneEffect(this);
-                var bc = GetComponent<BoneController>();
-                bc.AddBoneEffect(_bulgeBoneEffect);
+#if KK
+                // BodyTop/p_cf_body_00/cf_o_root/n_body/n_dankon
+                // BodyTop/p_cf_body_00 can be disabled in kkp in some cases, somehow, so need a full scan
+                var sonGo = transform.FindChildDeep("n_dankon");
+#elif AI
+                var sonGo = ChaControl.cmpBody.targetEtc.objDanTop;
+#endif
+                if (sonGo)
+                {
+                    BulgePlugin.Logger.LogDebug("Found n_dankon bone GameObject at " + sonGo.GetFullPath());
+                    _bulgeBoneEffect = new BulgeBoneEffect(this, sonGo.gameObject);
+                    var bc = GetComponent<BoneController>();
+                    bc.AddBoneEffect(_bulgeBoneEffect);
+                }
+                else
+                {
+                    BulgePlugin.Logger.LogDebug("Did not find n_dankon bone GameObject under " + gameObject.GetFullPath());
+                }
             }
 
             EnableBulge = BulgePlugin.DefaultBulgeState.Value;
@@ -147,14 +169,20 @@ namespace KK_Bulge
         private readonly BulgeController _ctrl;
         private readonly GameObject _son;
 
-        public BulgeBoneEffect(BulgeController ctrl)
+        public BulgeBoneEffect(BulgeController ctrl, GameObject son)
         {
             if (ctrl == null) throw new ArgumentNullException(nameof(ctrl));
+            if (son == null) throw new ArgumentNullException(nameof(son));
             _ctrl = ctrl;
+            _son = son;
+        }
+
+        private static bool IsSonDisabledInConfig()
+        {
 #if KK
-            _son = _ctrl.ChaControl.GetReferenceInfo(ChaReference.RefObjKey.S_Son);
+            return !Manager.Config.EtcData.VisibleSon;
 #elif AI
-            _son = _ctrl.ChaControl.cmpBody.targetEtc.objDanTop;
+            return !Manager.Config.HData.Son;
 #endif
         }
 
@@ -164,15 +192,8 @@ namespace KK_Bulge
             {
                 case BulgeEnableLevel.Auto:
                 default:
-                    if (GameAPI.InsideHScene)
-                    {
-#if KK
-                        if (!Manager.Config.EtcData.VisibleSon)
-#elif AI
-                        if (!Manager.Config.HData.Son)
-#endif
-                            return false;
-                    }
+                    if (GameAPI.InsideHScene && IsSonDisabledInConfig())
+                        return false;
 
                     var status = _ctrl.ChaControl.fileStatus;
                     var bulgeVisible = status.visibleSonAlways && !_son.activeSelf;
