@@ -1,16 +1,24 @@
 ﻿using System.Linq;
+using BepInEx.Configuration;
 using ExtensibleSaveFormat;
 using HarmonyLib;
 using KKAPI.MainGame;
+using KKAPI.Utilities;
 using UnityEngine;
 
 namespace KoikatuGameplayMod
 {
-    internal static class TrapNoVagInsertHooks
+    internal class TrapNoVagInsertHooks : IFeature
     {
-        public static void ApplyHooks(Harmony instance)
+        public bool Install(Harmony instance, ConfigFile config)
         {
-            instance.PatchAll(typeof(TrapNoVagInsertHooks));
+            var s = config.Bind(KoikatuGameplayMod.ConfCatHScene, "Disable vaginal insert for traps/men", true,
+                "Only works if you use UncensorSelector to give a female card a penis but no vagina in maker. Some positions don't have the anal option so you won't be able to insert at all in them.\nChanges take effect after game restart.");
+
+            if (s.Value)
+                instance.PatchAll(typeof(TrapNoVagInsertHooks));
+
+            return true;
         }
 
         /// <summary>
@@ -20,7 +28,7 @@ namespace KoikatuGameplayMod
         [HarmonyPatch(typeof(HSprite), nameof(HSprite.SetSonyuStart))]
         public static void SetSonyuStartPost(HSprite __instance)
         {
-            var isTrap = IsATrap(Utilities.GetTargetHeroine(__instance));
+            var isTrap = IsATrap(__instance.GetLeadingHeroine());
             var lstButton = __instance.sonyu.categoryActionButton.lstButton;
 
             // Toggle the front insert buttons. Anal buttons won't work properly if they are not already enabled so don't force enable.
@@ -55,7 +63,7 @@ namespace KoikatuGameplayMod
 
         private static void OnAnalCum(HFlag hFlag)
         {
-            if (IsATrap(Utilities.GetTargetHeroine(hFlag)))
+            if (IsATrap(hFlag.GetLeadingHeroine()))
             {
                 // If it's a trap, disable the first h guide after coming inside the back hole (wouldn't disappear otherwise)
                 Object.FindObjectOfType<HSprite>()?.objFirstHHelpBase?.SetActive(false);

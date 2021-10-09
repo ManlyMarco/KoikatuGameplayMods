@@ -1,24 +1,35 @@
 ﻿using System.Linq;
 using ActionGame;
+using BepInEx.Configuration;
 using HarmonyLib;
+using KKAPI;
 
 namespace KoikatuGameplayMod
 {
-    internal static class FastTravelCostHooks
+    internal class FastTravelCostHooks : IFeature
     {
-        public static void ApplyHooks(Harmony instance)
+        public bool Install(Harmony instance, ConfigFile config)
         {
+            if (KoikatuAPI.IsVR()) return false;
+
+            _fastTravelTimePenalty = config.Bind(KoikatuGameplayMod.ConfCatMainGame, "Fast travel (F3) time cost", 50,
+                new ConfigDescription("Value is in seconds. One period has 500 seconds.", new AcceptableValueRange<int>(0, 100)));
+
             instance.PatchAll(typeof(FastTravelCostHooks));
+
+            return true;
         }
+
+        private static ConfigEntry<int> _fastTravelTimePenalty;
 
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ActionMap), nameof(ActionMap.PlayerMapWarp))]
-        public static void MapSelectMenuSceneRegisterCallback(MapSelectMenuScene __instance)
+        private static void MapSelectMenuSceneRegisterCallback()
         {
-            if (KoikatuGameplayMod.FastTravelTimePenalty.Value > 0)
+            if (_fastTravelTimePenalty.Value > 0)
             {
                 var cycle = UnityEngine.Object.FindObjectsOfType<Cycle>().FirstOrDefault();
-                if (cycle != null) cycle.AddTimer(KoikatuGameplayMod.FastTravelTimePenalty.Value / 500f);
+                if (cycle != null) cycle.AddTimer(_fastTravelTimePenalty.Value / 500f);
             }
         }
     }

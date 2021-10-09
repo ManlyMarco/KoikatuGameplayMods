@@ -1,24 +1,36 @@
 ﻿using System;
+using BepInEx.Configuration;
 using HarmonyLib;
+using KKAPI.MainGame;
 using KKAPI.Utilities;
 using UnityEngine;
 
 namespace KoikatuGameplayMod
 {
-    internal static class ForceInsertHooks
+    internal class ForceInsertHooks : IFeature
     {
-        public static void ApplyHooks(Harmony instance)
+        private static ConfigEntry<bool> _forceInsert;
+        private static ConfigEntry<bool> _forceInsertAnger;
+
+        public bool Install(Harmony instance, ConfigFile config)
         {
+            _forceInsert = config.Bind(KoikatuGameplayMod.ConfCatHScene, "Allow force insert", true, 
+                "Can insert raw even if it's denied.\nTo force insert - click on the blue insert button right after being denied, after coming outside, or after making her come multiple times. Other contitions might apply.");
+            _forceInsertAnger = config.Bind(KoikatuGameplayMod.ConfCatHScene, "Force insert causes anger", true, 
+                "If you cum inside on or force insert too many times the heroine will get angry with you.\nWhen enabled heroine's expression changes during H (if forced).");
+
             instance.PatchAll(typeof(ForceInsertHooks));
 
-            Utilities.HSceneEndClicked += ApplyGirlAnger;
+            GameAPI.EndH += ApplyGirlAnger;
+
+            return true;
         }
 
         #region ForceAnal
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(HSprite), nameof(HSprite.OnInsertAnalClick), new Type[] { })]
-        public static void OnInsertAnalClickPre(HSprite __instance, out bool __state)
+        private static void OnInsertAnalClickPre(HSprite __instance, out bool __state)
         {
             __state = __instance.flags.isAnalInsertOK;
 
@@ -26,25 +38,25 @@ namespace KoikatuGameplayMod
             if (__instance.flags.count.sonyuAnalOrg >= 1)
             {
                 __instance.flags.isAnalInsertOK = true;
-                var heroine = Utilities.GetTargetHeroine(__instance);
+                var heroine = __instance.GetLeadingHeroine();
                 if (heroine != null) MakeGirlAngry(heroine, 20, 10);
             }
         }
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(HSprite), nameof(HSprite.OnInsertAnalNoVoiceClick), new Type[] { })]
-        public static void OnInsertAnalNoVoiceClickPre(HSprite __instance, out bool __state)
+        private static void OnInsertAnalNoVoiceClickPre(HSprite __instance, out bool __state)
         {
             __state = __instance.flags.isAnalInsertOK;
 
             // Check if player can circumvent the anal deny
-            if (!KoikatuGameplayMod.ForceInsert.Value) return;
+            if (!_forceInsert.Value) return;
             if (CanCircumventDeny(__instance) || __instance.flags.count.sonyuAnalOrg >= 1)
             {
                 __instance.flags.isAnalInsertOK = true;
                 __instance.flags.isDenialvoiceWait = false;
 
-                var heroine = Utilities.GetTargetHeroine(__instance);
+                var heroine = __instance.GetLeadingHeroine();
                 if (heroine != null) MakeGirlAngry(heroine, 30, 15);
             }
         }
@@ -52,7 +64,7 @@ namespace KoikatuGameplayMod
         [HarmonyPostfix]
         [HarmonyPatch(typeof(HSprite), nameof(HSprite.OnInsertAnalClick), new Type[] { })]
         [HarmonyPatch(typeof(HSprite), nameof(HSprite.OnInsertAnalNoVoiceClick), new Type[] { })]
-        public static void OnInsertAnalNoVoiceClickPost(HSprite __instance, bool __state)
+        private static void OnInsertAnalNoVoiceClickPost(HSprite __instance, bool __state)
         {
             __instance.flags.isAnalInsertOK = __state;
         }
@@ -63,18 +75,18 @@ namespace KoikatuGameplayMod
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(HSprite), nameof(HSprite.OnInsertNoVoiceClick), new Type[] { })]
-        public static void OnInsertNoVoiceClickPre(HSprite __instance, out bool __state)
+        private static void OnInsertNoVoiceClickPre(HSprite __instance, out bool __state)
         {
             var heroineId = __instance.GetLeadingHeroineId();
             __state = __instance.flags.isInsertOK[heroineId];
 
-            var heroine = Utilities.GetTargetHeroine(__instance);
+            var heroine = __instance.GetLeadingHeroine();
             if (heroine == null) return;
 
             var girlOrgasms = __instance.flags.count.sonyuOrg;
 
             // Check if player can circumvent the raw deny
-            if (!KoikatuGameplayMod.ForceInsert.Value) return;
+            if (!_forceInsert.Value) return;
             if (CanCircumventDeny(__instance) ||
                 girlOrgasms >= 3 + UnityEngine.Random.Range(0, 3) - heroine.lewdness / 66)
             {
@@ -87,12 +99,12 @@ namespace KoikatuGameplayMod
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(HSprite), nameof(HSprite.OnInsertClick), new Type[] { })]
-        public static void OnInsertClickPre(HSprite __instance, out bool __state)
+        private static void OnInsertClickPre(HSprite __instance, out bool __state)
         {
             var heroineId = __instance.GetLeadingHeroineId();
             __state = __instance.flags.isInsertOK[heroineId];
 
-            var heroine = Utilities.GetTargetHeroine(__instance);
+            var heroine = __instance.GetLeadingHeroine();
             if (heroine == null) return;
             var girlOrgasms = __instance.flags.count.sonyuOrg;
 
@@ -104,7 +116,7 @@ namespace KoikatuGameplayMod
         [HarmonyPostfix]
         [HarmonyPatch(typeof(HSprite), nameof(HSprite.OnInsertClick), new Type[] { })]
         [HarmonyPatch(typeof(HSprite), nameof(HSprite.OnInsertNoVoiceClick), new Type[] { })]
-        public static void OnInsertNoVoiceClickPost(HSprite __instance, bool __state)
+        private static void OnInsertNoVoiceClickPost(HSprite __instance, bool __state)
         {
             var heroineId = __instance.GetLeadingHeroineId();
             __instance.flags.isInsertOK[heroineId] = __state;
@@ -120,7 +132,7 @@ namespace KoikatuGameplayMod
         /// <param name="favorAmount"></param>
         private static void MakeGirlAngry(SaveData.Heroine heroine, int angerAmount, int favorAmount)
         {
-            if (!KoikatuGameplayMod.ForceInsertAnger.Value) return;
+            if (!_forceInsertAnger.Value) return;
 
             heroine.anger = Math.Min(100, heroine.anger + angerAmount);
             heroine.favor = Math.Max(0, heroine.favor - favorAmount);
@@ -140,31 +152,33 @@ namespace KoikatuGameplayMod
                    __instance.flags.isDenialvoiceWait;
         }
 
-        private static void ApplyGirlAnger(HSprite __instance)
+        private static void ApplyGirlAnger(object sender, EventArgs e)
         {
-            if (!KoikatuGameplayMod.ForceInsertAnger.Value) return;
+            if (!_forceInsertAnger.Value) return;
 
-            var heroine = Utilities.GetTargetHeroine(__instance);
+            var hflag = GameObject.FindObjectOfType<HFlag>();
+
+            var heroine = hflag.GetLeadingHeroine();
             if (heroine == null) return;
 
-            if (!__instance.flags.isInsertOK[Utilities.GetTargetHeroineId(__instance)])
+            if (!hflag.isInsertOK[hflag.GetLeadingHeroineId()])
             {
-                if (__instance.flags.count.sonyuInside > 0)
+                if (hflag.count.sonyuInside > 0)
                 {
                     if (HFlag.GetMenstruation(heroine.MenstruationDay) == HFlag.MenstruationType.危険日)
                     {
                         // If it's dangerous always make her angry
-                        heroine.anger = Math.Min(100, heroine.anger + __instance.flags.count.sonyuInside * 45);
+                        heroine.anger = Math.Min(100, heroine.anger + hflag.count.sonyuInside * 45);
                         heroine.isAnger = true;
                     }
                     else
                     {
-                        heroine.anger = Math.Min(100, heroine.anger + __instance.flags.count.sonyuInside * 25);
+                        heroine.anger = Math.Min(100, heroine.anger + hflag.count.sonyuInside * 25);
                     }
                 }
-                else if (__instance.flags.count.sonyuOutside > 0)
+                else if (hflag.count.sonyuOutside > 0)
                 {
-                    heroine.anger = Math.Max(0, heroine.anger - __instance.flags.count.sonyuOutside * 10);
+                    heroine.anger = Math.Max(0, heroine.anger - hflag.count.sonyuOutside * 10);
                 }
             }
 

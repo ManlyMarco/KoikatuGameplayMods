@@ -1,12 +1,19 @@
-﻿using HarmonyLib;
+﻿using BepInEx.Configuration;
+using HarmonyLib;
 
 namespace KoikatuGameplayMod
 {
-    internal static class ExperienceLogicHooks
+    internal class ExperienceLogicHooks : IFeature
     {
-        public static void ApplyHooks(Harmony instance)
+        public bool Install(Harmony instance, ConfigFile config)
         {
-            instance.PatchAll(typeof(ExperienceLogicHooks));
+            var s = config.Bind(KoikatuGameplayMod.ConfCatHScene, "Can be experienced from only one hole", true,
+                "Make it so you only need to max the girls' either vaginal caress/piston or anal caress/piston to achieve experienced state. By default you have to max out both front and rear to get the experienced status.\nChanges take effect after game restart.");
+
+            if (s.Value)
+                instance.PatchAll(typeof(ExperienceLogicHooks));
+
+            return true;
         }
 
         /// <summary>
@@ -14,7 +21,7 @@ namespace KoikatuGameplayMod
         /// </summary>
         [HarmonyPostfix]
         [HarmonyPatch(typeof(SaveData.Heroine), nameof(SaveData.Heroine.HExperience), MethodType.Getter)]
-        public static void GetHExperiencePost(SaveData.Heroine __instance, ref SaveData.Heroine.HExperienceKind __result)
+        private static void GetHExperiencePost(SaveData.Heroine __instance, ref SaveData.Heroine.HExperienceKind __result)
         {
             if (__result == SaveData.Heroine.HExperienceKind.不慣れ) // inexperienced
             {
