@@ -4,15 +4,18 @@ using System.Linq;
 using BepInEx;
 using HarmonyLib;
 using KKAPI;
+using Manager;
 
 namespace KoikatuGameplayMod
 {
     [BepInPlugin(GUID, "Koikatu Gameplay Tweaks and Improvements", Version)]
     [BepInProcess(KoikatuAPI.GameProcessName)]
-    [BepInProcess(KoikatuAPI.GameProcessNameSteam)]
     [BepInProcess(KoikatuAPI.VRProcessName)]
+#if KK
+    [BepInProcess(KoikatuAPI.GameProcessNameSteam)]
     [BepInProcess(KoikatuAPI.VRProcessNameSteam)]
     [BepInIncompatibility("fulmene.experiencelogic")]
+#endif
     [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
     public class KoikatuGameplayMod : BaseUnityPlugin
     {
@@ -27,7 +30,7 @@ namespace KoikatuGameplayMod
             var i = new Harmony(GUID);
 
             var featureT = typeof(IFeature);
-            var types = typeof(KoikatuGameplayMod).Assembly.GetTypes().Where(x => featureT.IsAssignableFrom(x));
+            var types = typeof(KoikatuGameplayMod).Assembly.GetTypes().Where(x => featureT.IsAssignableFrom(x) && x.IsClass);
 
             var successful = new List<string>();
             foreach (var type in types)
@@ -37,6 +40,15 @@ namespace KoikatuGameplayMod
                     successful.Add(type.Name);
             }
             Logger.LogInfo("Loaded features: " + string.Join(", ", successful.ToArray()));
+        }
+
+        internal static List<SaveData.Heroine> GetHeroineList()
+        {
+#if KK
+            return Game.Instance.HeroineList;
+#else
+            return Game.HeroineList;
+#endif
         }
     }
 }

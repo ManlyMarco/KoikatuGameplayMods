@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>c9650f99-df26-4d54-9826-5f77275c9d31</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>Core_GameplayMod</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Hooks\ExitHSceneEarlyHooks.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Hooks\ExperienceLogicHooks.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Hooks\FastTravelCostHooks.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Hooks\ForceInsertHooks.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Hooks\HidePlayerWhenTouchingHooks.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Hooks\ResetNoCondomHooks.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)Hooks\TrapNoVagInsertHooks.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)IFeature.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)KoikatuGameplayMod.cs" />
+  </ItemGroup>
+</Project>

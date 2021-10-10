@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Reflection.Emit;
@@ -30,28 +31,10 @@ namespace KoikatuGameplayMod
             var target = AccessTools.Method(typeof(HActionBase), nameof(HActionBase.IsBodyTouch)) ?? throw new ArgumentNullException("HActionBase.IsBodyTouch)");
             var replacement = AccessTools.Method(typeof(HidePlayerWhenTouchingHooks), nameof(HidePlayerWhenTouchingHooks.IsBodyTouchOverride)) ?? throw new ArgumentNullException("HSceneHooks.CanHide");
 
-            var asd = new CodeMatcher(instructions.ToList())
+            return new CodeMatcher(instructions.ToList())
                 .MatchForward(true, new CodeMatch(null, target))
-                .Repeat(m => m.InsertAndAdvance(new CodeInstruction(OpCodes.Call, replacement)), err => throw new Exception("Nothing replaced. " + err))
+                .Repeat(m => m.Advance(1).InsertAndAdvance(new CodeInstruction(OpCodes.Call, replacement)), err => throw new Exception("Nothing replaced. " + err))
                 .Instructions().ToList();
-
-            var orig = CodeInstructions(instructions, target, replacement).ToList();
-
-            if (!asd.SequenceEqual(orig)) throw new Exception("aaaaaa");
-            return orig;
-        }
-
-        private static IEnumerable<CodeInstruction> CodeInstructions(IEnumerable<CodeInstruction> instructions, MethodInfo target, MethodInfo replacement)
-        {
-            foreach (var codeInstruction in instructions)
-            {
-                yield return codeInstruction;
-
-                if (codeInstruction.operand == target)
-                {
-                    yield return new CodeInstruction(OpCodes.Call, replacement);
-                }
-            }
         }
 
         private static bool IsBodyTouchOverride(bool isTouch)

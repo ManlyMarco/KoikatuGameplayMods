@@ -16,12 +16,15 @@ namespace KoikatuGameplayMod
         {
             _forceInsert = config.Bind(KoikatuGameplayMod.ConfCatHScene, "Allow force insert", true, 
                 "Can insert raw even if it's denied.\nTo force insert - click on the blue insert button right after being denied, after coming outside, or after making her come multiple times. Other contitions might apply.");
+
+#if KK
             _forceInsertAnger = config.Bind(KoikatuGameplayMod.ConfCatHScene, "Force insert causes anger", true, 
                 "If you cum inside on or force insert too many times the heroine will get angry with you.\nWhen enabled heroine's expression changes during H (if forced).");
+            GameAPI.EndH += ApplyGirlAnger;
+#endif
 
             instance.PatchAll(typeof(ForceInsertHooks));
 
-            GameAPI.EndH += ApplyGirlAnger;
 
             return true;
         }
@@ -132,9 +135,11 @@ namespace KoikatuGameplayMod
         /// <param name="favorAmount"></param>
         private static void MakeGirlAngry(SaveData.Heroine heroine, int angerAmount, int favorAmount)
         {
+#if KK
             if (!_forceInsertAnger.Value) return;
 
             heroine.anger = Math.Min(100, heroine.anger + angerAmount);
+#endif
             heroine.favor = Math.Max(0, heroine.favor - favorAmount);
 
             heroine.chaCtrl.tearsLv = 2;
@@ -152,6 +157,7 @@ namespace KoikatuGameplayMod
                    __instance.flags.isDenialvoiceWait;
         }
 
+#if KK
         private static void ApplyGirlAnger(object sender, EventArgs e)
         {
             if (!_forceInsertAnger.Value) return;
@@ -185,5 +191,6 @@ namespace KoikatuGameplayMod
             if (heroine.anger >= 100)
                 heroine.isAnger = true;
         }
+#endif
     }
 }

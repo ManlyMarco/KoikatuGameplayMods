@@ -1,4 +1,5 @@
-﻿using BepInEx.Configuration;
+﻿using System.Collections.Generic;
+using BepInEx.Configuration;
 using HarmonyLib;
 using KKAPI;
 using KKAPI.MainGame;
@@ -27,7 +28,7 @@ namespace KoikatuGameplayMod
         {
             if (_resetNoCondom.Value)
             {
-                foreach (var heroine in Game.Instance.HeroineList)
+                foreach (var heroine in KoikatuGameplayMod.GetHeroineList())
                 {
                     if (heroine.parameter.attribute.bitch) continue;
 
