@@ -13,7 +13,7 @@ namespace KoikatuGameplayMod
             if (KoikatuAPI.IsVR()) return false;
 
             _fastTravelTimePenalty = config.Bind(KoikatuGameplayMod.ConfCatMainGame, "Fast travel (F3) time cost", 50,
-                new ConfigDescription("Value is in seconds. One period has 500 seconds.", new AcceptableValueRange<int>(0, 100)));
+                new ConfigDescription("Value is in seconds. One period has 500 seconds.", new AcceptableValueRange<int>(0, 200)));
 
             instance.PatchAll(typeof(FastTravelCostHooks));
 
