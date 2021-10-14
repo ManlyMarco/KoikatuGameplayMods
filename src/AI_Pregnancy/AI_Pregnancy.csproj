@@ -96,32 +96,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Core_Pregnancy\Data\HeroineStatus.cs" />
-    <!-- <Compile Include="..\Core_Pregnancy\LactationController.cs" /> -->
-    <Compile Include="..\Core_Pregnancy\Data\MenstruationSchedule.cs" />
-    <Compile Include="..\Core_Pregnancy\PregnancyBoneEffect.cs" />
-    <Compile Include="..\Core_Pregnancy\PregnancyCharaController.cs" />
-    <Compile Include="..\Core_Pregnancy\Data\PregnancyData.cs" />
-    <Compile Include="..\Core_Pregnancy\Data\PregnancyDataUtils.cs" />
-    <Compile Include="..\Core_Pregnancy\PregnancyGameController.cs" />
-    <Compile Include="..\Core_Pregnancy\GUI\PregnancyGui.cs" />
-    <!-- <Compile Include="..\Core_Pregnancy\GUI\PregnancyGui.HSceneMenstrIconOverride.cs" /> -->
-    <Compile Include="..\Core_Pregnancy\GUI\PregnancyGui.StatusIcons.cs" />
-    <Compile Include="..\Core_Pregnancy\PregnancyPlugin.cs" />
-    <Compile Include="..\Core_Pregnancy\PregnancyPlugin.Hooks.cs" />
-    <Compile Include="..\Core_Pregnancy\Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="..\Core_Pregnancy\Resources\leave.png" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="..\Core_Pregnancy\Resources\pregnant.png" />
-    <EmbeddedResource Include="..\Core_Pregnancy\Resources\risky.png" />
-    <EmbeddedResource Include="..\Core_Pregnancy\Resources\safe.png" />
-    <EmbeddedResource Include="..\Core_Pregnancy\Resources\unknown.png" />
-  </ItemGroup>
+  <Import Project="..\Core_Pregnancy\Core_Pregnancy.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
