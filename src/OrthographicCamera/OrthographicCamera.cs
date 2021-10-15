@@ -16,7 +16,7 @@ namespace KK_OrthographicCamera
 
         private void Start()
         {
-            ToggleOrthoCamera = Config.Bind("", "Toggle orthographic mode", new KeyboardShortcut(KeyCode.I));
+            ToggleOrthoCamera = Config.Bind("", "Toggle orthographic mode", KeyboardShortcut.Empty);
             // No need to force it in koi studio
             ForceOrthographicSize = Application.productName != "CharaStudio";
         }
