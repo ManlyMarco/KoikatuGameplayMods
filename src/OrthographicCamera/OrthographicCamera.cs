@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace KK_OrthographicCamera
 {
-    [BepInPlugin(GUID, GUID, Version)]
+    [BepInPlugin(GUID, "OrthographicCamera", Version)]
     [DefaultExecutionOrder(1000)]
     public class OrthographicCamera : BaseUnityPlugin
     {
