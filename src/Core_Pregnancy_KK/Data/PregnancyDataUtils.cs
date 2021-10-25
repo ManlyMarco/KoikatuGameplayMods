@@ -54,7 +54,7 @@ namespace KK_Pregnancy
                 if (pregData == null) pregData = heroine.GetPregnancyData();
 
                 // Check if she wants to tell //todo need to ask in talk scene
-                if (heroine.intimacy >= 80 ||
+                if (heroine.intimacy >= 80 || //todo what is relation in kks
                     heroine.hCount >= 5 ||
                     heroine.parameter.attribute.bitch && heroine.favor > 50 ||
                     (heroine.isGirlfriend || heroine.favor >= 90) &&

@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using ExtensibleSaveFormat;
-using KKAPI.Chara;
 using KKAPI.MainGame;
 using Manager;
 using UnityEngine;
@@ -27,13 +26,21 @@ namespace KK_Pregnancy
             }
         }
 
+#if KK
+        protected override void OnStartH(BaseLoader proc, HFlag hFlag, bool vr)
+#else
         protected override void OnStartH(MonoBehaviour proc, HFlag hFlag, bool vr)
+#endif
         {
             InsideHScene = true;
             proc.gameObject.AddComponent<LactationController>();
         }
 
+#if KK
+        protected override void OnEndH(BaseLoader proc, HFlag hFlag, bool vr)
+#else
         protected override void OnEndH(MonoBehaviour proc, HFlag hFlag, bool vr)
+#endif
         {
             InsideHScene = false;
             Destroy(proc.GetComponent<LactationController>());
@@ -114,8 +121,13 @@ namespace KK_Pregnancy
                 }
             }
 
+#if KK
+            foreach (var heroine in Game.Instance.HeroineList) ApplyToDatas(heroine);
+            ApplyToDatas(Game.Instance.Player);
+#else
             foreach (var heroine in Game.HeroineList) ApplyToDatas(heroine);
             ApplyToDatas(Game.Player);
+#endif
 
             // If controller exists then update its state so it gets any pregnancy week updates
             foreach (var controller in FindObjectsOfType<PregnancyCharaController>())

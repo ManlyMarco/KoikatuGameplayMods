@@ -97,7 +97,28 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Resources\preg_icon.xcf" />
   </ItemGroup>
-  <Import Project="..\Core_Pregnancy\Core_Pregnancy.projitems" Label="Shared" />
+  <ItemGroup>
+    <Content Include="Resources\leave.png" />
+    <Content Include="Resources\pregnant.png" />
+    <Content Include="Resources\risky.png" />
+    <Content Include="Resources\safe.png" />
+    <Content Include="Resources\unknown.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Data\HeroineStatus.cs" />
+    <Compile Include="Data\MenstruationSchedule.cs" />
+    <Compile Include="Data\PregnancyData.cs" />
+    <Compile Include="Data\PregnancyDataUtils.cs" />
+    <Compile Include="GUI\PregnancyGui.cs" />
+    <Compile Include="GUI\PregnancyGui.StatusIcons.cs" />
+    <Compile Include="PregnancyBoneEffect.cs" />
+    <Compile Include="PregnancyCharaController.cs" />
+    <Compile Include="PregnancyGameController.cs" />
+    <Compile Include="PregnancyPlugin.cs" />
+    <Compile Include="PregnancyPlugin.Hooks.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

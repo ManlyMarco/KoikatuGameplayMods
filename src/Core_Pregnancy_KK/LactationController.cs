@@ -233,17 +233,22 @@ namespace KK_Pregnancy
                 {
                     var soundEffectSetting = new Utils.Sound.Setting(Manager.Sound.Type.GameSE3D)
                     {
+#if KK
                         assetBundleName = "sound/data/se/h/00/00_00.unity3d",
                         assetName = "khse_06"
+#else
+                        bundle = "sound/data/se/h/00/00_00.unity3d",  //todo check if it's still the same asset name
+                        asset = "khse_06"
+#endif
                     };
                     // Alternative sound effect, much longer
                     //assetBundleName = @"sound/data/se/h/12/12_00.unity3d";
                     //assetName = "hse_siofuki";
 
-                    var soundTr = Utils.Sound.Play(soundEffectSetting);
+                    var soundSource = Utils.Sound.Play(soundEffectSetting);
                     var chaRef = chaControl.GetReferenceInfo(reference);
-                    if (soundTr && chaRef)
-                        soundTr.SetParent(chaRef.transform, false);
+                    if (soundSource && chaRef)
+                        soundSource.transform.SetParent(chaRef.transform, false);
                 }
 
                 PlaySoundEffect(ChaControl, ChaReference.RefObjKey.a_n_bust_f);

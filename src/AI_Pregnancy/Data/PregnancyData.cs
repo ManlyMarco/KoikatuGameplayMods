@@ -33,12 +33,10 @@ namespace KK_Pregnancy
 
         public MenstruationSchedule MenstruationSchedule = MenstruationSchedule.Default;
 
-        #if AI
-            /// <summary>
-            /// The first day that menstraion started in AI
-            /// </summary>
-            public int MenstrationStartDay = -1;
-        #endif
+        /// <summary>
+        /// The first day that menstraion started in AI
+        /// </summary>
+        public int MenstrationStartDay = -1;
 
         /// <summary>
         /// If 0 or negative, the character is not pregant.
@@ -126,19 +124,17 @@ namespace KK_Pregnancy
             }
         }
 
-        #if AI
-            public void StartMenstration(int currentDay)
+        public void StartMenstration(int currentDay)
+        {
+            if (!IsPregnant)
             {
-                if (!IsPregnant)
-                {
-                    MenstrationStartDay = currentDay;                    
-                }
+                MenstrationStartDay = currentDay;
             }
+        }
 
-            public void StopMenstration()
-            {
-                MenstrationStartDay = -1;
-            }
-        #endif
+        public void StopMenstration()
+        {
+            MenstrationStartDay = -1;
+        }
     }
 }

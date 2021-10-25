@@ -3,30 +3,22 @@
   <PropertyGroup>
     <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
     <HasSharedItems>true</HasSharedItems>
-    <SharedGUID>eebf32ed-c125-4597-8b3d-4e7e44a15626</SharedGUID>
+    <SharedGUID>3c122ef8-491b-447b-94e4-ada9d818403c</SharedGUID>
   </PropertyGroup>
   <PropertyGroup Label="Configuration">
-    <Import_RootNamespace>Core_Pregnancy</Import_RootNamespace>
+    <Import_RootNamespace>Core_Pregnancy_KK</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\HeroineStatus.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\MenstruationSchedule.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\PregnancyData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)Data\PregnancyDataUtils.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GUI\PregnancyGui.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)GUI\PregnancyGui.StatusIcons.cs" />
+    <Compile Include="$(MSBuildThisFileDirectory)LactationController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PregnancyBoneEffect.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PregnancyCharaController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PregnancyGameController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PregnancyPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PregnancyPlugin.Hooks.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources\leave.png" />
-    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources\pregnant.png" />
-    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources\risky.png" />
-    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources\safe.png" />
-    <EmbeddedResource Include="$(MSBuildThisFileDirectory)Resources\unknown.png" />
   </ItemGroup>
 </Project>
