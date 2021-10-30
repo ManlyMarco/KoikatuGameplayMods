@@ -106,11 +106,16 @@ namespace KK_LewdCrestX
                     x.Element("Description").Value,
                     Bundle));
             // ReSharper restore PossibleNullReferenceException
+
+            var sb = new System.Text.StringBuilder(300);
+            sb.Append("Loaded crests:");
             foreach (var crestInfo in crestInfos)
             {
-                Logger.LogDebug("Added crest " + crestInfo.Id);
+                sb.Append(' ');
+                sb.Append(crestInfo.Id);
                 CrestInfos.Add(crestInfo.Id, crestInfo);
             }
+            Logger.LogDebug(sb.ToString());
 
             //todo use custom material in the future? might allow glow effects, showing through clothes, adjusting crest location
             //var mat = new Material(Shader.Find("Standard"));
