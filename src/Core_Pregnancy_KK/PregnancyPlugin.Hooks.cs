@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using System.Reflection.Emit;
 using ExtensibleSaveFormat;
 using HarmonyLib;
-using KKAPI.MainGame;
+using KKAPI.Utilities;
 using Manager;
 using UnityEngine;
 
@@ -19,16 +17,13 @@ namespace KK_Pregnancy
             {
                 harmonyInstance.PatchAll(typeof(Hooks));
 
-                PatchNPCLoadAll(harmonyInstance, new HarmonyMethod(typeof(Hooks), nameof(NPCLoadAllTpl)));
+                PatchNPCLoadAll(harmonyInstance);
             }
-
-            private static bool _lastPullProc;
 
             #region Custom safe day schedule
 
             private static SaveData.Heroine _lastHeroine;
             private static byte[] _menstruationsBackup;
-
 
             [HarmonyPostfix]
             [HarmonyPatch(typeof(SaveData.Heroine), nameof(SaveData.Heroine.MenstruationDay), MethodType.Getter)]
@@ -71,17 +66,21 @@ namespace KK_Pregnancy
             /// <summary>
             /// Needed for preventing characters from going to school when on leave after pregnancy
             /// </summary>
-            private static void PatchNPCLoadAll(Harmony instance, HarmonyMethod transpiler)
+            private static void PatchNPCLoadAll(Harmony instance)
             {
-                var t = typeof(ActionScene).GetNestedTypes(BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public).Single(x => x.Name.StartsWith("<NPCLoadAll>c__Iterator"));
-                var m = t.GetMethod("MoveNext");
-                instance.Patch(m, null, null, transpiler);
+                var transpiler = new HarmonyMethod(typeof(Hooks), nameof(NPCLoadAllTpl));
+                foreach (var target in typeof(ActionScene).GetMethods(AccessTools.all).Where(x => x.Name == nameof(ActionScene.NPCLoadAll)))
+                {
+                    Logger.LogDebug("Patching " + target.FullDescription());
+                    instance.PatchMoveNext(target, null, null, transpiler);
+                }
             }
 
             private static IEnumerable<CodeInstruction> NPCLoadAllTpl(IEnumerable<CodeInstruction> instructions)
             {
                 var target = AccessTools.Property(typeof(Game), nameof(Game.HeroineList)).GetGetMethod();
                 var customFilterM = AccessTools.Method(typeof(Hooks), nameof(GetFilteredHeroines));
+                var count = 0;
                 foreach (var instruction in instructions)
                 {
                     yield return instruction;
@@ -90,8 +89,10 @@ namespace KK_Pregnancy
                     {
                         // Grab the return of get_HeroineList and process it
                         yield return new CodeInstruction(OpCodes.Call, customFilterM);
+                        count++;
                     }
                 }
+                Logger.LogDebug("NPCLoadAllTpl calls injected count: " + count);
             }
 
             #endregion Preg leave from school

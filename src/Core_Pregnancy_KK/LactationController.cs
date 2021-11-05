@@ -285,9 +285,14 @@ namespace KK_Pregnancy
 
                 PregnancyPlugin.Logger.LogDebug("Adding particles to heroine: " + ChaControl.fileParam.fullname);
 
+#if KK
+                const string assetFilePath = @"h/common/00_00.unity3d";
+#elif KKS
+                const string assetFilePath = @"h/common/01.unity3d";
+#endif
                 _partHeavyR = new HParticleCtrl.ParticleInfo
                 {
-                    assetPath = @"h/common/00_00.unity3d",
+                    assetPath = assetFilePath,
                     file = "LiquidSiru",
                     numParent = 1,
                     nameParent = "a_n_nip_R",
@@ -296,7 +301,7 @@ namespace KK_Pregnancy
                 };
                 _partLightR = new HParticleCtrl.ParticleInfo
                 {
-                    assetPath = @"h/common/00_00.unity3d",
+                    assetPath = assetFilePath,
                     file = "LiquidSio",
                     numParent = 1,
                     nameParent = "a_n_nip_R",
@@ -305,7 +310,7 @@ namespace KK_Pregnancy
                 };
                 _partHeavyL = new HParticleCtrl.ParticleInfo
                 {
-                    assetPath = @"h/common/00_00.unity3d",
+                    assetPath = assetFilePath,
                     file = "LiquidSiru",
                     numParent = 1,
                     nameParent = "a_n_nip_L",
@@ -314,7 +319,7 @@ namespace KK_Pregnancy
                 };
                 _partLightL = new HParticleCtrl.ParticleInfo
                 {
-                    assetPath = @"h/common/00_00.unity3d",
+                    assetPath = assetFilePath,
                     file = "LiquidSio",
                     numParent = 1,
                     nameParent = "a_n_nip_L",

@@ -54,11 +54,18 @@ namespace KK_Pregnancy
                 if (pregData == null) pregData = heroine.GetPregnancyData();
 
                 // Check if she wants to tell //todo need to ask in talk scene
-                if (heroine.intimacy >= 80 || //todo what is relation in kks
+#if KK
+                if (heroine.intimacy >= 80 ||
                     heroine.hCount >= 5 ||
                     heroine.parameter.attribute.bitch && heroine.favor > 50 ||
                     (heroine.isGirlfriend || heroine.favor >= 90) &&
                     (!heroine.isVirgin || heroine.hCount >= 2 || heroine.intimacy >= 40))
+#else
+                if (heroine.relation >= 3 ||
+                    heroine.hCount >= 5 ||
+                    heroine.parameter.attribute.bitch && heroine.favor > 50 ||
+                    heroine.isGirlfriend && (heroine.favor >= 90 || heroine.hCount >= 2))
+#endif
                 {
                     var pregnancyWeek = pregData.Week;
                     if (pregnancyWeek > 0)

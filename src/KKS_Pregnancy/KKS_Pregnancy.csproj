@@ -180,9 +180,9 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="GUI\PregnancyGui.cs" />
-    <None Include="GUI\PregnancyGui.HSceneMenstrIconOverride.cs" />
-    <None Include="GUI\PregnancyGui.StatusIcons.cs" />
+    <Compile Include="GUI\PregnancyGui.cs" />
+    <Compile Include="GUI\PregnancyGui.HSceneMenstrIconOverride.cs" />
+    <Compile Include="GUI\PregnancyGui.StatusIcons.cs" />
   </ItemGroup>
   <Import Project="..\Core_Pregnancy_KK\Core_Pregnancy_KK.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
