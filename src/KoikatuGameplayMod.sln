@@ -41,13 +41,20 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KKS_GameplayMod", "KKS_Game
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Core_GameplayMod", "Core_GameplayMod\Core_GameplayMod.shproj", "{C9650F99-DF26-4D54-9826-5F77275C9D31}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KKS_Pregnancy", "KKS_Pregnancy\KKS_Pregnancy.csproj", "{736EB022-A7B9-43AA-95C3-05A84B57F7E7}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Core_Pregnancy_KK", "Core_Pregnancy_KK\Core_Pregnancy_KK.shproj", "{3C122EF8-491B-447B-94E4-ADA9D818403C}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Core_Bulge\Core_Bulge.projitems*{0f6b651e-d1f9-467f-a8f3-d1006c277e51}*SharedItemsImports = 4
 		Core_GameplayMod\Core_GameplayMod.projitems*{15a4df23-86ea-49b4-b120-e8f123f8dafe}*SharedItemsImports = 4
+		Core_Pregnancy_KK\Core_Pregnancy_KK.projitems*{3c122ef8-491b-447b-94e4-ada9d818403c}*SharedItemsImports = 13
 		Core_Bulge\Core_Bulge.projitems*{3e03b28f-bc65-459f-89e5-70d89905d636}*SharedItemsImports = 13
 		Core_Bulge\Core_Bulge.projitems*{49cad984-906a-4b18-9982-e003d8668fe4}*SharedItemsImports = 4
+		Core_Pregnancy_KK\Core_Pregnancy_KK.projitems*{736eb022-a7b9-43aa-95c3-05a84b57f7e7}*SharedItemsImports = 4
 		Core_Bulge\Core_Bulge.projitems*{904b04c0-5095-40f9-915a-005f80bc2cb1}*SharedItemsImports = 4
+		Core_Pregnancy_KK\Core_Pregnancy_KK.projitems*{930a00a6-2935-4ea0-81f0-b16d3e71b74c}*SharedItemsImports = 4
 		Core_GameplayMod\Core_GameplayMod.projitems*{9a51cfcb-a18a-428a-843a-fe7cf2eef523}*SharedItemsImports = 4
 		Core_GameplayMod\Core_GameplayMod.projitems*{c9650f99-df26-4d54-9826-5f77275c9d31}*SharedItemsImports = 13
 	EndGlobalSection
@@ -112,6 +119,10 @@ Global
 		{15A4DF23-86EA-49B4-B120-E8F123F8DAFE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{15A4DF23-86EA-49B4-B120-E8F123F8DAFE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{15A4DF23-86EA-49B4-B120-E8F123F8DAFE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{736EB022-A7B9-43AA-95C3-05A84B57F7E7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{736EB022-A7B9-43AA-95C3-05A84B57F7E7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{736EB022-A7B9-43AA-95C3-05A84B57F7E7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{736EB022-A7B9-43AA-95C3-05A84B57F7E7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -126,6 +137,8 @@ Global
 		{0F6B651E-D1F9-467F-A8F3-D1006C277E51} = {C75FFBF1-9DCE-4BC4-9F20-F95B243ABEE3}
 		{15A4DF23-86EA-49B4-B120-E8F123F8DAFE} = {5DECD423-5B05-4F46-AB72-7CA9CCB27E0C}
 		{C9650F99-DF26-4D54-9826-5F77275C9D31} = {5DECD423-5B05-4F46-AB72-7CA9CCB27E0C}
+		{736EB022-A7B9-43AA-95C3-05A84B57F7E7} = {1C61B7E0-3603-4193-9B05-A5FF0CAFBD11}
+		{3C122EF8-491B-447B-94E4-ADA9D818403C} = {1C61B7E0-3603-4193-9B05-A5FF0CAFBD11}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {19B0272D-3305-4C60-8DD9-E15889B2FF54}

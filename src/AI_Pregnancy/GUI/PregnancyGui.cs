@@ -7,9 +7,6 @@ using KKAPI.Studio.UI;
 using KKAPI.Utilities;
 using UniRx;
 using UnityEngine;
-#if AI
-    using AIChara;
-#endif
 
 namespace KK_Pregnancy
 {
@@ -34,7 +31,7 @@ namespace KK_Pregnancy
                     var iconTex = new Texture2D(2, 2, TextureFormat.DXT5, false);
                     Object.DontDestroyOnLoad(iconTex);
                     iconTex.LoadImage(ResourceUtils.GetEmbeddedResource(resourceFileName));
-                    
+
                     var sprite = Sprite.Create(iconTex, new Rect(0f, 0f, iconTex.width, iconTex.height),
                         new Vector2(0.5f, 0.5f), 100f, 0u, SpriteMeshType.FullRect);
                     Object.DontDestroyOnLoad(sprite);
@@ -47,10 +44,6 @@ namespace KK_Pregnancy
                 var leaveSprite = LoadIcon("leave.png");
 
                 StatusIcons.Init(hi, unknownSprite, pregSprite, safeSprite, riskySprite, leaveSprite);
-                
-                #if KK
-                    HSceneMenstrIconOverride.Init(hi, unknownSprite, pregSprite, safeSprite, riskySprite, leaveSprite);
-                #endif
             }
         }
 
@@ -72,12 +65,7 @@ namespace KK_Pregnancy
             var female = MakerAPI.GetMakerSex() != 0;
 
             // This category is inaccessible from class maker
-            
-            #if KK           
-                var cat = new MakerCategory(MakerConstants.Parameter.Character.CategoryName, "Pregnancy"); //MakerConstants.Parameter.Character;
-            #elif AI
-                var cat = new MakerCategory(MakerConstants.Body.CategoryName, "Pregnancy");
-            #endif
+            var cat = new MakerCategory(MakerConstants.Body.CategoryName, "Pregnancy");
 
             e.AddSubCategory(cat);
 
@@ -117,16 +105,6 @@ namespace KK_Pregnancy
 
                 e.AddControl(new MakerText("Changes how many risky days the character has in a cycle. Default is more safe days than risky days.", cat, _pluginInstance) { TextColor = hintColor });
             }
-
-            #if KK
-                if (female)
-                {
-                    var lactatToggle = e.AddControl(new MakerToggle(cat, "Always lactates", _pluginInstance));
-                    lactatToggle.BindToFunctionController<PregnancyCharaController, bool>(controller => controller.Data.AlwaysLactates, (controller, value) => controller.Data.AlwaysLactates = value);
-
-                    e.AddControl(new MakerText("Makes the character always have milk, even when not pregnant.", cat, _pluginInstance) { TextColor = hintColor });
-                }
-            #endif
         }
     }
 }

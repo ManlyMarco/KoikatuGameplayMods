@@ -6,26 +6,15 @@ using KKABMX.Core;
 using KKAPI;
 using KKAPI.Chara;
 using KKAPI.MainGame;
-#if AI
-    using AIChara;
-#endif
 
 namespace KK_Pregnancy
 {
     [BepInPlugin(GUID, GUID, Version)]
     [BepInDependency(KKABMX_Core.GUID, "4.1")]
-    #if KK
-        [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
-    #elif AI
-        [BepInDependency(KoikatuAPI.GUID, "1.12")]
-    #endif
+    [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
     public partial class PregnancyPlugin : BaseUnityPlugin
     {
-        #if KK
-            public const string GUID = "KK_Pregnancy";
-        #elif AI
-            public const string GUID = "AI_Pregnancy";
-        #endif
+        public const string GUID = "AI_Pregnancy";
         public const string Version = "2.5.2";
 
         public static ConfigEntry<bool> ConceptionEnabled { get; private set; }
@@ -40,30 +29,16 @@ namespace KK_Pregnancy
         public static ConfigEntry<bool> InflationOpenClothAtMax { get; private set; }
         public static ConfigEntry<int> InflationMaxCount { get; private set; }
 
-        public static ConfigEntry<bool> LactationEnabled { get; private set; }
-        public static ConfigEntry<int> LactationFillTime { get; private set; }
-        public static ConfigEntry<bool> LactationForceMaxCapacity { get; private set; }
-
         internal static new ManualLogSource Logger { get; private set; }
 
         private void Start()
         {
             Logger = base.Logger;
 
-            #if KK
-                PregnancyProgressionSpeed = Config.Bind("General", "Pregnancy progression speed", 4,
-                    new ConfigDescription("How much faster does the in-game pregnancy progresses than the standard 40 weeks. " +
-                                        "It also reduces the time characters leave school for after birth.\n\n" +
-                                        "x1 is 40 weeks, x2 is 20 weeks, x4 is 10 weeks, x10 is 4 weeks.",
-                        new AcceptableValueList<int>(1, 2, 4, 10)));
-
-            #elif AI
-
-                PregnancyProgressionSpeed = Config.Bind("General", "Pregnancy progression speed", 4,
-                    new ConfigDescription("How much faster does the in-game pregnancy progresses than the standard 4 weeks. \n\n" +
-                                        "x1 is 4 weeks, x2 is 2 weeks, x4 is 1 week, x10 is ~4 days.",
-                        new AcceptableValueList<int>(1, 2, 4, 10)));
-            #endif
+            PregnancyProgressionSpeed = Config.Bind("General", "Pregnancy progression speed", 4,
+                new ConfigDescription("How much faster does the in-game pregnancy progresses than the standard 4 weeks. \n\n" +
+                                    "x1 is 4 weeks, x2 is 2 weeks, x4 is 1 week, x10 is ~4 days.",
+                    new AcceptableValueList<int>(1, 2, 4, 10)));
 
             ConceptionEnabled = Config.Bind("General", "Enable conception", true,
                 "Allows characters to get pregnant from vaginal sex. Doesn't affect already pregnant characters.");
@@ -96,17 +71,6 @@ namespace KK_Pregnancy
             InflationMaxCount = Config.Bind("Inflation", "Cum count until full", 8,
                 new ConfigDescription("How many times you have to let out inside to reach the maximum belly size.", new AcceptableValueRange<int>(2, 15)));
 
-            #if KK
-                LactationEnabled = Config.Bind("Lactation", "Enable lactation", true,
-                    "Enable the lactation effect. For the effect to work the character has to be pregnant, or the override setting has to be enabled.");
-
-                LactationFillTime = Config.Bind("Lactation", "Time to fully refill", 5,
-                    new ConfigDescription("How many minutes it takes to fully refill the milk. 0 is always fully refilled.", new AcceptableValueRange<int>(0, 10)));
-
-                LactationForceMaxCapacity = Config.Bind("Lactation", "Force max milk capacity", false,
-                    "If enabled, all characters will lactate and have full capacity. If off, capacity depends on the pregnancy progress.");
-            #endif
-            
             CharacterApi.RegisterExtraBehaviour<PregnancyCharaController>(GUID);
             GameAPI.RegisterExtraBehaviour<PregnancyGameController>(GUID);
 

@@ -96,32 +96,29 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="..\Core_Pregnancy\Data\HeroineStatus.cs" />
-    <!-- <Compile Include="..\Core_Pregnancy\LactationController.cs" /> -->
-    <Compile Include="..\Core_Pregnancy\Data\MenstruationSchedule.cs" />
-    <Compile Include="..\Core_Pregnancy\PregnancyBoneEffect.cs" />
-    <Compile Include="..\Core_Pregnancy\PregnancyCharaController.cs" />
-    <Compile Include="..\Core_Pregnancy\Data\PregnancyData.cs" />
-    <Compile Include="..\Core_Pregnancy\Data\PregnancyDataUtils.cs" />
-    <Compile Include="..\Core_Pregnancy\PregnancyGameController.cs" />
-    <Compile Include="..\Core_Pregnancy\GUI\PregnancyGui.cs" />
-    <!-- <Compile Include="..\Core_Pregnancy\GUI\PregnancyGui.HSceneMenstrIconOverride.cs" /> -->
-    <Compile Include="..\Core_Pregnancy\GUI\PregnancyGui.StatusIcons.cs" />
-    <Compile Include="..\Core_Pregnancy\PregnancyPlugin.cs" />
-    <Compile Include="..\Core_Pregnancy\PregnancyPlugin.Hooks.cs" />
-    <Compile Include="..\Core_Pregnancy\Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Resources\preg_icon.xcf" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\Core_Pregnancy\Resources\leave.png" />
+    <Content Include="Resources\leave.png" />
+    <Content Include="Resources\pregnant.png" />
+    <Content Include="Resources\risky.png" />
+    <Content Include="Resources\safe.png" />
+    <Content Include="Resources\unknown.png" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="..\Core_Pregnancy\Resources\pregnant.png" />
-    <EmbeddedResource Include="..\Core_Pregnancy\Resources\risky.png" />
-    <EmbeddedResource Include="..\Core_Pregnancy\Resources\safe.png" />
-    <EmbeddedResource Include="..\Core_Pregnancy\Resources\unknown.png" />
+    <Compile Include="Data\HeroineStatus.cs" />
+    <Compile Include="Data\MenstruationSchedule.cs" />
+    <Compile Include="Data\PregnancyData.cs" />
+    <Compile Include="Data\PregnancyDataUtils.cs" />
+    <Compile Include="GUI\PregnancyGui.cs" />
+    <Compile Include="GUI\PregnancyGui.StatusIcons.cs" />
+    <Compile Include="PregnancyBoneEffect.cs" />
+    <Compile Include="PregnancyCharaController.cs" />
+    <Compile Include="PregnancyGameController.cs" />
+    <Compile Include="PregnancyPlugin.cs" />
+    <Compile Include="PregnancyPlugin.Hooks.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
