@@ -100,11 +100,11 @@
     <None Include="Resources\preg_icon.xcf" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Resources\leave.png" />
-    <Content Include="Resources\pregnant.png" />
-    <Content Include="Resources\risky.png" />
-    <Content Include="Resources\safe.png" />
-    <Content Include="Resources\unknown.png" />
+    <EmbeddedResource Include="Resources\leave.png" />
+    <EmbeddedResource Include="Resources\pregnant.png" />
+    <EmbeddedResource Include="Resources\risky.png" />
+    <EmbeddedResource Include="Resources\safe.png" />
+    <EmbeddedResource Include="Resources\unknown.png" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\HeroineStatus.cs" />
