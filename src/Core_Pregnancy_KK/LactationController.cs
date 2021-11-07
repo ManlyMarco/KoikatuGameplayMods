@@ -236,14 +236,14 @@ namespace KK_Pregnancy
 #if KK
                         assetBundleName = "sound/data/se/h/00/00_00.unity3d",
                         assetName = "khse_06"
+                        // Alternative sound effect, much longer
+                        //assetBundleName = @"sound/data/se/h/12/12_00.unity3d";
+                        //assetName = "hse_siofuki";
 #else
-                        bundle = "sound/data/se/h/00/00_00.unity3d",  //todo check if it's still the same asset name
+                        bundle = "sound/data/se/h/00/00_00.unity3d",
                         asset = "khse_06"
 #endif
                     };
-                    // Alternative sound effect, much longer
-                    //assetBundleName = @"sound/data/se/h/12/12_00.unity3d";
-                    //assetName = "hse_siofuki";
 
                     var soundSource = Utils.Sound.Play(soundEffectSetting);
                     var chaRef = chaControl.GetReferenceInfo(reference);
@@ -285,14 +285,8 @@ namespace KK_Pregnancy
 
                 PregnancyPlugin.Logger.LogDebug("Adding particles to heroine: " + ChaControl.fileParam.fullname);
 
-#if KK
-                const string assetFilePath = @"h/common/00_00.unity3d";
-#elif KKS
-                const string assetFilePath = @"h/common/01.unity3d";
-#endif
                 _partHeavyR = new HParticleCtrl.ParticleInfo
                 {
-                    assetPath = assetFilePath,
                     file = "LiquidSiru",
                     numParent = 1,
                     nameParent = "a_n_nip_R",
@@ -301,7 +295,6 @@ namespace KK_Pregnancy
                 };
                 _partLightR = new HParticleCtrl.ParticleInfo
                 {
-                    assetPath = assetFilePath,
                     file = "LiquidSio",
                     numParent = 1,
                     nameParent = "a_n_nip_R",
@@ -310,7 +303,6 @@ namespace KK_Pregnancy
                 };
                 _partHeavyL = new HParticleCtrl.ParticleInfo
                 {
-                    assetPath = assetFilePath,
                     file = "LiquidSiru",
                     numParent = 1,
                     nameParent = "a_n_nip_L",
@@ -319,17 +311,31 @@ namespace KK_Pregnancy
                 };
                 _partLightL = new HParticleCtrl.ParticleInfo
                 {
-                    assetPath = assetFilePath,
                     file = "LiquidSio",
                     numParent = 1,
                     nameParent = "a_n_nip_L",
                     //pos = new Vector3(0, 0f, 0.05f),
                     rot = new Vector3(-20, 0, 0)
                 };
+#if KK
+                _partHeavyR.assetPath = @"h/common/00_00.unity3d";
+                _partLightR.assetPath = @"h/common/00_00.unity3d";
+                _partHeavyL.assetPath = @"h/common/00_00.unity3d";
+                _partLightL.assetPath = @"h/common/00_00.unity3d";
+#elif KKS
+                _partHeavyR.assetPath = @"h/common/01.unity3d";
+                _partLightR.assetPath = @"h/common/01.unity3d";
+                _partHeavyL.assetPath = @"h/common/01.unity3d";
+                _partLightL.assetPath = @"h/common/01.unity3d";
+                // Manifests are needed or the game will crash after changing H positions
+                _partHeavyR.manifest = "add01";
+                _partLightR.manifest = "add01";
+                _partHeavyL.manifest = "add01";
+                _partLightL.manifest = "add01";
+#endif
 
                 // Load the particles
-                var particleDic = (Dictionary<int, HParticleCtrl.ParticleInfo>)AccessTools
-                    .Field(typeof(HParticleCtrl), "dicParticle").GetValue(_particleCtrl);
+                var particleDic = _particleCtrl.dicParticle;
                 particleDic[691] = _partHeavyR;
                 particleDic[692] = _partLightR;
                 particleDic[693] = _partHeavyL;
