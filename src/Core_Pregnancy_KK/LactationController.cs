@@ -341,6 +341,13 @@ namespace KK_Pregnancy
                 particleDic[693] = _partHeavyL;
                 particleDic[694] = _partLightL;
                 _particleCtrl.Load(ChaControl.objBodyBone, 1);
+
+#if KKS
+                // Need to unload the bundles we just loaded or things that try to load them later like hpointmove can crash
+                // Need to unload both manifest null and add01 for some reason or the bundle won't fully unload
+                AssetBundleManager.UnloadAssetBundle(@"h/common/01.unity3d", true, null, false);
+                AssetBundleManager.UnloadAssetBundle(@"h/common/01.unity3d", true, "add01", false);
+#endif
             }
         }
     }
