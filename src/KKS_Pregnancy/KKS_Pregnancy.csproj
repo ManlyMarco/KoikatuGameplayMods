@@ -7,7 +7,7 @@
     <ProjectGuid>{736EB022-A7B9-43AA-95C3-05A84B57F7E7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>KKS_Pregnancy</RootNamespace>
+    <RootNamespace>KK_Pregnancy</RootNamespace>
     <AssemblyName>KKS_Pregnancy</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -56,9 +56,8 @@
       <HintPath>..\packages\ABMX.KKSABMX.4.4.5\lib\net46\KKSABMX.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="KKSAPI, Version=1.27.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\IllusionModdingAPI.KKSAPI.1.27.0\lib\net46\KKSAPI.dll</HintPath>
-      <Private>False</Private>
+    <Reference Include="KKSAPI">
+      <HintPath>..\..\..\KKAPI\bin\KKSAPI.dll</HintPath>
     </Reference>
     <Reference Include="KKS_ExtensibleSaveFormat, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ExtensibleSaveFormat.KoikatsuSunshine.16.8.0\lib\net46\KKS_ExtensibleSaveFormat.dll</HintPath>
@@ -180,9 +179,13 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Features\FamilyCondomsFeature.cs" />
     <Compile Include="GUI\PregnancyGui.cs" />
     <Compile Include="GUI\PregnancyGui.HSceneMenstrIconOverride.cs" />
     <Compile Include="GUI\PregnancyGui.StatusIcons.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\item_rubber.png" />
   </ItemGroup>
   <Import Project="..\Core_Pregnancy_KK\Core_Pregnancy_KK.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
