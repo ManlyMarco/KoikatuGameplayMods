@@ -1,4 +1,7 @@
-﻿using BepInEx;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
@@ -91,6 +94,29 @@ namespace KK_Pregnancy
             var hi = new Harmony(GUID);
             Hooks.InitHooks(hi);
             PregnancyGui.Init(hi, this);
+            
+            LoadFeatures(hi);
+        }
+
+        private void LoadFeatures(Harmony hi)
+        {
+            var featureT = typeof(IFeature);
+            var types = typeof(PregnancyPlugin).Assembly.GetTypes().Where(x => featureT.IsAssignableFrom(x) && x.IsClass);
+
+            var successful = new List<string>();
+            foreach (var type in types)
+            {
+                var feature = (IFeature)Activator.CreateInstance(type);
+                if (feature.Install(hi, Config))
+                    successful.Add(type.Name);
+            }
+
+            Logger.LogInfo("Loaded features: " + string.Join(", ", successful.ToArray()));
+        }
+
+        internal static PregnancyCharaController GetEffectController(SaveData.Heroine heroine)
+        {
+            return heroine?.chaCtrl != null ? heroine.chaCtrl.GetComponent<PregnancyCharaController>() : null;
         }
     }
 }

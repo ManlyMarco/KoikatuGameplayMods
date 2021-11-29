@@ -16,6 +16,11 @@ namespace KK_Pregnancy
 
         internal static bool InsideHScene { get; private set; }
 
+        public static void StartPregnancy(SaveData.Heroine heroine)
+        {
+            _startedPregnancies.Add(heroine);
+        }
+
         protected override void OnDayChange(Cycle.Week day)
         {
             // Use Sunday for weekly stuff because it is always triggered (all other days can get skipped)
@@ -72,7 +77,7 @@ namespace KK_Pregnancy
                 if (wonAChild)
                 {
                     //Logger.Log(LogLevel.Debug, "Preg - child lottery won, pregnancy will start");
-                    _startedPregnancies.Add(heroine);
+                    StartPregnancy(heroine);
                 }
             }
         }
