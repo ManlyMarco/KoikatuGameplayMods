@@ -1,15 +1,17 @@
 ﻿using System.Threading;
 using BepInEx.Configuration;
 using HarmonyLib;
+using JetBrains.Annotations;
 using KKAPI.MainGame;
 using KKAPI.Studio;
 using KKAPI.Utilities;
 
 namespace KK_Pregnancy
 {
+    [UsedImplicitly]
     public class FamilyCondomsFeature : IFeature
     {
-        public const int RubberStoreId = 3456700;
+        public const int RubberStoreId = Constants.FamilyCondomsID;
 
         private static int _installed;
 
@@ -35,8 +37,8 @@ namespace KK_Pregnancy
         }
 
         [HarmonyPrefix]
-        [HarmonyWrapSafe] // Ignore crashes
         [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuCondomInside))]
+        [HarmonyWrapSafe] // Ignore crashes
         private static void OnFinishInside(HFlag __instance)
         {
             if (!IsEffectActive()) return;

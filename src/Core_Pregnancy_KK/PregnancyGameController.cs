@@ -12,13 +12,19 @@ namespace KK_Pregnancy
 {
     public class PregnancyGameController : GameCustomFunctionController
     {
-        private static readonly HashSet<SaveData.Heroine> _startedPregnancies = new HashSet<SaveData.Heroine>();
+        private static readonly HashSet<SaveData.CharaData> _startedPregnancies = new HashSet<SaveData.CharaData>();
+        private static readonly HashSet<SaveData.CharaData> _stoppedPregnancies = new HashSet<SaveData.CharaData>();
 
         internal static bool InsideHScene { get; private set; }
 
-        public static void StartPregnancy(SaveData.Heroine heroine)
+        public static void StartPregnancy(SaveData.CharaData heroine)
         {
             _startedPregnancies.Add(heroine);
+        }
+
+        public static void StopPregnancy(SaveData.CharaData heroine)
+        {
+            _stoppedPregnancies.Add(heroine);
         }
 
         protected override void OnDayChange(Cycle.Week day)
@@ -101,7 +107,13 @@ namespace KK_Pregnancy
         {
             ApplyToAllDatas((chara, data) =>
             {
-                if (chara is SaveData.Heroine heroine && _startedPregnancies.Contains(heroine) && !data.IsPregnant)
+                // Stopping overrules starting
+                if (_stoppedPregnancies.Contains(chara) && !data.IsPregnant)
+                {
+                    data.StopPregnancy();
+                    return true;
+                }
+                if (_startedPregnancies.Contains(chara) && !data.IsPregnant)
                 {
                     data.StartPregnancy();
                     return true;
@@ -109,6 +121,7 @@ namespace KK_Pregnancy
                 return false;
             });
             _startedPregnancies.Clear();
+            _stoppedPregnancies.Clear();
         }
 
         private static void ApplyToAllDatas(Func<SaveData.CharaData, PregnancyData, bool> action)
