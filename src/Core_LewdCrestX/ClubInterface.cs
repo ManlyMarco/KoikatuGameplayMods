@@ -37,9 +37,9 @@ namespace KK_LewdCrestX
             {
                 if (_showWindow != value)
                 {
-                    var actScene = Singleton<Game>.Instance.actScene;
-                    var lockField = Traverse.Create(actScene).Field<bool>("_isCursorLock");
-                    lockField.Value = !value;
+                    var actScene = LewdCrestXGameController.GetActionScene();
+
+                    actScene._isCursorLock = !value;
 
                     Time.timeScale = value ? 0 : 1;
 
@@ -59,8 +59,13 @@ namespace KK_LewdCrestX
                                 heroine.Destroy();
                         }
 
-                        _crestableHeroines = Singleton<Game>.Instance.HeroineList
-                            .Where(x => x != null && x.isStaff) // staff is club member
+                        _crestableHeroines = LewdCrestXGameController.GetHeroineList()
+                            .Where(x => x != null)
+#if KK
+                            .Where(x => x.isStaff)
+#else
+                            .Where(x => x.fixCharaID < 0)
+#endif
                             .Select(x => new HeroineData(x))
                             .Where(x => x.Controller != null)
                             .ToList();
@@ -140,7 +145,7 @@ namespace KK_LewdCrestX
             // This has to be specifically reset in repaint at the end of this method because ongui
             // when mouse click is handled there's an extra layout added after the repaint and then the
             // mouse event is processed, so the mouseDown has to survive the entire frame before being seein in repaint
-            if (Event.current.type == EventType.repaint)
+            if (Event.current.type == EventType.Repaint)
                 _mouseDown = false;
         }
 

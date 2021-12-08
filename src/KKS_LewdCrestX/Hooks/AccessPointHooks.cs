@@ -12,7 +12,7 @@ using Object = UnityEngine.Object;
 
 namespace KK_LewdCrestX
 {
-    internal static class ActionIconHooks
+    internal static class AccessPointHooks
     {
         [HarmonyPostfix]
         [HarmonyPatch(typeof(ActionMap), "Reserve")]
@@ -85,12 +85,16 @@ namespace KK_LewdCrestX
                 c.GetComponent<Player>().actionPointList.Remove(evt);
             };
 
-            var player = Singleton<Game>.Instance.actScene.Player;
+            var player = LewdCrestXGameController.GetActionScene().Player;
             evt.UpdateAsObservable()
                 .Subscribe(_ =>
                 {
                     // Hide in H scenes and other places
-                    var isVisible = Singleton<Game>.IsInstance() && !Singleton<Game>.Instance.IsRegulate(true);
+#if KK
+                    var isVisible = Game.IsInstance() && !Game.instance.IsRegulate(true);
+#else
+                    var isVisible = !Game.IsRegulate(true);
+#endif
                     if (rendererIcon.enabled != isVisible)
                         rendererIcon.enabled = isVisible;
 

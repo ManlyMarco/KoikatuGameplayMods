@@ -59,8 +59,7 @@ namespace KK_Pregnancy
                     _currentHeroine.Clear();
                     SpawnGUI();
 
-                    var entries = Traverse.Create(__instance).Property("charaPreviewList")
-                        .GetValue<List<PreviewClassData>>();
+                    var entries = __instance.charaPreviewList;
 
                     foreach (var chaEntry in entries)
                     {
@@ -110,7 +109,7 @@ namespace KK_Pregnancy
             [HarmonyPatch(typeof(ParamUI), "SetHeroine", typeof(SaveData.Heroine))]
             private static void ParamUI_SetHeroine(ParamUI __instance, SaveData.Heroine _heroine)
             {
-                var objFemaleRoot = Traverse.Create(__instance).Field("objFemaleRoot").GetValue<GameObject>();
+                var objFemaleRoot = __instance.objFemaleRoot;
                 if (objFemaleRoot == null) return;
 
                 SpawnGUI();

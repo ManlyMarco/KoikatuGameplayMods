@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using ActionGame;
 using HarmonyLib;
-using KK_Pregnancy;
+using KKAPI;
 using KKAPI.MainGame;
 using KKAPI.Utilities;
 using Manager;
@@ -17,7 +17,6 @@ namespace KK_LewdCrestX
         private HsceneHeroineInfo[] _hSceneHeroines;
         private HFlag _hFlag;
 
-        private static readonly HashSet<SaveData.Heroine> _tempPreggers = new HashSet<SaveData.Heroine>();
         private List<LewdCrestXController> _existingControllers;
 
         private readonly Dictionary<SaveData.Heroine, float> _actionCooldowns = new Dictionary<SaveData.Heroine, float>();
@@ -35,27 +34,11 @@ namespace KK_LewdCrestX
             return timeLeft;
         }
 
-        public static void ApplyTempPreggers(SaveData.Heroine heroine)
-        {
-            if (_tempPreggers.Add(heroine))
-                LewdCrestXPlugin.Logger.LogInfo("Triggering temporary pregnancy because of breedgasm crest: " + heroine.charFile?.parameter?.fullname);
-        }
-
-        private static void ClearTempPreggers()
-        {
-            foreach (var heroine in _tempPreggers)
-            {
-                var pregCtrl = heroine?.GetCrestController()?.GetComponent<PregnancyCharaController>();
-                if (pregCtrl != null)
-                {
-                    pregCtrl.Data.Week = 0;
-                    pregCtrl.SaveData();
-                }
-            }
-            _tempPreggers.Clear();
-        }
-
+#if KK
         protected override void OnStartH(BaseLoader proc, HFlag hFlag, bool vr)
+#else
+        protected override void OnStartH(MonoBehaviour proc, HFlag hFlag, bool vr)
+#endif
         {
             _hFlag = hFlag;
             _hSceneHeroines = hFlag.lstHeroine.Select(x => new HsceneHeroineInfo(x)).ToArray();
@@ -74,7 +57,11 @@ namespace KK_LewdCrestX
             }
         }
 
+#if KK
         protected override void OnEndH(BaseLoader proc, HFlag hFlag, bool vr)
+#else
+        protected override void OnEndH(MonoBehaviour proc, HFlag hFlag, bool vr)
+#endif
         {
             foreach (var heroine in _hSceneHeroines)
             {
@@ -84,7 +71,9 @@ namespace KK_LewdCrestX
                     var h = heroine.Heroine;
                     h.lewdness = Mathf.Min(100, h.lewdness + totalTime / 10);
                     h.favor = Mathf.Min(100, h.favor + totalTime / 20);
+#if KK
                     h.intimacy = Mathf.Min(100, h.intimacy + totalTime / 30);
+#endif
                 }
 
                 if (heroine.NeedsRegenRestored)
@@ -97,7 +86,7 @@ namespace KK_LewdCrestX
 
         private void Update()
         {
-            if (Manager.Scene.Instance.IsNowLoadingFade) return;
+            if (SceneApi.GetIsNowLoadingFade()) return;
 
             if (_hSceneHeroines != null)
             {
@@ -121,13 +110,13 @@ namespace KK_LewdCrestX
                     var controller = _existingControllers[i];
                     if (controller.CurrentCrest == CrestType.mantraction)
                     {
-                        var actScene = Game.Instance.actScene;
+                        var actScene = GetActionScene();
                         if (actScene == null) return;
                         var player = actScene.Player;
                         if (player == null) continue;
 
                         var heroine = controller.Heroine;
-                        if(heroine == null) continue;
+                        if (heroine == null) continue;
 
                         var npc = heroine.GetNPC();
                         if (player.mapNo == npc.mapNo)
@@ -163,22 +152,12 @@ namespace KK_LewdCrestX
         private IEnumerator OnPeriodChangeCo()
         {
             yield return null;
-            yield return new WaitWhile(() => Scene.Instance.IsNowLoadingFade);
+            yield return new WaitWhile(SceneApi.GetIsNowLoadingFade);
 
-            // Apply the effect now to get a delay
-            foreach (var heroine in _tempPreggers)
-            {
-                var pregCtrl = heroine?.GetCrestController()?.GetComponent<PregnancyCharaController>();
-                if (pregCtrl != null)
-                {
-                    pregCtrl.Data.Week = PregnancyData.LeaveSchoolWeek;
-                    pregCtrl.SaveData();
-                }
-            }
+            PreggersHooks.OnPeriodChanged();
 
-            _existingControllers = Game.Instance.HeroineList.Select(x => x.GetCrestController()).Where(x => x != null).ToList();
-
-            var actCtrl = Game.Instance.actScene?.actCtrl;
+            _existingControllers = GetHeroineList().Select(x => x.GetCrestController()).Where(x => x != null).ToList();
+            var actCtrl = GameAPI.GetActionControl();
             if (actCtrl != null)
             {
                 foreach (var ctrl in _existingControllers)
@@ -207,7 +186,7 @@ namespace KK_LewdCrestX
 
         protected override void OnDayChange(Cycle.Week day)
         {
-            foreach (var heroine in Game.Instance.HeroineList)
+            foreach (var heroine in GetHeroineList())
             {
                 if (heroine == null) continue;
 
@@ -224,12 +203,30 @@ namespace KK_LewdCrestX
                 }
             }
 
-            ClearTempPreggers();
+            PreggersHooks.ClearTempPreggers();
         }
 
         protected override void OnGameSave(GameSaveLoadEventArgs args)
         {
-            ClearTempPreggers();
+            PreggersHooks.ClearTempPreggers();
+        }
+
+        internal static List<SaveData.Heroine> GetHeroineList()
+        {
+#if KK
+            return Game.Instance.HeroineList;
+#else
+            return Game.HeroineList;
+#endif
+        }
+
+        internal static ActionScene GetActionScene()
+        {
+#if KK
+            return Game.Instance.actScene;
+#else
+            return GameAPI.GetActionControl().actionScene;
+#endif
         }
 
         private sealed class HsceneHeroineInfo

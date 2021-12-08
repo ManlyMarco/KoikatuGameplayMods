@@ -6,7 +6,6 @@ using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
-using KK_Pregnancy;
 using KKABMX.Core;
 using KKAPI;
 using KKAPI.Chara;
@@ -28,7 +27,8 @@ namespace KK_LewdCrestX
     [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
     [BepInDependency(KKABMX_Core.GUID, "4.0")]
     [BepInDependency(KoiSkinOverlayMgr.GUID, "5.2")]
-    [BepInDependency(PregnancyPlugin.GUID, PregnancyPlugin.Version)]
+    //[BepInDependency(PregnancyPlugin.GUID, PregnancyPlugin.Version)]
+    [BepInDependency("KK_Pregnancy", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("Marco.SkinEffects", BepInDependency.DependencyFlags.SoftDependency)]
     public partial class LewdCrestXPlugin : BaseUnityPlugin
     {
@@ -67,10 +67,15 @@ namespace KK_LewdCrestX
                 //todo hook only when entering story mode?
                 _hi = new Harmony(GUID);
                 _hi.PatchAll(typeof(CharacterHooks));
-                _hi.PatchAll(typeof(ActionIconHooks));
+                _hi.PatchAll(typeof(AccessPointHooks));
                 _hi.PatchAll(typeof(TalkHooks));
                 _hi.PatchAll(typeof(HsceneHooks));
-                PreggersHooks.TryPatchPreggers(_hi);
+
+                if (!PreggersHooks.TryPatchPreggers(_hi))
+                {
+                    ImplementedCrestTypes.Remove(CrestType.breedgasm);
+                    ImplementedCrestTypes.Remove(CrestType.lactation);
+                }
 
                 var effType = Type.GetType("KK_SkinEffects.SkinEffectsController, KK_SkinEffects", false);
                 if (effType != null)
