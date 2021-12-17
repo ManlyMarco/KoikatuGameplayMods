@@ -27,7 +27,6 @@ namespace KK_LewdCrestX
     [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
     [BepInDependency(KKABMX_Core.GUID, "4.0")]
     [BepInDependency(KoiSkinOverlayMgr.GUID, "5.2")]
-    //[BepInDependency(PregnancyPlugin.GUID, PregnancyPlugin.Version)]
     [BepInDependency("KK_Pregnancy", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("Marco.SkinEffects", BepInDependency.DependencyFlags.SoftDependency)]
     public partial class LewdCrestXPlugin : BaseUnityPlugin
@@ -54,12 +53,11 @@ namespace KK_LewdCrestX
                 false,
                 "If false, to change crests inside story mode you have to invite the character to the club and use the crest icon in clubroom.");
 
-            LoadAssets();
-
             CharacterApi.RegisterExtraBehaviour<LewdCrestXController>(GUID);
 
             if (StudioAPI.InsideStudio)
             {
+                LoadAssets();
                 CreateStudioControls();
             }
             else
@@ -87,6 +85,7 @@ namespace KK_LewdCrestX
                 else
                     Logger.LogWarning("Could not find KK_SkinEffects.SkinEffectsController, some features might not work until you install KK_SkinEffects (please report this if you do have latest version of KK_SkinEffects installed)");
 
+                LoadAssets();
 
                 GameAPI.RegisterExtraBehaviour<LewdCrestXGameController>(GUID);
 
