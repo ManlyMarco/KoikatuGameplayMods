@@ -1,5 +1,6 @@
 ﻿using System;
 using HarmonyLib;
+using KKAPI.MainGame;
 using KKAPI.Utilities;
 using Manager;
 using StrayTech;
@@ -26,10 +27,15 @@ namespace KK_LewdCrestX
                     var currentCrest = heroine.GetCurrentCrest();
                     if (currentCrest == CrestType.siphoning)
                     {
+#if KK
                         __instance.player.physical = Mathf.Min(100, __instance.player.physical + 15);
                         __instance.player.intellect = Mathf.Min(100, __instance.player.intellect + 10);
                         __instance.player.hentai = Mathf.Min(100, __instance.player.hentai + 5);
-                        Game.Instance.actScene?.actCtrl?.AddDesire(22, heroine, 35);
+#elif KKS
+                        __instance.player.koikatsuPoint += 10;
+#endif
+                        // 22 is sleep
+                        GameAPI.GetActionControl()?.AddDesire(22, heroine, 35);
                     }
                 }
             }
@@ -50,7 +56,7 @@ namespace KK_LewdCrestX
                     var heroine = __instance.GetLeadingHeroine();
                     var currentCrest = heroine.GetCurrentCrest();
                     if (currentCrest == CrestType.breedgasm)
-                        LewdCrestXGameController.ApplyTempPreggers(heroine);
+                        PreggersHooks.ApplyTempPreggers(heroine);
                 }
             }
             catch (Exception e)
@@ -74,12 +80,18 @@ namespace KK_LewdCrestX
                     case CrestType.mindmelt:
                         // This effect makes character slowly forget things on every org
                         h.favor = Mathf.Clamp(h.favor - 10, 0, 100);
+#if KK
                         h.intimacy = Mathf.Clamp(h.intimacy - 8, 0, 100);
 
                         h.anger = Mathf.Clamp(h.anger - 10, 0, 100);
                         if (h.anger == 0) h.isAnger = false;
-
-                        if (Random.value < 0.2f) h.isDate = false;
+                        
+                        if (Random.value < 0.15f) h.isDate = false;
+#else
+                        if (Random.value < 0.15f) h.isDayH = false;
+                        if (Random.value < 0.15f) h.isDresses = false;
+#endif
+                        if (Random.value < 0.15f) h.isLunch = false;
 
                         // In exchange they get lewder
                         h.lewdness = Mathf.Clamp(h.lewdness + 30, 0, 100);
@@ -87,7 +99,11 @@ namespace KK_LewdCrestX
                         var orgCount = __instance.GetOrgCount();
                         if (orgCount >= 2)
                         {
+#if KK
                             if (h.favor == 0 && h.intimacy == 0)
+#else
+                            if (h.favor == 0)
+#endif
                             {
                                 h.isGirlfriend = false;
                                 if (Random.value < 0.2f) h.confessed = false;

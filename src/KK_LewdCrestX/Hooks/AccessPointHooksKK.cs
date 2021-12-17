@@ -12,15 +12,20 @@ using Object = UnityEngine.Object;
 
 namespace KK_LewdCrestX
 {
-    internal static class ActionIconHooks
+    internal static class AccessPointHooks
     {
+        public static void Apply(Harmony hi)
+        {
+            hi.PatchAll(typeof(AccessPointHooks));
+        }
+
         [HarmonyPostfix]
-        [HarmonyPatch(typeof(ActionMap), "Reserve")]
+        [HarmonyPatch(typeof(ActionMap), nameof(ActionMap.Reserve))]
         private static void OnMapChangedHook(ActionMap __instance)
         {
             if (__instance.mapRoot == null || __instance.isMapLoading) return;
 
-            if (__instance.no == 22)
+            if (__instance.no == 22) // clubroom
             {
                 try
                 {
@@ -85,12 +90,16 @@ namespace KK_LewdCrestX
                 c.GetComponent<Player>().actionPointList.Remove(evt);
             };
 
-            var player = Singleton<Game>.Instance.actScene.Player;
+            var player = LewdCrestXGameController.GetActionScene().Player;
             evt.UpdateAsObservable()
                 .Subscribe(_ =>
                 {
                     // Hide in H scenes and other places
-                    var isVisible = Singleton<Game>.IsInstance() && !Singleton<Game>.Instance.IsRegulate(true);
+#if KK
+                    var isVisible = Game.IsInstance() && !Game.instance.IsRegulate(true);
+#else
+                    var isVisible = !Game.IsRegulate(true);
+#endif
                     if (rendererIcon.enabled != isVisible)
                         rendererIcon.enabled = isVisible;
 
