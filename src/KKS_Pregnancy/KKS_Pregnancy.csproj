@@ -56,8 +56,9 @@
       <HintPath>..\packages\ABMX.KKSABMX.4.4.5\lib\net46\KKSABMX.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="KKSAPI">
-      <HintPath>..\..\..\KKAPI\bin\KKSAPI.dll</HintPath>
+    <Reference Include="KKSAPI, Version=1.29.1.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\IllusionModdingAPI.KKSAPI.1.29.1\lib\net46\KKSAPI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="KKS_ExtensibleSaveFormat, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ExtensibleSaveFormat.KoikatsuSunshine.16.8.0\lib\net46\KKS_ExtensibleSaveFormat.dll</HintPath>
