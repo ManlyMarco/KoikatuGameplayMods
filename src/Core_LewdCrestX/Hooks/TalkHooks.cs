@@ -2,6 +2,7 @@
 using ActionGame.Communication;
 using HarmonyLib;
 using Illusion.Extensions;
+using KKAPI.MainGame;
 using Manager;
 using UnityEngine;
 using UnityEngine.UI;
@@ -16,32 +17,38 @@ namespace KK_LewdCrestX
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(Info), nameof(Info.GetEventADV))]
-        static void GetEventADVPrefix(Info __instance, int _command, PassingInfo ____passingInfo)
+        static void GetEventADVPrefix(Info __instance, int _command)
         {
-            _currentCrestType = ____passingInfo?.heroine?.GetCurrentCrest() ?? CrestType.None;
-            _currentPassingInfo = ____passingInfo;
-            Console.WriteLine("GetEventADVPrefix " + _currentCrestType);
-            _isHEvent = _command == 3;
+            _currentCrestType = __instance.passingInfo?.heroine?.GetCurrentCrest() ?? CrestType.None;
+            _currentPassingInfo = __instance.passingInfo;
+
+            _isHEvent =
+#if KK
+                _command == 3;
+#elif KKS
+                _command == 20;
+#endif
+            Console.WriteLine($"GetEventADVPrefix crest={_currentCrestType} _command={_command} _isHEvent={_isHEvent}");
         }
         [HarmonyFinalizer]
         [HarmonyPatch(typeof(Info), nameof(Info.GetEventADV))]
         static void GetEventADVFinalizer()
         {
-            Console.WriteLine("GetEventADVFinalizer " + _currentCrestType);
+            Console.WriteLine($"GetEventADVFinalizer crest={_currentCrestType}");
             _currentCrestType = CrestType.None;
         }
 
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(TalkScene), "ReflectChangeValue")]
-        static void ReflectChangeValuePrefix(TalkScene __instance, bool ___isDesire)
+        [HarmonyPatch(typeof(TalkScene), nameof(TalkScene.ReflectChangeValue))]
+        static void ReflectChangeValuePrefix(TalkScene __instance)
         {
             // This is set by using the talk lewd option
-            if (___isDesire)
+            if (__instance.isDesire)
             {
                 var heroine = __instance.targetHeroine;
                 if (heroine.GetCurrentCrest() == CrestType.triggered)
                 {
-                    var actCtrl = Singleton<Game>.Instance.actScene.actCtrl;
+                    var actCtrl = GameAPI.GetActionControl();
                     actCtrl.AddDesire(4, heroine, 60);
                     actCtrl.AddDesire(5, heroine, 60);
                     actCtrl.AddDesire(26, heroine, heroine.parameter.attribute.likeGirls ? 60 : 30);
@@ -52,39 +59,52 @@ namespace KK_LewdCrestX
         }
 
         [HarmonyPrefix]
-        [HarmonyPatch(typeof(TalkScene), "UpdateUI")]
+        [HarmonyPatch(typeof(TalkScene), nameof(TalkScene.UpdateUI))]
         static void UpdateUIPrefix(TalkScene __instance)
         {
             _currentCrestType = __instance.targetHeroine.GetCurrentCrest();
-            Console.WriteLine("UpdateUIPrefix " + _currentCrestType);
+            Console.WriteLine($"UpdateUIPrefix crest={_currentCrestType}");
             _isHEvent = false;
         }
 
         [HarmonyFinalizer]
-        [HarmonyPatch(typeof(TalkScene), "UpdateUI")]
-        static void UpdateUIFinalizer(TalkScene __instance, Button[] ___buttonEventContents)
+        [HarmonyPatch(typeof(TalkScene), nameof(TalkScene.UpdateUI))]
+        static void UpdateUIFinalizer(TalkScene __instance)
         {
-            Console.WriteLine("UpdateUIFinalizer " + _currentCrestType);
+            Console.WriteLine($"UpdateUIFinalizer crest={_currentCrestType}");
             if (_currentCrestType == CrestType.libido)
             {
-                // 3 is lets have h
                 // todo avoid using index for better compat?
-                ___buttonEventContents[3]?.gameObject.SetActiveIfDifferent(true);
+#if KK
+                // 3 is lets have h
+                __instance.buttonEventContents[3]?.gameObject.SetActiveIfDifferent(true);
+#elif KKS
+                // 1 is lets have h
+                __instance.buttonR18Contents[1]?.gameObject.SetActiveIfDifferent(true);
+                // Need to turn on the main r18 button in case none of the sub options were active
+                __instance.buttonInfos[4].Active = true;
+#else
+                throw new NotImplementedException();
+#endif
             }
 
             _currentCrestType = CrestType.None;
         }
 
+        // Used to override relationship level during talkscene conversation
         [HarmonyPostfix]
-        [HarmonyPatch(typeof(Info), "GetStage")]
-        //private int GetStage()
+#if KK
+        [HarmonyPatch(typeof(Info), nameof(Info.GetStage))]
+#else
+        [HarmonyPatch(typeof(Info), nameof(Info.relation), MethodType.Getter)] //todo test if works
+#endif
         static void GetStagePatch(ref int __result)
         {
-            Console.WriteLine("GetStagePatch " + _currentCrestType);
+            Console.WriteLine($"GetStagePatch crest={_currentCrestType}");
             switch (_currentCrestType)
             {
                 case CrestType.libido:
-                    if (_isHEvent) __result = 2;
+                    if (_isHEvent && __result < 2) __result = 2;
                     break;
                 case CrestType.command:
                     if (__result == 0) __result = 1;
@@ -93,11 +113,10 @@ namespace KK_LewdCrestX
         }
 
         [HarmonyPostfix]
-        [HarmonyPatch(typeof(Info), "RandomBranch")]
-        //private int RandomBranch(params int[] _values)
+        [HarmonyPatch(typeof(Info), nameof(Info.RandomBranch))]
         static void RandomBranchPatch(ref int __result)
         {
-            Console.WriteLine("RandomBranchPatch " + _currentCrestType);
+            Console.WriteLine($"RandomBranchPatch crest={_currentCrestType}");
             switch (_currentCrestType)
             {
                 case CrestType.libido:
@@ -113,14 +132,14 @@ namespace KK_LewdCrestX
         }
 
         [HarmonyPostfix]
-        [HarmonyPatch(typeof(PassingInfo), "isHPossible", MethodType.Getter)]
+        [HarmonyPatch(typeof(PassingInfo), nameof(PassingInfo.isHPossible), MethodType.Getter)]
         static void isHPossiblePatch(ref bool __result, PassingInfo __instance)
         {
             var crest = _currentCrestType;
             if (_currentCrestType == CrestType.None)
                 crest = __instance.heroine.GetCurrentCrest();
 
-            Console.WriteLine("isHPossiblePatch " + _currentCrestType);
+            Console.WriteLine($"isHPossiblePatch crest={_currentCrestType}");
 
             switch (crest)
             {
