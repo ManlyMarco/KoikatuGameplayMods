@@ -33,7 +33,7 @@ namespace KK_LewdCrestX
     public partial class LewdCrestXPlugin : BaseUnityPlugin
     {
         public const string GUID = "LewdCrestX";
-        public const string Version = "1.2.1";
+        public const string Version = "1.3";
 
         public static Dictionary<CrestType, CrestInfo> CrestInfos { get; } = new Dictionary<CrestType, CrestInfo>();
 
@@ -67,6 +67,7 @@ namespace KK_LewdCrestX
                 //todo hook only when entering story mode?
                 _hi = new Harmony(GUID);
                 _hi.PatchAll(typeof(CharacterHooks));
+                AccessPointHooks.Apply(_hi);
                 _hi.PatchAll(typeof(AccessPointHooks));
                 _hi.PatchAll(typeof(TalkHooks));
                 _hi.PatchAll(typeof(HsceneHooks));
@@ -76,8 +77,11 @@ namespace KK_LewdCrestX
                     ImplementedCrestTypes.Remove(CrestType.breedgasm);
                     ImplementedCrestTypes.Remove(CrestType.lactation);
                 }
-
+#if KK
                 var effType = Type.GetType("KK_SkinEffects.SkinEffectsController, KK_SkinEffects", false);
+#elif KKS
+                var effType = Type.GetType("KK_SkinEffects.SkinEffectsController, KKS_SkinEffects", false);
+#endif
                 if (effType != null)
                     SkinEffectsType = effType;
                 else

@@ -27,9 +27,14 @@ namespace KK_LewdCrestX
                     var currentCrest = heroine.GetCurrentCrest();
                     if (currentCrest == CrestType.siphoning)
                     {
+#if KK
                         __instance.player.physical = Mathf.Min(100, __instance.player.physical + 15);
                         __instance.player.intellect = Mathf.Min(100, __instance.player.intellect + 10);
                         __instance.player.hentai = Mathf.Min(100, __instance.player.hentai + 5);
+#elif KKS
+                        __instance.player.koikatsuPoint += 10;
+#endif
+                        // 22 is sleep
                         GameAPI.GetActionControl()?.AddDesire(22, heroine, 35);
                     }
                 }

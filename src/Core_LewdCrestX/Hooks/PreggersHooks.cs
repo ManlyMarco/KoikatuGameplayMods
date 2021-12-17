@@ -14,7 +14,7 @@ namespace KK_LewdCrestX
         public static bool TryPatchPreggers(Harmony hi)
         {
 #if KK
-            var lactType = Type.GetType("KK_Pregnancy.LactationController, KK_Pregnancy", false);
+            var lactType = Type.GetType("KK_Pregnancy.LactationController, KK_Pregnancy", false); //todo add kks to ass name
             if (lactType != null)
             {
                 var lactDataType = lactType.GetNestedType("CharaData", AccessTools.all);

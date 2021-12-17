@@ -10,7 +10,6 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(MSBuildThisFileDirectory)AssemblyInfo.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)ClubInterface.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)ClubInterface.HeroineData.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CrestInfo.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)CrestInterfaceList.cs" />

@@ -17,10 +17,10 @@ namespace KK_LewdCrestX
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(Info), nameof(Info.GetEventADV))]
-        static void GetEventADVPrefix(Info __instance, int _command, PassingInfo ____passingInfo)
+        static void GetEventADVPrefix(Info __instance, int _command)
         {
-            _currentCrestType = ____passingInfo?.heroine?.GetCurrentCrest() ?? CrestType.None;
-            _currentPassingInfo = ____passingInfo;
+            _currentCrestType = __instance.passingInfo?.heroine?.GetCurrentCrest() ?? CrestType.None;
+            _currentPassingInfo = __instance.passingInfo;
 
             _isHEvent =
 #if KK
@@ -40,10 +40,10 @@ namespace KK_LewdCrestX
 
         [HarmonyPrefix]
         [HarmonyPatch(typeof(TalkScene), nameof(TalkScene.ReflectChangeValue))]
-        static void ReflectChangeValuePrefix(TalkScene __instance, bool ___isDesire)
+        static void ReflectChangeValuePrefix(TalkScene __instance)
         {
             // This is set by using the talk lewd option
-            if (___isDesire)
+            if (__instance.isDesire)
             {
                 var heroine = __instance.targetHeroine;
                 if (heroine.GetCurrentCrest() == CrestType.triggered)

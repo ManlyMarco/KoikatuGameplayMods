@@ -86,10 +86,10 @@ namespace KK_LewdCrestX
 
         private void Update()
         {
-            if (SceneApi.GetIsNowLoadingFade()) return;
-
             if (_hSceneHeroines != null)
             {
+                if (SceneApi.GetIsNowLoadingFade()) return;
+
                 var speed = _hFlag.IsSonyu() && _hFlag.speedCalc > 0.7f
                     ? (_hFlag.speedCalc - 0.7f) * 3.3f
                     : (_hFlag.speedItem > 1.4f ? 0.33f : 0);
@@ -105,6 +105,8 @@ namespace KK_LewdCrestX
             }
             else if (_existingControllers != null)
             {
+                if (SceneApi.GetIsNowLoadingFade()) return;
+
                 for (var i = 0; i < _existingControllers.Count; i++)
                 {
                     var controller = _existingControllers[i];

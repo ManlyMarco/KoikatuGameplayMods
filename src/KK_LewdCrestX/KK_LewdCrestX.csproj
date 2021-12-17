@@ -116,7 +116,8 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Hooks\AccessPointHooks.cs" />
+    <Compile Include="ClubInterfaceKK.cs" />
+    <Compile Include="Hooks\AccessPointHooksKK.cs" />
   </ItemGroup>
   <Import Project="..\Core_LewdCrestX\Core_LewdCrestX.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
