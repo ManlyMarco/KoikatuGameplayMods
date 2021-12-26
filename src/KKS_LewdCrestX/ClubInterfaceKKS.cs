@@ -24,6 +24,7 @@ namespace KK_LewdCrestX
 
         private static int _selHeroine;
         private static int _selCrest;
+        private static bool _selHideGraphic;
 
         private static bool _mouseDown;
 
@@ -33,7 +34,7 @@ namespace KK_LewdCrestX
         // 0 off, 1 on, 2 and 3 upgrades
         private static int _featureLevel;
         private static int _currentCrest;
-        private static bool _hideCrestGraphic;
+        private static bool _currentHideGraphic;
 
         public static bool ShowWindow
         {
@@ -75,7 +76,8 @@ namespace KK_LewdCrestX
                             .Where(x => x.Controller != null)
                             .ToList();
 
-                        _selCrest = _selHeroine = 0;
+                        _selCrest = _currentCrest = _selHeroine = 0;
+                        _selHideGraphic = _currentHideGraphic = false;
                         _scrollPos1 = _scrollPos2 = Vector2.zero;
                     }
                     else
@@ -190,7 +192,16 @@ namespace KK_LewdCrestX
                                     {
                                         GUILayout.Label(heroine.GetFaceTex());
                                         GUILayout.Label(heroine.HeroineName);
-                                        GUILayout.Label(heroine.GetCrestName());
+                                        GUILayout.BeginHorizontal();
+                                        {
+                                            GUILayout.Label(heroine.GetCrestName());
+                                            if (heroine.Controller.HideCrestGraphic)
+                                            {
+                                                GUILayout.FlexibleSpace();
+                                                GUILayout.Label("(H)");
+                                            }
+                                        }
+                                        GUILayout.EndHorizontal();
                                     }
                                     GUILayout.EndVertical();
 
@@ -202,7 +213,8 @@ namespace KK_LewdCrestX
                                         _selHeroine = i;
                                         _currentCrest = _crestlist.GetIndex(heroine.Controller.CurrentCrest);
                                         _selCrest = _currentCrest;
-                                        _hideCrestGraphic = heroine.Controller.HideCrestGraphic;
+                                        _currentHideGraphic = heroine.Controller.HideCrestGraphic;
+                                        _selHideGraphic = _currentHideGraphic;
                                     }
                                 }
                                 GUILayout.EndHorizontal();
@@ -210,12 +222,6 @@ namespace KK_LewdCrestX
                         }
                     }
                     GUILayout.EndScrollView();
-
-                    //if (Event.current.type == EventType.repaint)
-                    //{
-                    //    _scrollRect = GUILayoutUtility.GetLastRect();
-                    //    //Console.WriteLine("scrl " + _scrollRect.ToString());
-                    //}
                 }
                 GUILayout.EndVertical();
 
@@ -224,7 +230,7 @@ namespace KK_LewdCrestX
                 {
                     GUILayout.BeginVertical(GUI.skin.box, GUILayout.ExpandWidth(true));
                     {
-                        GUILayout.Label("An old board with elaborate designs carved onto it is stuffed behind the shelf. It looks like something a shaman or a witch would use. There are some instructions scribbled in the back:");
+                        GUILayout.Label("An old board with elaborate designs carved onto it is stuffed behind the shelf. It looks like something a shaman or a witch would use. There are some instructions carved in the back:");
                         GUILayout.Label("\"You can choose a crest for anyone that you know well enough. Effects are applied and removed within an hour. There are no lasting physical effects, but memories remain.\"");
                     }
                     GUILayout.EndVertical();
@@ -234,11 +240,6 @@ namespace KK_LewdCrestX
                         _scrollPos2 = GUILayout.BeginScrollView(_scrollPos2, false, true, GUILayout.ExpandWidth(true));
                         {
                             _selCrest = GUILayout.SelectionGrid(_selCrest, _crestlist.GetInterfaceNames(), 3, _btnStyleDeselected, GUILayout.ExpandWidth(true));
-                            //if (GUI.changed)
-                            //{
-                            //    selectedController.CurrentCrest = _crestlist.GetType(_selCrest);
-                            //    GUI.changed = false;
-                            //}
                         }
                         GUILayout.EndScrollView();
                         ShowOnlyImplemented = GUILayout.Toggle(ShowOnlyImplemented, "Show only crests with gameplay effects");
@@ -255,12 +256,12 @@ namespace KK_LewdCrestX
 
                             if (_featureLevel >= 3)
                             {
-                                _hideCrestGraphic = GUILayout.Toggle(_hideCrestGraphic, "Hide crest graphic (effect is still applied)");
+                                _selHideGraphic = GUILayout.Toggle(_selHideGraphic, "Hide crest graphic (effect is still applied)");
                             }
                             else
                             {
                                 GUI.enabled = false;
-                                _hideCrestGraphic = GUILayout.Toggle(_hideCrestGraphic, "Hide crest graphic (needs a board level 3)");
+                                _selHideGraphic = GUILayout.Toggle(_selHideGraphic, "Hide crest graphic (needs a board level 3)");
                                 GUI.enabled = true;
                             }
 
@@ -268,7 +269,6 @@ namespace KK_LewdCrestX
                             GUILayout.Label(currentCrest.Implemented
                                 ? "Gameplay will be changed roughly as described."
                                 : "Only for looks and lore, it won't change gameplay.");
-
 
                             //GUILayout.Label("Currently selected heroine: " + selectedHeroine.HeroineName);
                         }
@@ -281,10 +281,15 @@ namespace KK_LewdCrestX
 
                         GUILayout.BeginHorizontal();
                         {
-                            var changed = _selCrest != _currentCrest;
+                            var crestChanged = _selCrest != _currentCrest;
+                            // Changing a crest automatically disables hiding the crest graphic, so it has to be applied again (have to pay again)
+                            var currentHideGraphic = !crestChanged && _currentHideGraphic;
+                            var graphicChanged = _selHideGraphic != currentHideGraphic;
+                            var anyChanged = crestChanged || graphicChanged;
+
                             if (currentCrest != null && selectedHeroine != null)
                             {
-                                if (!changed)
+                                if (!anyChanged)
                                 {
                                     GUI.enabled = false;
                                     GUILayout.Button("Crest is applied", GUILayout.ExpandWidth(true));
@@ -292,11 +297,8 @@ namespace KK_LewdCrestX
                                 }
                                 else
                                 {
-                                    //todo need to apply changes and pay up, show disabled button "not enough koikatsu points"
-                                    // cost for no effect is 5, effect is 10, hidden effect is 15, no effect hidden is 10?
-
-                                    var cost = currentCrest.Implemented ? 10 : 5;
-                                    if (_hideCrestGraphic) cost += 5;
+                                    var cost = crestChanged ? (currentCrest.Implemented ? 10 : 5) : 0;
+                                    if (graphicChanged) cost += 5;
 
                                     var enoughPoints = Game.saveData.player.koikatsuPoint >= cost;
 
@@ -305,7 +307,9 @@ namespace KK_LewdCrestX
                                         if (GUILayout.Button($"Apply for {cost} Koikatsu points", GUILayout.ExpandWidth(true)))
                                         {
                                             selectedController.CurrentCrest = _crestlist.GetType(_selCrest);
+                                            selectedController.HideCrestGraphic = _selHideGraphic;
                                             _currentCrest = _selCrest;
+                                            _currentHideGraphic = _selHideGraphic;
                                             Game.saveData.player.koikatsuPoint -= cost;
                                         }
                                     }
@@ -318,12 +322,14 @@ namespace KK_LewdCrestX
                                 }
                                 GUILayout.Space(15);
                             }
-                            else if (changed && _selCrest == 0 && selectedHeroine != null)
+                            else if (crestChanged && _selCrest == 0 && selectedHeroine != null)
                             {
                                 if (GUILayout.Button("Take crest off", GUILayout.ExpandWidth(true)))
                                 {
                                     selectedController.CurrentCrest = _crestlist.GetType(_selCrest);
+                                    selectedController.HideCrestGraphic = _selHideGraphic = false;
                                     _currentCrest = _selCrest;
+                                    _currentHideGraphic = _selHideGraphic;
                                 }
                                 GUILayout.Space(15);
                             }
