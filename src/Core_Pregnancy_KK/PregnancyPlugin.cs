@@ -9,6 +9,8 @@ using KKABMX.Core;
 using KKAPI;
 using KKAPI.Chara;
 using KKAPI.MainGame;
+using KKAPI.Utilities;
+using UnityEngine;
 
 namespace KK_Pregnancy
 {
@@ -94,8 +96,20 @@ namespace KK_Pregnancy
             var hi = new Harmony(GUID);
             Hooks.InitHooks(hi);
             PregnancyGui.Init(hi, this);
-            
+
             LoadFeatures(hi);
+
+            if (TimelineCompatibility.IsTimelineAvailable())
+            {
+                TimelineCompatibility.AddCharaFunctionInterpolable<int, PregnancyCharaController>(
+                    GUID, 
+                    "week", 
+                    "Pregnancy week",
+                    (oci, parameter, leftValue, rightValue, factor) => parameter.Data.Week = Mathf.RoundToInt(Mathf.LerpUnclamped(leftValue, rightValue, factor)),
+                    null,
+                    (oci, parameter) => parameter.Data.Week
+                    );
+            }
         }
 
         private void LoadFeatures(Harmony hi)
