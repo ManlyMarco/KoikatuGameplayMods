@@ -196,15 +196,26 @@ namespace KK_Pregnancy
                                 var day = Singleton<Cycle>.Instance.nowWeek;
 
                                 GUILayout.Label("Forecast for this week:");
-                                GUILayout.Label($"Today ({day}): {status}");
 
-                                for (var dayOffset = 1; dayOffset < 7; dayOffset++)
+                                switch (pregData.MenstruationSchedule)
                                 {
-                                    var adjustedDay = (Cycle.Week)((int)(day + dayOffset) % Enum.GetValues(typeof(Cycle.Week)).Length);
-                                    var adjustedSafe = HFlag.GetMenstruation((byte)((heroine.MenstruationDay + dayOffset) % HFlag.menstruations.Length)) == HFlag.MenstruationType.安全日;
-                                    GUILayout.Label($"{adjustedDay}: {(adjustedSafe ? "Safe" : "Risky")}");
-                                }
+                                    case MenstruationSchedule.AlwaysSafe:
+                                        GUILayout.Label("It's always safe!");
+                                        break;
+                                    case MenstruationSchedule.AlwaysRisky:
+                                        GUILayout.Label("It's always risky!");
+                                        break;
+                                    default:
+                                        GUILayout.Label($"Today ({day}): {status}");
 
+                                        for (var dayOffset = 1; dayOffset < 7; dayOffset++)
+                                        {
+                                            var adjustedDay = (Cycle.Week)((int)(day + dayOffset) % Enum.GetValues(typeof(Cycle.Week)).Length);
+                                            var adjustedSafe = HFlag.GetMenstruation((byte)((heroine.MenstruationDay + dayOffset) % HFlag.menstruations.Length)) == HFlag.MenstruationType.安全日;
+                                            GUILayout.Label($"{adjustedDay}: {(adjustedSafe ? "Safe" : "Risky")}");
+                                        }
+                                        break;
+                                }
 
                                 var pregnancyCount = pregData.IsPregnant ? pregData.PregnancyCount - 1 : pregData.PregnancyCount;
                                 if (pregnancyCount > 0)
