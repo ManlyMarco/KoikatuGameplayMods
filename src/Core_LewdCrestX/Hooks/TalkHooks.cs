@@ -24,17 +24,17 @@ namespace KK_LewdCrestX
 
             _isHEvent =
 #if KK
-                _command == 3;
+                _command == 3; // 3 is lets have h
 #elif KKS
-                _command == 20;
+                _command == 20 || _command == 21; // 20 is lets have h, 21 is come to my room
 #endif
-            Console.WriteLine($"GetEventADVPrefix crest={_currentCrestType} _command={_command} _isHEvent={_isHEvent}");
+            //Console.WriteLine($"GetEventADVPrefix crest={_currentCrestType} _command={_command} _isHEvent={_isHEvent}");
         }
         [HarmonyFinalizer]
         [HarmonyPatch(typeof(Info), nameof(Info.GetEventADV))]
         static void GetEventADVFinalizer()
         {
-            Console.WriteLine($"GetEventADVFinalizer crest={_currentCrestType}");
+            //Console.WriteLine($"GetEventADVFinalizer crest={_currentCrestType}");
             _currentCrestType = CrestType.None;
         }
 
@@ -63,7 +63,7 @@ namespace KK_LewdCrestX
         static void UpdateUIPrefix(TalkScene __instance)
         {
             _currentCrestType = __instance.targetHeroine.GetCurrentCrest();
-            Console.WriteLine($"UpdateUIPrefix crest={_currentCrestType}");
+            //Console.WriteLine($"UpdateUIPrefix crest={_currentCrestType}");
             _isHEvent = false;
         }
 
@@ -71,7 +71,7 @@ namespace KK_LewdCrestX
         [HarmonyPatch(typeof(TalkScene), nameof(TalkScene.UpdateUI))]
         static void UpdateUIFinalizer(TalkScene __instance)
         {
-            Console.WriteLine($"UpdateUIFinalizer crest={_currentCrestType}");
+            //Console.WriteLine($"UpdateUIFinalizer crest={_currentCrestType}");
             if (_currentCrestType == CrestType.libido)
             {
                 // todo avoid using index for better compat?
@@ -79,8 +79,8 @@ namespace KK_LewdCrestX
                 // 3 is lets have h
                 __instance.buttonEventContents[3]?.gameObject.SetActiveIfDifferent(true);
 #elif KKS
-                // 1 is lets have h
-                __instance.buttonR18Contents[1]?.gameObject.SetActiveIfDifferent(true);
+                // 0 is lets have h, 1 is invite to room
+                __instance.buttonR18Contents[0]?.gameObject.SetActiveIfDifferent(true);
                 // Need to turn on the main r18 button in case none of the sub options were active
                 __instance.buttonInfos[4].Active = true;
 #else
@@ -100,7 +100,7 @@ namespace KK_LewdCrestX
 #endif
         static void GetStagePatch(ref int __result)
         {
-            Console.WriteLine($"GetStagePatch crest={_currentCrestType}");
+            //Console.WriteLine($"GetStagePatch crest={_currentCrestType}");
             switch (_currentCrestType)
             {
                 case CrestType.libido:
@@ -116,7 +116,7 @@ namespace KK_LewdCrestX
         [HarmonyPatch(typeof(Info), nameof(Info.RandomBranch))]
         static void RandomBranchPatch(ref int __result)
         {
-            Console.WriteLine($"RandomBranchPatch crest={_currentCrestType}");
+            //Console.WriteLine($"RandomBranchPatch crest={_currentCrestType}");
             switch (_currentCrestType)
             {
                 case CrestType.libido:
@@ -139,7 +139,7 @@ namespace KK_LewdCrestX
             if (_currentCrestType == CrestType.None)
                 crest = __instance.heroine.GetCurrentCrest();
 
-            Console.WriteLine($"isHPossiblePatch crest={_currentCrestType}");
+            //Console.WriteLine($"isHPossiblePatch crest={_currentCrestType}");
 
             switch (crest)
             {
