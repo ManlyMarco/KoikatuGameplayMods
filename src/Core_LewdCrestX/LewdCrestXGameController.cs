@@ -105,17 +105,27 @@ namespace KK_LewdCrestX
             }
             else if (_existingControllers != null)
             {
-                if (SceneApi.GetIsNowLoadingFade()) return;
-
                 for (var i = 0; i < _existingControllers.Count; i++)
                 {
                     var controller = _existingControllers[i];
                     if (controller.CurrentCrest == CrestType.mantraction)
                     {
+                        if (SceneApi.GetIsNowLoadingFade()) return;
+
                         var actScene = GetActionScene();
                         if (actScene == null) return;
                         var player = actScene.Player;
                         if (player == null) continue;
+
+                        // Stop the crest from activating outsied of when player runs around
+                        // needed because if the code below activates during an adv scene or some other inopportune times it will softlock the game
+                        if (player.isActionNow) return;
+#if KKS
+                        if (Game.IsRegulate(true)) return;
+                        if (actScene.regulate != 0 || (actScene.AdvScene != null && actScene.AdvScene.gameObject.activeSelf) || TalkScene.isPaly) return;
+#elif KK
+                        if (Game.instance.IsRegulate(true)) return;
+#endif
 
                         var heroine = controller.Heroine;
                         if (heroine == null) continue;
