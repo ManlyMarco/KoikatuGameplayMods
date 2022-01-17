@@ -1,15 +1,9 @@
 ﻿using System;
-using System.Linq;
 using ActionGame;
-using ActionGame.Chara;
 using HarmonyLib;
-using Illusion.Component;
-using Illusion.Game;
 using KKAPI.MainGame;
 using KKAPI.Utilities;
-using Manager;
 using UniRx;
-using UniRx.Triggers;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
@@ -25,7 +19,7 @@ namespace KK_LewdCrestX
 
             StoreApi.RegisterShopItem(StoreItemId, "Cursed drawing board",
                 "Gives access to a supposedly cursed drawing board inside the Training Center. The board is said to give its user the ability to bestow lewd crests upon people they know. Each upgrade lets you affect characters that you know less well.",
-                StoreApi.ShopType.NightOnly, StoreApi.ShopBackground.Yellow, 3, 3, false, 100,
+                StoreApi.ShopType.Normal, StoreApi.ShopBackground.Yellow, 3, 3, false, 100,
                 numText: "{0} available upgrades");
         }
 
