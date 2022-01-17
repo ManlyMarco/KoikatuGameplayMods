@@ -94,3 +94,14 @@ Inspired by the original KK_LewdCrest plugin by picolet21. Crests were drawn and
 2. Download the latest release.
 3. Extract the archive into your game directory. The plugin .dll should end up inside your BepInEx\plugins directory.
 4. Check if there are no warnings on game startup. A new "Crest" category should appear in character maker in the same tab as character name (check preview screenshots). To give characters crests in story mode, invite them to the club and look for a new action icon in the clubroom. If you applied a crest to the character in maker then it will already be applied when you add the character to story mode. To give crests in studio, select character and scroll down in the "anim / Current State" menu (check preview pictures).
+
+# MoreShopItems
+This plugin adds new things to buy in the shop. Each item has a different effect or use.
+
+New items should appear in the main game shop (on the Harbor map). Some items are only available during the Night period).
+
+### How to use
+1. Install latest versions of BepInEx, BepisPlugins, KKSAPI. At least KKSAPI v1.31.1 is required as of v1.0.
+2. Download the latest release.
+3. Extract the archive into your game directory. The plugin .dll should end up inside your BepInEx\plugins directory.
+4. Check if there are no warnings on game startup. Load into the main game and go to the shop, you should see new items (some will only appear in night shop).
