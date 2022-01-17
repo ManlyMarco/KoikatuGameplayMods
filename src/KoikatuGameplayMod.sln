@@ -51,6 +51,8 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Core_LewdCrestX", "Core_Lew
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KKS_LewdCrestX", "KKS_LewdCrestX\KKS_LewdCrestX.csproj", "{45953D5D-FCB8-48F1-8DD4-9D4FAA031B57}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KKS_MoreShopItems", "KKS_MoreStoreItems\KKS_MoreShopItems.csproj", "{77C865CD-B068-4E41-8736-5B38386611EB}"
+EndProject
 Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Core_Bulge\Core_Bulge.projitems*{0f6b651e-d1f9-467f-a8f3-d1006c277e51}*SharedItemsImports = 4
@@ -136,6 +138,10 @@ Global
 		{45953D5D-FCB8-48F1-8DD4-9D4FAA031B57}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{45953D5D-FCB8-48F1-8DD4-9D4FAA031B57}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{45953D5D-FCB8-48F1-8DD4-9D4FAA031B57}.Release|Any CPU.Build.0 = Release|Any CPU
+		{77C865CD-B068-4E41-8736-5B38386611EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{77C865CD-B068-4E41-8736-5B38386611EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{77C865CD-B068-4E41-8736-5B38386611EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{77C865CD-B068-4E41-8736-5B38386611EB}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
