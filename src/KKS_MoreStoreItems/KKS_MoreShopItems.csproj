@@ -122,8 +122,11 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Extensions.cs" />
+    <Compile Include="Features\IFeature.cs" />
     <Compile Include="MoreShopItemsPlugin.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Features\TwinTalismanFeat.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
