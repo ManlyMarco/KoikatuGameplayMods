@@ -17,15 +17,19 @@ namespace MoreShopItems
         public const string GUID = "MoreShopItems";
         public const string Version = "1.0";
 
-        internal static new ManualLogSource Logger;
+        internal const int DetectorItemId = 3456651;
+        internal const int TalismanItemId = 3456650;
 
-        private static IDisposable _featureCleanup;
+        internal static new ManualLogSource Logger;
 
         private void Awake()
         {
             Logger = base.Logger;
 
-            _featureCleanup = LoadFeatures();
+            var cleanup = LoadFeatures();
+#if DEBUG
+            cleanup.AddTo(this);
+#endif
         }
 
         /// <summary>
@@ -33,48 +37,48 @@ namespace MoreShopItems
         /// </summary>
         private IDisposable LoadFeatures()
         {
-            var loadedList = new StringBuilder("Loaded features: ");
             var cleanupList = new CompositeDisposable();
-            var interfaceT = typeof(IFeature);
-            var ourAss = typeof(MoreShopItemsPlugin).Assembly;
-            foreach (var featType in ourAss.GetTypes().Where(x => !x.IsAbstract && x.IsClass && interfaceT.IsAssignableFrom(x)))
+            try
             {
-                var disp = new CompositeDisposable();
-                try
+                var loadedList = new StringBuilder("Loaded features: ");
+                var interfaceT = typeof(IFeature);
+                var ourAss = typeof(MoreShopItemsPlugin).Assembly;
+                foreach (var featType in ourAss.GetTypes().Where(x => !x.IsAbstract && x.IsClass && interfaceT.IsAssignableFrom(x)))
                 {
-                    var i = (IFeature)Activator.CreateInstance(featType);
-                    if (i.ApplyFeature(ref disp, this))
+                    var disp = new CompositeDisposable();
+                    try
                     {
-                        cleanupList.Add(disp);
-                        disp = new CompositeDisposable();
-                        loadedList.Append(featType.Name);
-                        loadedList.Append(" ");
+                        var i = (IFeature)Activator.CreateInstance(featType);
+                        if (i.ApplyFeature(ref disp, this))
+                        {
+                            cleanupList.Add(disp);
+                            disp = new CompositeDisposable();
+                            loadedList.Append(featType.Name);
+                            loadedList.Append(" ");
+                        }
+                        else
+                        {
+                            disp.Clear();
+                        }
                     }
-                    else
+                    catch (Exception e)
                     {
+                        disp.Dispose();
                         disp.Clear();
+
+                        Logger.LogWarning($"Failed to load feature {featType.FullName} with exception: " + e);
                     }
                 }
-                catch (Exception e)
-                {
-                    disp.Dispose();
-                    disp.Clear();
 
-                    Logger.LogWarning($"Failed to load feature {featType.FullName} with exception: " + e);
-                }
+                Logger.LogInfo(loadedList.ToString());
+
+                return cleanupList;
             }
-
-            Logger.LogInfo(loadedList.ToString());
-
-            return cleanupList;
+            catch
+            {
+                cleanupList.Dispose();
+                throw;
+            }
         }
-
-#if DEBUG
-        private void OnDestroy()
-        {
-            _featureCleanup?.Dispose();
-            _featureCleanup = null;
-        }
-#endif
     }
 }

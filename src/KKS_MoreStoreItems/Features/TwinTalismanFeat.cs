@@ -16,10 +16,9 @@ namespace MoreShopItems.Features
 
             disp.Add(ico);
 
-            const int talismanItemId = 3456650;
             const int maxTalismansOwned = 2;
             disp.Add(StoreApi.RegisterShopItem(
-                itemId: talismanItemId,
+                itemId: MoreShopItemsPlugin.TalismanItemId,
                 itemName: "Twin-making Talisman",
                 explaination: "An old talisman that was allegedly used for conversing with spirits in the past. It can summon a fake twin of any living person that is experienced in sex. (One time use during H scenes)",
                 shopType: StoreApi.ShopType.NightOnly,
@@ -39,7 +38,7 @@ namespace MoreShopItems.Features
                            && !flags.isFreeH
                            // 3P is only available for experienced or horny
                            && flags.lstHeroine[0].HExperience >= Heroine.HExperienceKind.慣れ
-                           && StoreApi.GetItemAmountBought(talismanItemId) > 0
+                           && StoreApi.GetItemAmountBought(MoreShopItemsPlugin.TalismanItemId) > 0
                            // Only enable if not coming from a peeping H scene, because trying to start 3P in that state just ends the H scene
                            && GameObject.FindObjectOfType<HScene>().dataH.peepCategory.Count == 0;
                 },
@@ -75,7 +74,7 @@ namespace MoreShopItems.Features
                     if (asi) asi.ShortcutKeyEnable(false);
 
                     // Eat one of the held items
-                    StoreApi.DecreaseItemAmountBought(talismanItemId);
+                    StoreApi.DecreaseItemAmountBought(MoreShopItemsPlugin.TalismanItemId);
                 }));
 
             return true;
