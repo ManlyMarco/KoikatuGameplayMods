@@ -167,6 +167,69 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <EmbeddedResource Include="Resources\Events\c04_AS_mysterious.csv" />
+    <EmbeddedResource Include="Resources\Events\c04_PREG_mysterious.csv" />
+    <EmbeddedResource Include="Resources\Events\c04_XPREG_mysterious.csv" />
+    <EmbeddedResource Include="Resources\Events\c07_AS_tomboy.csv" />
+    <EmbeddedResource Include="Resources\Events\c07_PREG_tomboy.csv" />
+    <EmbeddedResource Include="Resources\Events\c07_XPREG_tomboy.csv" />
+    <EmbeddedResource Include="Resources\Events\c08_AS_pure.csv" />
+    <EmbeddedResource Include="Resources\Events\c08_PREG_pure.csv" />
+    <EmbeddedResource Include="Resources\Events\c08_XPREG_pure.csv" />
+    <EmbeddedResource Include="Resources\Events\c11_AS_motherly.csv" />
+    <EmbeddedResource Include="Resources\Events\c11_PREG_motherly.csv" />
+    <EmbeddedResource Include="Resources\Events\c11_XPREG_motherly.csv" />
+    <EmbeddedResource Include="Resources\Events\c13_AS_gyaru.csv" />
+    <EmbeddedResource Include="Resources\Events\c13_PREG_gyaru.csv" />
+    <EmbeddedResource Include="Resources\Events\c13_XPREG_gyaru.csv" />
+    <EmbeddedResource Include="Resources\Events\c14_AS_delinquent.csv" />
+    <EmbeddedResource Include="Resources\Events\c14_PREG_delinquent.csv" />
+    <EmbeddedResource Include="Resources\Events\c14_XPREG_delinquent.csv" />
+    <EmbeddedResource Include="Resources\Events\c15_AS_wild.csv" />
+    <EmbeddedResource Include="Resources\Events\c15_PREG_wild.csv" />
+    <EmbeddedResource Include="Resources\Events\c15_XPREG_wild.csv" />
+    <EmbeddedResource Include="Resources\Events\c18_AS_jinxed.csv" />
+    <EmbeddedResource Include="Resources\Events\c18_PREG_jinxed.csv" />
+    <EmbeddedResource Include="Resources\Events\c18_XPREG_jinxed.csv" />
+    <EmbeddedResource Include="Resources\Events\c19_AS_Bookworm.csv" />
+    <EmbeddedResource Include="Resources\Events\c19_PREG_Bookworm.csv" />
+    <EmbeddedResource Include="Resources\Events\c19_XPREG_Bookworm.csv" />
+    <EmbeddedResource Include="Resources\Events\c20_AS_timid.csv" />
+    <EmbeddedResource Include="Resources\Events\c20_PREG_timid.csv" />
+    <EmbeddedResource Include="Resources\Events\c20_XPREG_timid.csv" />
+    <EmbeddedResource Include="Resources\Events\c22_AS_trendy.csv" />
+    <EmbeddedResource Include="Resources\Events\c22_PREG_trendy.csv" />
+    <EmbeddedResource Include="Resources\Events\c22_XPREG_trendy.csv" />
+    <EmbeddedResource Include="Resources\Events\c24_AS_yandere.csv" />
+    <EmbeddedResource Include="Resources\Events\c24_PREG_yandere.csv" />
+    <EmbeddedResource Include="Resources\Events\c24_XPREG_yandere.csv" />
+    <EmbeddedResource Include="Resources\Events\c25_AS_lazy.csv" />
+    <EmbeddedResource Include="Resources\Events\c25_PREG_lazy.csv" />
+    <EmbeddedResource Include="Resources\Events\c25_XPREG_lazy.csv" />
+    <EmbeddedResource Include="Resources\Events\c27_AS_stubborn.csv" />
+    <EmbeddedResource Include="Resources\Events\c27_PREG_stubborn.csv" />
+    <EmbeddedResource Include="Resources\Events\c27_XPREG_stubborn.csv" />
+    <EmbeddedResource Include="Resources\Events\c29_AS_humble.csv" />
+    <EmbeddedResource Include="Resources\Events\c29_PREG_humble.csv" />
+    <EmbeddedResource Include="Resources\Events\c29_XPREG_humble.csv" />
+    <EmbeddedResource Include="Resources\Events\c32_AS_honest.csv" />
+    <EmbeddedResource Include="Resources\Events\c32_PREG_honest.csv" />
+    <EmbeddedResource Include="Resources\Events\c32_XPREG_honest.csv" />
+    <EmbeddedResource Include="Resources\Events\c33_AS_glamorous.csv" />
+    <EmbeddedResource Include="Resources\Events\c33_PREG_glamorous.csv" />
+    <EmbeddedResource Include="Resources\Events\c33_XPREG_glamorous.csv" />
+    <EmbeddedResource Include="Resources\Events\c34_AS_returnee.csv" />
+    <EmbeddedResource Include="Resources\Events\c34_PREG_returnee.csv" />
+    <EmbeddedResource Include="Resources\Events\c34_XPREG_returnee.csv" />
+    <EmbeddedResource Include="Resources\Events\c36_AS_sadist.csv" />
+    <EmbeddedResource Include="Resources\Events\c36_PREG_sadist.csv" />
+    <EmbeddedResource Include="Resources\Events\c36_XPREG_sadist.csv" />
+    <EmbeddedResource Include="Resources\Events\c37_AS_emotionless.csv" />
+    <EmbeddedResource Include="Resources\Events\c37_PREG_emotionless.csv" />
+    <EmbeddedResource Include="Resources\Events\c37_XPREG_emotionless.csv" />
+    <EmbeddedResource Include="Resources\Events\c99_AS_def.csv" />
+    <EmbeddedResource Include="Resources\Events\c99_PREG_def.csv" />
+    <EmbeddedResource Include="Resources\Events\c99_XPREG_def.csv" />
     <None Include="Resources\preg_icon.xcf" />
   </ItemGroup>
   <ItemGroup>
@@ -181,12 +244,14 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Constants.cs" />
+    <Compile Include="Features\CsvHelper.cs" />
     <Compile Include="Features\FamilyCondomsFeature.cs" />
-    <Compile Include="Features\FamilySuppositoryFeature.cs" />
+    <None Include="Features\FamilySuppositoryFeature.cs" />
     <Compile Include="Features\CustomEventsFeature.cs" />
     <Compile Include="GUI\PregnancyGui.cs" />
     <Compile Include="GUI\PregnancyGui.HSceneMenstrIconOverride.cs" />
     <Compile Include="GUI\PregnancyGui.StatusIcons.cs" />
+    <Compile Include="PregnancyGameController.cs" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Resources\item_rubber.png" />

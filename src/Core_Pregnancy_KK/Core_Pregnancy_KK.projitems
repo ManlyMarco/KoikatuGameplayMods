@@ -18,7 +18,6 @@
     <Compile Include="$(MSBuildThisFileDirectory)LactationController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PregnancyBoneEffect.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PregnancyCharaController.cs" />
-    <Compile Include="$(MSBuildThisFileDirectory)PregnancyGameController.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PregnancyPlugin.cs" />
     <Compile Include="$(MSBuildThisFileDirectory)PregnancyPlugin.Hooks.cs" />
   </ItemGroup>

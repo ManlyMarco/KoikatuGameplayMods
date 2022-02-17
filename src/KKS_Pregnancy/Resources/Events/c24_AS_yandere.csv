@@ -1,0 +1,83 @@
+"True","HeroineCallNameChange",""
+"False","CharaLookNeck","0","0","1",""
+"False","CharaFixMouth","0","True"
+"False","CharaMotionDefault","0"
+"False","CharaExpression","0","0","0","0","0.5","1","0","1","0","","0",""
+"False","Text","[P名]",""So.""
+"False","CharaLookNeck","0","3","2"
+"False","Text","[H名]",""Yes, my darling?""
+"False","Text","[P名]",""So We did it, yesterday, huh?""
+"False","CharaLookNeck","0","0","1"
+"False","CharaMotion","0","Stand_24_00","","","","","","","","",""
+"False","CharaExpression","0","12","2","4","","","","1","","","",""
+"False","Text","[H名]",""We sure did. I'm so happy right now, you wouldn't believe it.""
+"False","Text","[H名]",""Our future together is all but set. I cannot wait.""
+
+// Choice logic stuff
+"False","IF","PillForFree","0","True","Pill_Free","Pill_Pay"
+
+"False","Tag","Pill_Pay"
+"False","Choice","True","Take the pill (-1 After Pill),PillCheck","Do not take the pill,NoPill"
+
+"False","Tag","PillCheck"
+"False","IF","PlayerHasPill","0","True","PillPassed","NoPillToGive"
+
+"False","Tag","NoPillToGive"
+"False","Text","","Hmm..."
+"False","Text","","Oh no, I forgot to buy an After Pill! What now?"
+"False","Text","","Ugh... Looks like I will have to accept that she might get pregnant."
+"False","Jump","Pill_Pay"
+
+"False","Tag","Pill_Free"
+"False","Choice","True","Take the pill,PillPassed","Do not take the pill,NoPill"
+
+"False","Tag","PillPassed"
+"False","VAR","bool","PillUsed","true"
+
+// Adjust based on the notes
+"False","VAR","int","FavorChange","-30"
+
+// Event for the "take the pill" branch
+"False","Text","[P名]",""I want you to take the pill.""
+"False","CharaMotion","0","Stand_36_00","","","","","","","","",""
+"False","CharaExpression","0","13","2","8","1","","0.7","","","","0",""
+"False","Text","[H名]",""W-W-W-Why, I-I-I don't u-understand, why do you want me to take the pill, I thought you loved me, I thought you wanted to be with me forever, I th--""
+"False","Text","[P名]",""Please, just take a pill. We cannot have a child, not yet.""
+"False","CharaExpression","0","2","2","","","","0","7","0.3","","1",""
+"False","CharaMotion","0","Stand_Oth_00","","","","","","","","",""
+"False","Text","[H名]",""...I-I don't want to.""
+"False","CharaFixEyes","0","True"
+"False","CharaMotion","0","Stand_Ang_01","","","","","","","","",""
+"False","CharaExpression","0","10","1","15","","","","","0.5","","2",""
+"False","Text","[H名]",""I don't want to, I don't want to take the pill, I won't take the pill. You can't make me take the pill.""
+"False","Text","[P名]",""...Please. You have to.""
+"False","CharaFixEyes","0","False"
+"False","CharaExpression","0","11","2","14","","","0.6","1","","","",""
+"False","Text","[H名]","I can't! I love you so much- It'll be the crystallization of our love!"
+"False","Text","[P名]",".........."
+"False","CharaExpression","0","13","4","14","","","0.2","7","0.8","","3",""
+"False","CharaMotion","0","Stand_20_00","","","","","","","","",""
+"False","CharaLookNeck","0","0","1"
+"False","Text","[H名]",".........."
+"False","CharaMotion","0","Stand_18_00","","","","","","","","",""
+"False","CharaExpression","0","","","5","","","0","1","0.5","","",""
+"False","Text","[H名]",""Okay. I will do it. *sob* For you. Because I love you *sob*. Because I want you to keep loving me.""
+"False","Text","[P名]",""Thank you.""
+"False","Close"
+
+"False","Tag","NoPill"
+"False","VAR","bool","PillUsed","false"
+
+// Adjust based on the notes
+"False","VAR","int","FavorChange","30"
+
+// Event for the "don't take the pill" branch
+"False","Text","[P名]",""If you get pregnant, I want you to have the baby.""
+"False","CharaLookNeck","0","3","2"
+"False","Text","[H名]",""Of course, my love. That was my intention from the start. It'll be the crystallization of our love. Our little baby.""
+"False","Text","[H名]",""You don't need to worry about anything. I'll take care of everything. Let's raise a whole family together once we're both grown up, okay?""
+"False","Text","[P名]",""Thank you.""
+"False","CharaFixEyes","0","True"
+"False","CharaExpression","0","12","3","2","","","","","0.8","","",""
+"False","Text","[H名]",""Anything for you, darling.""
+"False","Close"

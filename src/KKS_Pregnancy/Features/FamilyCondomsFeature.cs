@@ -11,7 +11,7 @@ namespace KK_Pregnancy
     [UsedImplicitly]
     public class FamilyCondomsFeature : IFeature
     {
-        public const int RubberStoreId = Constants.FamilyCondomsID;
+        public const int RubberStoreId = Constants.FamilyCondomsItemID;
 
         private static int _installed;
 
@@ -21,9 +21,16 @@ namespace KK_Pregnancy
 
             var rubberCat = StoreApi.RegisterShopItemCategory(ResourceUtils.GetEmbeddedResource("item_rubber.png").LoadTexture());
 
-            StoreApi.RegisterShopItem(RubberStoreId, "Family Making Condoms",
-                "Makes pregnancy up to 95% likely after cumming inside with a condom on. Active in all H scenes until the end of the next day, use with caution! (Doesn't work on infertile characters)",
-                StoreApi.ShopType.NightOnly, StoreApi.ShopBackground.Pink, rubberCat, 1, true, 100, 460);
+            StoreApi.RegisterShopItem(itemId: RubberStoreId,
+                itemName: "Family Making Condoms",
+                explaination: "Makes pregnancy up to 95% likely after cumming inside with a condom on. Active in all H scenes until the end of the next day, use with caution! (Doesn't work on infertile characters)",
+                shopType: StoreApi.ShopType.NightOnly,
+                itemBackground: StoreApi.ShopBackground.Pink,
+                itemCategory: rubberCat,
+                stock: 1,
+                resetsDaily: true,
+                cost: 100,
+                sort: 460);
 
             instance.PatchAll(typeof(FamilyCondomsFeature));
 
@@ -52,7 +59,7 @@ namespace KK_Pregnancy
                 if (UnityEngine.Random.RandomRangeInt(0, 100) < (isDangerousDay ? 95 : 30))
                 {
                     PregnancyPlugin.Logger.LogInfo("Through the power of a pin hole, pregnancy");
-                    PregnancyGameController.StartPregnancy(heroine);
+                    PregnancyGameController.StartPregnancyDelayed(heroine, true);
                 }
             }
         }

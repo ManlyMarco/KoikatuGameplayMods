@@ -105,6 +105,7 @@
     <Compile Include="GUI\PregnancyGui.cs" />
     <Compile Include="GUI\PregnancyGui.HSceneMenstrIconOverride.cs" />
     <Compile Include="GUI\PregnancyGui.StatusIcons.cs" />
+    <Compile Include="PregnancyGameController.cs" />
   </ItemGroup>
   <Import Project="..\Core_Pregnancy_KK\Core_Pregnancy_KK.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

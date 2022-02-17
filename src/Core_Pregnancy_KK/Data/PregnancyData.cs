@@ -116,6 +116,11 @@ namespace KK_Pregnancy
         // If week is 0 the character is not peregenent
         public bool IsPregnant => Week > 0;
 
+//#if KKS
+        public bool CanAskForAfterpill;
+        public bool CanTellAboutPregnancy;
+//#endif
+
         public void StartPregnancy()
         {
             if (GameplayEnabled && !IsPregnant)
@@ -123,6 +128,9 @@ namespace KK_Pregnancy
                 Week = 1;
                 PregnancyCount++;
                 WeeksSinceLastPregnancy = 0;
+
+                //CanAskForAfterpill = true;
+                CanTellAboutPregnancy = true;
             }
         }
 
@@ -134,6 +142,9 @@ namespace KK_Pregnancy
                 if (Week <= 1) PregnancyCount--;
 
                 Week = 0;
+
+                CanAskForAfterpill = false;
+                CanTellAboutPregnancy = false;
             }
         }
     }

@@ -1,13 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
+using System.IO;
+using System.Linq;
 using System.Reflection.Emit;
+using System.Text.RegularExpressions;
 using System.Threading;
-using ActionGame;
 using ADV;
 using BepInEx.Configuration;
+using Cysharp.Threading.Tasks;
 using HarmonyLib;
 using JetBrains.Annotations;
-using KKAPI;
+using KK_Pregnancy.Features;
 using KKAPI.MainGame;
 using KKAPI.Studio;
 using KKAPI.Utilities;
@@ -23,21 +27,29 @@ namespace KK_Pregnancy
     [UsedImplicitly]
     public class CustomEventsFeature : IFeature
     {
-        public const int AfterpillStoreId = Constants.AfterpillID;
-        public const int AfterpillEventID = Constants.AfterpillID;
-        public const int PregTalkEventID = Constants.PregTalkEventID;
+        public const int AfterpillStoreId = Constants.AfterpillItemID;
 
         private static int _installed;
         public bool Install(Harmony instance, ConfigFile config)
         {
             if (StudioAPI.InsideStudio || Interlocked.Increment(ref _installed) != 1) return false;
 
-            StoreApi.RegisterShopItem(AfterpillStoreId, "Afterpill",
-                "Prevents pregnancy when used within a few days of insemination. Always smart to keep a couple of these for emergencies.",
-                StoreApi.ShopType.NightOnly, StoreApi.ShopBackground.Pink, 8, 3, false, 50, 461);
-            
-            instance.PatchMoveNext(AccessTools.Method(typeof(TalkScene), nameof(TalkScene.Introduction)), transpiler: new HarmonyMethod(typeof(CustomEventsFeature), nameof(IntroductionTpl)));
-            
+            StoreApi.RegisterShopItem(
+                itemId: AfterpillStoreId,
+                itemName: "Afterpill",
+                explaination: "Prevents pregnancy when used within a few days of insemination. Always smart to keep a couple of these for emergencies.",
+                shopType: StoreApi.ShopType.NightOnly,
+                itemBackground: StoreApi.ShopBackground.Pink,
+                itemCategory: 8,
+                stock: 5,
+                resetsDaily: false,
+                cost: 50,
+                sort: 461);
+
+            instance.PatchMoveNext(
+                original: AccessTools.Method(typeof(TalkScene), nameof(TalkScene.Introduction)),
+                transpiler: new HarmonyMethod(typeof(CustomEventsFeature), nameof(IntroductionTpl)));
+
             // todo make heroine want to talk to player when theres a custom event waiting
 
             return true;
@@ -58,63 +70,81 @@ namespace KK_Pregnancy
 
         private static void IntroductionEventHook(Heroine heroine)
         {
-            var preg = heroine.GetPregnancyData();
-            if (preg.GameplayEnabled)
+            try
             {
-                if (preg.Week > 1)
+                var preg = heroine.GetPregnancyData();
+                if (!preg.GameplayEnabled) return;
+
+                if (preg.CanAskForAfterpill && preg.Week <= 1)
                 {
-                    if (!heroine.talkEvent.Contains(PregTalkEventID))
-                    {
-                        // todo trigger after any h scene if mc came inside, not only if preg started
-                        // add more conditions? only trigger event if they pass? or just show it every time
-                        // todo give a pregnancy topic for later use?
-
-                        var scene = GameObject.FindObjectOfType<TalkScene>();
-                        scene.StartADV(GetPregEvent(heroine, preg), scene.cancellation.Token).GetAwaiter().GetResult();
-
-                        var vars = ActionScene.instance.AdvScene.Scenario.Vars;
-                        ApplyStatChangeVars(heroine, preg, vars);
-
-                        // Don't talk about this again
-                        // Use same list as base game events to keep track if the event was viewed
-                        heroine.talkEvent.Add(PregTalkEventID);
-                    }
+                    RunIntroEvent(heroine, preg, true);
                 }
-                else
+                else if (preg.CanTellAboutPregnancy && preg.Week >= 6)
                 {
-                    // If the week is 0 or 1, that means it's a new unconfirmed pergenancy, so reset the event and have it fire again
-                    heroine.talkEvent.Remove(PregTalkEventID);
-
-                    if (preg.Week == 1)
-                    {
-                        if (!heroine.talkEvent.Contains(AfterpillEventID))
-                        {
-                            var scene = GameObject.FindObjectOfType<TalkScene>();
-                            scene.StartADV(GetPillEvent(heroine, preg), scene.cancellation.Token).GetAwaiter().GetResult();
-
-                            var vars = ActionScene.instance.AdvScene.Scenario.Vars;
-                            ApplyStatChangeVars(heroine, preg, vars);
-
-                            // Don't talk about this again
-                            heroine.talkEvent.Add(AfterpillEventID);
-                        }
-                    }
-                    else
-                    {
-                        // If the week is 0, it means the event can be played again after a new pregnancy starts
-                        heroine.talkEvent.Remove(AfterpillEventID);
-                    }
+                    RunIntroEvent(heroine, preg, false);
                 }
             }
+            catch (Exception e)
+            {
+                PregnancyPlugin.Logger.LogError(e);
+            }
+        }
+
+        private static void RunIntroEvent(Heroine heroine, PregnancyData preg, bool isPillEvent)
+        {
+            var loadedEvt = GetEvent(heroine, preg, isPillEvent);
+            if (loadedEvt == null)
+            {
+                PregnancyPlugin.Logger.LogError("Unexpected null GetEvent result");
+                return;
+            }
+
+            // Init needed first since the custom event starts empty
+            var evt = EventApi.CreateNewEvent(setPlayerParam: true);
+            heroine.SetADVParam(evt);
+            var freePill = _personalityHasPills.TryGetValue(heroine.personality, out var val) && val;
+            evt.Add(Program.Transfer.VAR("bool", "PillForFree", freePill.ToString(CultureInfo.InvariantCulture)));
+            evt.Add(Program.Transfer.VAR("bool", "PlayerHasPill", (StoreApi.GetItemAmountBought(AfterpillStoreId) >= 1).ToString(CultureInfo.InvariantCulture)));
+            // Give favor by default, gets overriden if the event specifies any other value
+            evt.Add(Program.Transfer.VAR("int", "FavorChange", "30"));
+
+            evt.AddRange(loadedEvt);
+
+            var scene = TalkScene.instance;
+            scene.StartADV(evt, scene.cancellation.Token)
+                .ContinueWith(() => Program.ADVProcessingCheck(scene.cancellation.Token))
+                .ContinueWith(() =>
+                {
+                    PregnancyGameController.ApplyToAllDatas((chara, data) =>
+                    {
+                        if (chara == heroine)
+                        {
+                            if (isPillEvent) data.CanAskForAfterpill = false;
+                            else data.CanTellAboutPregnancy = false;
+                            return true;
+                        }
+                        return false;
+                    });
+
+                    var vars = ActionScene.instance.AdvScene.Scenario.Vars;
+                    ApplyStatChangeVars(heroine, preg, vars);
+
+                    // Fix mouth getting permanently locked by the events
+                    heroine.chaCtrl.ChangeMouthFixed(false);
+                })
+                .Forget();
         }
 
         private static void ApplyStatChangeVars(Heroine heroine, PregnancyData preg, Dictionary<string, ValData> vars)
         {
             if (vars.TryGetVarValue("PillUsed", out bool used) && used)
-                PregnancyGameController.StopPregnancy(heroine);
+            {
+                PregnancyGameController.ForceStopPregnancyDelayed(heroine);
 
-            if (vars.TryGetVarValue("PillGiven", out bool consume) && consume)
-                StoreApi.SetItemAmountBought(AfterpillStoreId, Mathf.Clamp(StoreApi.GetItemAmountBought(AfterpillStoreId) - 1, 0, 99));
+                var freePill = _personalityHasPills.TryGetValue(heroine.personality, out var val) && val;
+                if (!freePill)
+                    StoreApi.SetItemAmountBought(AfterpillStoreId, Mathf.Clamp(StoreApi.GetItemAmountBought(AfterpillStoreId) - 1, 0, 99));
+            }
 
             if (vars.TryGetVarValue<int>("FavorChange", out var favor))
                 heroine.favor = Mathf.Clamp(heroine.favor + favor, 0, 150);
@@ -126,56 +156,56 @@ namespace KK_Pregnancy
                 Manager.Game.saveData.player.koikatsuPoint += money;
         }
 
-        private static List<Program.Transfer> GetPregEvent(Heroine heroine, PregnancyData data)
+        private static List<Program.Transfer> GetEvent(Heroine heroine, PregnancyData data, bool isPill)
         {
-            // todo different text based on personality and stats (different if first vs second vs next)
-            var list = EventApi.CreateNewEvent();
-            list.Add(Program.Transfer.Text(EventApi.Heroine, "Hey, uhh, I need to tell you something important."));
-            list.Add(Program.Transfer.Text(EventApi.Player, "What's wrong?"));
-            list.Add(Program.Transfer.Text(EventApi.Heroine, "How do I say this... Well... My period's very late."));
-            list.Add(Program.Transfer.Text(EventApi.Player, "Hmm? Wait, does that mean..."));
-            list.Add(Program.Transfer.Text(EventApi.Heroine, "Yeah, most likely. And you're the only one it could be with."));
-            list.Add(Program.Transfer.Text(EventApi.Narrator, "She's pregnant? That's... not entirely unexpected. I'm worried about the future, but for now I think I'm just happy."));
-            list.Add(Program.Transfer.Text(EventApi.Player, "I see, that's great news! Don't worry about anything, I'll be sure to take responsibility."));
-            list.Add(Program.Transfer.Text(EventApi.Heroine, "Yeah, I'm happy too. In that case I'll be in your care from now on."));
+            var personalityNo = _personalityHasPills.ContainsKey(heroine.personality) ? heroine.personality : 99;
 
-            list.Add(Program.Transfer.VAR("System.Int32", "FavorChange", "50"));
-            list.Add(Program.Transfer.VAR("System.Int32", "MoneyChange", "200"));
-            return list;
+            var evtName = $"c{personalityNo:D2}_";
+            if (isPill)
+                evtName += "AS_";
+            else if (data.PregnancyCount <= 1)
+                evtName += "PREG_";
+            else
+                evtName += "XPREG_";
+            
+            var pattern = evtName + @"[\w\d ]+.csv$";
+
+            var containingAssembly = typeof(CustomEventsFeature).Assembly;
+            var evtResourceName = containingAssembly.GetManifestResourceNames().SingleOrDefault(fname => Regex.IsMatch(fname, pattern));
+            if (evtResourceName == null) throw new IOException($"Pattern {pattern} did not match any resources inside assembly {containingAssembly}");
+
+            using (var resourceStream = containingAssembly.GetManifestResourceStream(evtResourceName))
+            using (var reader = new StreamReader(resourceStream ?? throw new InvalidOperationException($"{evtResourceName} not found in assembly {containingAssembly}")))
+            {
+                var lines = reader.ReadToEnd().Split(new[] { '\r', '\n' }, StringSplitOptions.RemoveEmptyEntries);
+                var paramList = CsvHelper.ReadFomCsv(lines);
+                return paramList.Select(x => new Program.Transfer(x)).ToList();
+            }
         }
 
-        private static List<Program.Transfer> GetPillEvent(Heroine heroine, PregnancyData data)
+        private static readonly IReadOnlyDictionary<int, bool> _personalityHasPills = new Dictionary<int, bool>
         {
-            // todo some characters don't mention it? only show event if the pill is available?
-            // easiest is to always show but disable pill option if none bought (some characters already have one so you don't need to have it?)
-
-            var list = EventApi.CreateNewEvent();
-
-            // todo branch to not allow selecting the option and set PillConsumed approperiately
-            list.Add(Program.Transfer.VAR("System.Boolean", "PillBought", StoreApi.GetItemAmountBought(AfterpillStoreId) > 0 ? "true" : "false"));
-
-            list.Add(Program.Transfer.Text(EventApi.Narrator, "I'm woried she could get pregnant from what I did before, I should do something about this."));
-            list.Add(Program.Transfer.Text(EventApi.Player, "Hey, there's something I've been worrying about."));
-            list.Add(Program.Transfer.Text(EventApi.Heroine, "Hmm?"));
-            list.Add(Program.Transfer.Text(EventApi.Player, "Here."));
-            list.Add(Program.Transfer.Text(EventApi.Narrator, "I hand her the box with the afterpill."));
-            list.Add(Program.Transfer.Text(EventApi.Player, "I might be overthinking this, but I think it's better to be safe than sorry."));
-            list.Add(Program.Transfer.Text(EventApi.Narrator, "She takes a look at the box, her eyes scan the printed text."));
-            list.Add(Program.Transfer.Text(EventApi.Heroine, "Oh."));
-            list.Add(Program.Transfer.Text(EventApi.Heroine, "Umm, did we really do anything that could be dangerous?"));
-            list.Add(Program.Transfer.Text(EventApi.Player, "Maybe, maybe not, I just want to be extra safe. I don't want to cause you any trouble."));
-            list.Add(Program.Transfer.Text(EventApi.Heroine, "It wouldn't really trobule..."));
-            list.Add(Program.Transfer.Text(EventApi.Narrator, "Our eyes meet, I try to look as serious as possible."));
-            list.Add(Program.Transfer.Text(EventApi.Heroine, "*sigh* Alright, I understand, I'll take it. Do tell me if you change your mind though."));
-
-            list.Add(Program.Transfer.VAR("System.Boolean", "PillUsed", "true"));
-            list.Add(Program.Transfer.VAR("System.Boolean", "PillGiven", "true"));
-            list.Add(Program.Transfer.VAR("System.Int32", "FavorChange", "-30"));
-            list.Add(Program.Transfer.VAR("System.Int32", "LewdChange", "-20"));
-            // todo make this depend on if the character is left happy?
-            list.Add(Program.Transfer.VAR("System.Int32", "MoneyChange", "20"));
-            list.Add(Program.Transfer.Close());
-            return list;
-        }
+            { 04, false },
+            { 07, false },
+            { 08, false },
+            { 11, false },
+            { 13, false },
+            { 14, false },
+            { 15, false },
+            { 18, false },
+            { 19, false },
+            { 20, false },
+            { 22, false },
+            { 24, false },
+            { 25, false },
+            { 27, true  },
+            { 29, true  },
+            { 32, false },
+            { 33, true  },
+            { 34, true  },
+            { 36, false },
+            { 37, false },
+            { 99, false },
+        };
     }
 }
