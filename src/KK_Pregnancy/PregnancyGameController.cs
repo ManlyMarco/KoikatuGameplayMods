@@ -12,9 +12,20 @@ namespace KK_Pregnancy
 {
     public class PregnancyGameController : GameCustomFunctionController
     {
-        private static readonly HashSet<SaveData.Heroine> _startedPregnancies = new HashSet<SaveData.Heroine>();
+        private static readonly HashSet<SaveData.CharaData> _startedPregnancies = new HashSet<SaveData.CharaData>();
+        private static readonly HashSet<SaveData.CharaData> _stoppedPregnancies = new HashSet<SaveData.CharaData>();
 
         internal static bool InsideHScene { get; private set; }
+
+        public static void StartPregnancy(SaveData.CharaData heroine)
+        {
+            _startedPregnancies.Add(heroine);
+        }
+
+        public static void StopPregnancy(SaveData.CharaData heroine)
+        {
+            _stoppedPregnancies.Add(heroine);
+        }
 
         protected override void OnDayChange(Cycle.Week day)
         {
@@ -26,21 +37,13 @@ namespace KK_Pregnancy
             }
         }
 
-#if KK
         protected override void OnStartH(BaseLoader proc, HFlag hFlag, bool vr)
-#else
-        protected override void OnStartH(MonoBehaviour proc, HFlag hFlag, bool vr)
-#endif
         {
             InsideHScene = true;
             proc.gameObject.AddComponent<LactationController>();
         }
 
-#if KK
         protected override void OnEndH(BaseLoader proc, HFlag hFlag, bool vr)
-#else
-        protected override void OnEndH(MonoBehaviour proc, HFlag hFlag, bool vr)
-#endif
         {
             InsideHScene = false;
             Destroy(proc.GetComponent<LactationController>());
@@ -72,7 +75,7 @@ namespace KK_Pregnancy
                 if (wonAChild)
                 {
                     //Logger.Log(LogLevel.Debug, "Preg - child lottery won, pregnancy will start");
-                    _startedPregnancies.Add(heroine);
+                    StartPregnancy(heroine);
                 }
             }
         }
@@ -96,7 +99,13 @@ namespace KK_Pregnancy
         {
             ApplyToAllDatas((chara, data) =>
             {
-                if (chara is SaveData.Heroine heroine && _startedPregnancies.Contains(heroine) && !data.IsPregnant)
+                // Stopping overrules starting
+                if (_stoppedPregnancies.Contains(chara) && !data.IsPregnant)
+                {
+                    data.StopPregnancy();
+                    return true;
+                }
+                if (_startedPregnancies.Contains(chara) && !data.IsPregnant)
                 {
                     data.StartPregnancy();
                     return true;
@@ -104,6 +113,7 @@ namespace KK_Pregnancy
                 return false;
             });
             _startedPregnancies.Clear();
+            _stoppedPregnancies.Clear();
         }
 
         private static void ApplyToAllDatas(Func<SaveData.CharaData, PregnancyData, bool> action)
@@ -121,13 +131,8 @@ namespace KK_Pregnancy
                 }
             }
 
-#if KK
             foreach (var heroine in Game.Instance.HeroineList) ApplyToDatas(heroine);
             ApplyToDatas(Game.Instance.Player);
-#else
-            foreach (var heroine in Game.HeroineList) ApplyToDatas(heroine);
-            ApplyToDatas(Game.Player);
-#endif
 
             // If controller exists then update its state so it gets any pregnancy week updates
             foreach (var controller in FindObjectsOfType<PregnancyCharaController>())

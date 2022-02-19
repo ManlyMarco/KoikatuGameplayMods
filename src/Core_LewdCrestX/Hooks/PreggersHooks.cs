@@ -14,7 +14,10 @@ namespace KK_LewdCrestX
         public static bool TryPatchPreggers(Harmony hi)
         {
 #if KK
-            var lactType = Type.GetType("KK_Pregnancy.LactationController, KK_Pregnancy", false); //todo add kks to ass name
+            var lactType = Type.GetType("KK_Pregnancy.LactationController, KK_Pregnancy", false);
+#elif KKS
+            var lactType = Type.GetType("KK_Pregnancy.LactationController, KKS_Pregnancy", false);
+#endif
             if (lactType != null)
             {
                 var lactDataType = lactType.GetNestedType("CharaData", AccessTools.all);
@@ -39,7 +42,6 @@ namespace KK_LewdCrestX
             else
                 LewdCrestXPlugin.Logger.LogWarning(
                     "Could not find KK_Pregnancy.LactationController, some features might not work until you install KK_Pregnancy (please report this if you do have latest version of KK_Pregnancy installed)");
-#endif
 
             return false;
         }
@@ -55,17 +57,14 @@ namespace KK_LewdCrestX
 
         public static void ApplyTempPreggers(SaveData.Heroine heroine)
         {
-#if KK
             if (!_patched) return;
 
             if (_tempPreggers.Add(heroine))
                 LewdCrestXPlugin.Logger.LogInfo("Triggering temporary pregnancy because of breedgasm crest: " + heroine.charFile?.parameter?.fullname);
-#endif
         }
 
         public static void OnPeriodChanged()
         {
-#if KK
             if (!_patched) return;
 
             // Apply the effect now to get a delay
@@ -78,12 +77,10 @@ namespace KK_LewdCrestX
                     pregCtrl.SaveData();
                 }
             }
-#endif
         }
 
         public static void ClearTempPreggers()
         {
-#if KK
             if (!_patched) return;
 
             foreach (var heroine in _tempPreggers)
@@ -96,7 +93,6 @@ namespace KK_LewdCrestX
                 }
             }
             _tempPreggers.Clear();
-#endif
         }
     }
 }

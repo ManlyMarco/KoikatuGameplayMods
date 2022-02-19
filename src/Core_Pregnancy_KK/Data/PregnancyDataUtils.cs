@@ -34,15 +34,16 @@ namespace KK_Pregnancy
 
             // Figure out which data to take if there are multiple
             // probably not necessary? null check should be enough? 
-            return chara.GetRelatedChaFiles()
-                .Select(GetPregnancyData)
-                .Where(x => x != null)
-                .OrderByDescending(x => x.PregnancyCount)
-                .ThenByDescending(x => x.WeeksSinceLastPregnancy)
-                .ThenByDescending(x => x.Week)
-                .ThenByDescending(x => x.MenstruationSchedule)
-                .ThenByDescending(x => x.GameplayEnabled)
-                .FirstOrDefault() ?? new PregnancyData();
+            //return chara.GetRelatedChaFiles()
+            //    .Select(GetPregnancyData)
+            //    .Where(x => x != null)
+            //    .OrderByDescending(x => x.PregnancyCount)
+            //    .ThenByDescending(x => x.WeeksSinceLastPregnancy)
+            //    .ThenByDescending(x => x.Week)
+            //    .ThenByDescending(x => x.MenstruationSchedule)
+            //    .ThenByDescending(x => x.GameplayEnabled)
+            //    .FirstOrDefault() ?? new PregnancyData();
+            return GetPregnancyData(chara.charFile) ?? new PregnancyData();
         }
 
         [Obsolete]

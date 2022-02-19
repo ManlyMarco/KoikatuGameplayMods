@@ -1,4 +1,7 @@
-﻿using BepInEx;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using BepInEx;
 using BepInEx.Configuration;
 using BepInEx.Logging;
 using HarmonyLib;
@@ -6,6 +9,8 @@ using KKABMX.Core;
 using KKAPI;
 using KKAPI.Chara;
 using KKAPI.MainGame;
+using KKAPI.Utilities;
+using UnityEngine;
 
 namespace KK_Pregnancy
 {
@@ -15,7 +20,7 @@ namespace KK_Pregnancy
     public partial class PregnancyPlugin : BaseUnityPlugin
     {
         public const string GUID = "KK_Pregnancy";
-        public const string Version = "2.5.5";
+        public const string Version = "2.6";
 
         public static ConfigEntry<bool> ConceptionEnabled { get; private set; }
         public static ConfigEntry<float> FertilityOverride { get; private set; }
@@ -91,6 +96,41 @@ namespace KK_Pregnancy
             var hi = new Harmony(GUID);
             Hooks.InitHooks(hi);
             PregnancyGui.Init(hi, this);
+
+            LoadFeatures(hi);
+
+            if (TimelineCompatibility.IsTimelineAvailable())
+            {
+                TimelineCompatibility.AddCharaFunctionInterpolable<int, PregnancyCharaController>(
+                    GUID, 
+                    "week", 
+                    "Pregnancy week",
+                    (oci, parameter, leftValue, rightValue, factor) => parameter.Data.Week = Mathf.RoundToInt(Mathf.LerpUnclamped(leftValue, rightValue, factor)),
+                    null,
+                    (oci, parameter) => parameter.Data.Week
+                    );
+            }
+        }
+
+        private void LoadFeatures(Harmony hi)
+        {
+            var featureT = typeof(IFeature);
+            var types = typeof(PregnancyPlugin).Assembly.GetTypes().Where(x => featureT.IsAssignableFrom(x) && x.IsClass);
+
+            var successful = new List<string>();
+            foreach (var type in types)
+            {
+                var feature = (IFeature)Activator.CreateInstance(type);
+                if (feature.Install(hi, Config))
+                    successful.Add(type.Name);
+            }
+
+            Logger.LogInfo("Loaded features: " + string.Join(", ", successful.ToArray()));
+        }
+
+        internal static PregnancyCharaController GetEffectController(SaveData.Heroine heroine)
+        {
+            return heroine?.chaCtrl != null ? heroine.chaCtrl.GetComponent<PregnancyCharaController>() : null;
         }
     }
 }

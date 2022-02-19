@@ -1,5 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Reflection.Emit;
 using ExtensibleSaveFormat;
 using HarmonyLib;
@@ -85,7 +86,7 @@ namespace KK_Pregnancy
                 {
                     yield return instruction;
 
-                    if (instruction.operand == target)
+                    if (instruction.operand as MethodInfo == target)
                     {
                         // Grab the return of get_HeroineList and process it
                         yield return new CodeInstruction(OpCodes.Call, customFilterM);
@@ -124,7 +125,7 @@ namespace KK_Pregnancy
             [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddHoushiDrink))]
             public static void OnFinishInside(HFlag __instance)
             {
-                var heroine = GetLeadHeroine(__instance);
+                var heroine = __instance.GetLeadingHeroine();
                 var controller = GetEffectController(heroine);
                 controller.AddInflation(1);
             }
@@ -134,20 +135,9 @@ namespace KK_Pregnancy
             [HarmonyPatch(typeof(HFlag), nameof(HFlag.AddSonyuAnalTare))]
             public static void OnDrain(HFlag __instance)
             {
-                var heroine = GetLeadHeroine(__instance);
+                var heroine = __instance.GetLeadingHeroine();
                 var controller = GetEffectController(heroine);
                 controller.DrainInflation(Mathf.Max(3, Mathf.CeilToInt(InflationMaxCount.Value / 2.2f)));
-            }
-
-            private static PregnancyCharaController GetEffectController(SaveData.Heroine heroine)
-            {
-                return heroine?.chaCtrl != null ? heroine.chaCtrl.GetComponent<PregnancyCharaController>() : null;
-            }
-
-            private static SaveData.Heroine GetLeadHeroine(HFlag hflag)
-            {
-                var id = hflag.mode == HFlag.EMode.houshi3P || hflag.mode == HFlag.EMode.sonyu3P ? hflag.nowAnimationInfo.id % 2 : 0;
-                return hflag.lstHeroine[id];
             }
 
             #endregion

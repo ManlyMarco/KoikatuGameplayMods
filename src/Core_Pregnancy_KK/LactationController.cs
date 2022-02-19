@@ -90,13 +90,15 @@ namespace KK_Pregnancy
             {
                 if (PregnancyPlugin.LactationFillTime.Value == 0)
                 {
-                    charaData.CurrentMilk = charaData.MaxMilk;
+                    charaData.CurrentMilkL = charaData.MaxMilk;
+                    charaData.CurrentMilkR = charaData.MaxMilk;
                 }
                 else
                 {
                     // Fully fill in 60 seconds * x
                     var change = Time.deltaTime / (60f * PregnancyPlugin.LactationFillTime.Value);
-                    charaData.CurrentMilk = Mathf.Min(charaData.CurrentMilk + change * charaData.MaxMilk, charaData.MaxMilk);
+                    charaData.CurrentMilkL = Mathf.Min(charaData.CurrentMilkL + change * charaData.MaxMilk, charaData.MaxMilk);
+                    charaData.CurrentMilkR = Mathf.Min(charaData.CurrentMilkR + change * charaData.MaxMilk, charaData.MaxMilk);
                 }
             }
         }
@@ -125,7 +127,7 @@ namespace KK_Pregnancy
             private int _singleTriggerCount;
 
             // Range from 0 to MaxMilk
-            public float CurrentMilk;
+            public float CurrentMilkL, CurrentMilkR;
 
             public CharaData(ChaControl chaControl, HParticleCtrl particleCtrl, HandCtrl procHand)
             {
@@ -135,7 +137,8 @@ namespace KK_Pregnancy
 
                 var controller = chaControl.GetComponent<PregnancyCharaController>();
                 MaxMilk = GetMilkAmount(controller);
-                CurrentMilk = MaxMilk;
+                CurrentMilkL = MaxMilk;
+                CurrentMilkR = MaxMilk;
             }
 
             private static float GetMilkAmount(PregnancyCharaController controller)
@@ -170,47 +173,40 @@ namespace KK_Pregnancy
                 if ((!ChaControl.IsClothesStateKind(0) || clothesState[0] != 0) &&
                     (!ChaControl.IsClothesStateKind(2) || clothesState[2] != 0))
                 {
-                    //PregnancyPlugin.Logger.LogDebug(
-                    //    $"OnOrgasm > CurrentMilk level for chara {ChaControl.chaFile.parameter.fullname}: {Mathf.RoundToInt(CurrentMilk * 100)}%");
-
                     InitializeParticles();
 
-                    if (CurrentMilk >= MoreMilk)
-                    {
-                        if (orgasm)
-                            OnOrgasm(true);
-                        else
-                            OnSingle(true);
-                    }
-                    else if (CurrentMilk >= MinimumMilk)
-                    {
-                        if (orgasm)
-                            OnOrgasm(false);
-                        else
-                            OnSingle(false);
-                    }
+                    if (orgasm)
+                        OnOrgasm();
+                    else
+                        OnSingle();
                 }
             }
 
-            private void OnSingle(bool large)
+            private void OnSingle()
             {
-                if (IsTouchingMune(true, false))
+                var firedAmount = 0;
+                if (CurrentMilkL >= MinimumMilk && IsTouchingMune(true, false))
                 {
                     _partLightL.particle.Simulate(0f);
                     _partLightL.particle.Play();
-                    CurrentMilk -= 0.025f;
+                    CurrentMilkL -= 0.05f;
+                    firedAmount++;
                 }
-
-                if (IsTouchingMune(false, true))
+                if (CurrentMilkR >= MinimumMilk && IsTouchingMune(false, true))
                 {
                     _partLightR.particle.Simulate(0f);
                     _partLightR.particle.Play();
-                    CurrentMilk -= 0.025f;
+                    CurrentMilkR -= 0.05f;
+                    firedAmount++;
                 }
 
-                ChaControl.StartCoroutine(OnSingleCo());
+                if (firedAmount == 0) return;
 
-                if (_singleTriggerCount++ == 4)
+                // Stop playing the effect early to make it look like a single splash
+                ChaControl.StartCoroutine(OnSingleFinishCo());
+
+                // Trigger faster if both sides are fired at the same time
+                if ((_singleTriggerCount += firedAmount) == 8)
                 {
                     var currentState = ChaControl.GetSiruFlags(ChaFileDefine.SiruParts.SiruFrontUp);
                     if (currentState < 1) // Only go up to the 1st level since quantity is lower
@@ -218,7 +214,7 @@ namespace KK_Pregnancy
                 }
             }
 
-            private IEnumerator OnSingleCo()
+            private IEnumerator OnSingleFinishCo()
             {
                 yield return new WaitForSeconds(0.3f);
                 //_partHeavyL.particle.Stop();
@@ -227,8 +223,11 @@ namespace KK_Pregnancy
                 _partLightR.particle.Stop();
             }
 
-            private void OnOrgasm(bool large)
+            private void OnOrgasm()
             {
+                if (CurrentMilkL < MinimumMilk && CurrentMilkR < MinimumMilk)
+                    return;
+
                 void PlaySoundEffect(ChaControl chaControl, ChaReference.RefObjKey reference)
                 {
                     var soundEffectSetting = new Utils.Sound.Setting(Manager.Sound.Type.GameSE3D)
@@ -254,14 +253,16 @@ namespace KK_Pregnancy
                 PlaySoundEffect(ChaControl, ChaReference.RefObjKey.a_n_bust_f);
 
                 var currentState = ChaControl.GetSiruFlags(ChaFileDefine.SiruParts.SiruFrontUp);
-                if (large)
+                // Play the same effect on both even if they have different levels or it looks weird
+                if (CurrentMilkL >= MoreMilk || CurrentMilkR >= MoreMilk)
                 {
                     _partHeavyL.particle.Simulate(0f);
                     _partHeavyL.particle.Play();
                     _partHeavyR.particle.Simulate(0f);
                     _partHeavyR.particle.Play();
 
-                    CurrentMilk -= 0.35f;
+                    CurrentMilkL -= 0.7f;
+                    CurrentMilkR -= 0.7f;
                     if (currentState < 2) // Has 3 states, value is max 2
                         ChaControl.SetSiruFlags(ChaFileDefine.SiruParts.SiruFrontUp, (byte)(currentState + 1));
                 }
@@ -272,7 +273,8 @@ namespace KK_Pregnancy
                     _partLightR.particle.Simulate(0f);
                     _partLightR.particle.Play();
 
-                    CurrentMilk -= 0.25f;
+                    CurrentMilkL -= 0.5f;
+                    CurrentMilkR -= 0.5f;
                     if (currentState < 1) // Only go up to the 1st level since quantity is lower
                         ChaControl.SetSiruFlags(ChaFileDefine.SiruParts.SiruFrontUp, (byte)(currentState + 1));
                 }

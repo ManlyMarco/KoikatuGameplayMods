@@ -183,6 +183,12 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\KKS_Pregnancy\KKS_Pregnancy.csproj">
+      <Project>{736eb022-a7b9-43aa-95c3-05a84b57f7e7}</Project>
+      <Name>KKS_Pregnancy</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="..\Core_LewdCrestX\Core_LewdCrestX.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\IllusionLibs.BepInEx.Harmony.2.5.4\build\IllusionLibs.BepInEx.Harmony.targets" Condition="Exists('..\packages\IllusionLibs.BepInEx.Harmony.2.5.4\build\IllusionLibs.BepInEx.Harmony.targets')" />

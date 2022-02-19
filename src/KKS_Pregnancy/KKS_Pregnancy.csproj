@@ -7,7 +7,7 @@
     <ProjectGuid>{736EB022-A7B9-43AA-95C3-05A84B57F7E7}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>KKS_Pregnancy</RootNamespace>
+    <RootNamespace>KK_Pregnancy</RootNamespace>
     <AssemblyName>KKS_Pregnancy</AssemblyName>
     <TargetFrameworkVersion>v4.6</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
@@ -56,8 +56,8 @@
       <HintPath>..\packages\ABMX.KKSABMX.4.4.5\lib\net46\KKSABMX.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="KKSAPI, Version=1.27.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\IllusionModdingAPI.KKSAPI.1.27.0\lib\net46\KKSAPI.dll</HintPath>
+    <Reference Include="KKSAPI, Version=1.30.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\IllusionModdingAPI.KKSAPI.1.30.0\lib\net46\KKSAPI.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="KKS_ExtensibleSaveFormat, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -160,13 +160,76 @@
       <HintPath>..\packages\IllusionLibs.KoikatsuSunshine.UnityEngine.UIModule.2019.4.9\lib\net46\UnityEngine.UIModule.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="XUnity.AutoTranslator.Plugin.Core, Version=4.16.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\IllusionLibs.XUnity.AutoTranslator.Plugin.Core.4.16.0\lib\net46\XUnity.AutoTranslator.Plugin.Core.dll</HintPath>
+    <Reference Include="XUnity.AutoTranslator.Plugin.Core, Version=4.18.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\IllusionLibs.XUnity.AutoTranslator.Plugin.Core.4.18.0\lib\net46\XUnity.AutoTranslator.Plugin.Core.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <EmbeddedResource Include="Resources\Events\c04_AS_mysterious.csv" />
+    <EmbeddedResource Include="Resources\Events\c04_PREG_mysterious.csv" />
+    <EmbeddedResource Include="Resources\Events\c04_XPREG_mysterious.csv" />
+    <EmbeddedResource Include="Resources\Events\c07_AS_tomboy.csv" />
+    <EmbeddedResource Include="Resources\Events\c07_PREG_tomboy.csv" />
+    <EmbeddedResource Include="Resources\Events\c07_XPREG_tomboy.csv" />
+    <EmbeddedResource Include="Resources\Events\c08_AS_pure.csv" />
+    <EmbeddedResource Include="Resources\Events\c08_PREG_pure.csv" />
+    <EmbeddedResource Include="Resources\Events\c08_XPREG_pure.csv" />
+    <EmbeddedResource Include="Resources\Events\c11_AS_motherly.csv" />
+    <EmbeddedResource Include="Resources\Events\c11_PREG_motherly.csv" />
+    <EmbeddedResource Include="Resources\Events\c11_XPREG_motherly.csv" />
+    <EmbeddedResource Include="Resources\Events\c13_AS_gyaru.csv" />
+    <EmbeddedResource Include="Resources\Events\c13_PREG_gyaru.csv" />
+    <EmbeddedResource Include="Resources\Events\c13_XPREG_gyaru.csv" />
+    <EmbeddedResource Include="Resources\Events\c14_AS_delinquent.csv" />
+    <EmbeddedResource Include="Resources\Events\c14_PREG_delinquent.csv" />
+    <EmbeddedResource Include="Resources\Events\c14_XPREG_delinquent.csv" />
+    <EmbeddedResource Include="Resources\Events\c15_AS_wild.csv" />
+    <EmbeddedResource Include="Resources\Events\c15_PREG_wild.csv" />
+    <EmbeddedResource Include="Resources\Events\c15_XPREG_wild.csv" />
+    <EmbeddedResource Include="Resources\Events\c18_AS_jinxed.csv" />
+    <EmbeddedResource Include="Resources\Events\c18_PREG_jinxed.csv" />
+    <EmbeddedResource Include="Resources\Events\c18_XPREG_jinxed.csv" />
+    <EmbeddedResource Include="Resources\Events\c19_AS_Bookworm.csv" />
+    <EmbeddedResource Include="Resources\Events\c19_PREG_Bookworm.csv" />
+    <EmbeddedResource Include="Resources\Events\c19_XPREG_Bookworm.csv" />
+    <EmbeddedResource Include="Resources\Events\c20_AS_timid.csv" />
+    <EmbeddedResource Include="Resources\Events\c20_PREG_timid.csv" />
+    <EmbeddedResource Include="Resources\Events\c20_XPREG_timid.csv" />
+    <EmbeddedResource Include="Resources\Events\c22_AS_trendy.csv" />
+    <EmbeddedResource Include="Resources\Events\c22_PREG_trendy.csv" />
+    <EmbeddedResource Include="Resources\Events\c22_XPREG_trendy.csv" />
+    <EmbeddedResource Include="Resources\Events\c24_AS_yandere.csv" />
+    <EmbeddedResource Include="Resources\Events\c24_PREG_yandere.csv" />
+    <EmbeddedResource Include="Resources\Events\c24_XPREG_yandere.csv" />
+    <EmbeddedResource Include="Resources\Events\c25_AS_lazy.csv" />
+    <EmbeddedResource Include="Resources\Events\c25_PREG_lazy.csv" />
+    <EmbeddedResource Include="Resources\Events\c25_XPREG_lazy.csv" />
+    <EmbeddedResource Include="Resources\Events\c27_AS_stubborn.csv" />
+    <EmbeddedResource Include="Resources\Events\c27_PREG_stubborn.csv" />
+    <EmbeddedResource Include="Resources\Events\c27_XPREG_stubborn.csv" />
+    <EmbeddedResource Include="Resources\Events\c29_AS_humble.csv" />
+    <EmbeddedResource Include="Resources\Events\c29_PREG_humble.csv" />
+    <EmbeddedResource Include="Resources\Events\c29_XPREG_humble.csv" />
+    <EmbeddedResource Include="Resources\Events\c32_AS_honest.csv" />
+    <EmbeddedResource Include="Resources\Events\c32_PREG_honest.csv" />
+    <EmbeddedResource Include="Resources\Events\c32_XPREG_honest.csv" />
+    <EmbeddedResource Include="Resources\Events\c33_AS_glamorous.csv" />
+    <EmbeddedResource Include="Resources\Events\c33_PREG_glamorous.csv" />
+    <EmbeddedResource Include="Resources\Events\c33_XPREG_glamorous.csv" />
+    <EmbeddedResource Include="Resources\Events\c34_AS_returnee.csv" />
+    <EmbeddedResource Include="Resources\Events\c34_PREG_returnee.csv" />
+    <EmbeddedResource Include="Resources\Events\c34_XPREG_returnee.csv" />
+    <EmbeddedResource Include="Resources\Events\c36_AS_sadist.csv" />
+    <EmbeddedResource Include="Resources\Events\c36_PREG_sadist.csv" />
+    <EmbeddedResource Include="Resources\Events\c36_XPREG_sadist.csv" />
+    <EmbeddedResource Include="Resources\Events\c37_AS_emotionless.csv" />
+    <EmbeddedResource Include="Resources\Events\c37_PREG_emotionless.csv" />
+    <EmbeddedResource Include="Resources\Events\c37_XPREG_emotionless.csv" />
+    <EmbeddedResource Include="Resources\Events\c99_AS_def.csv" />
+    <EmbeddedResource Include="Resources\Events\c99_PREG_def.csv" />
+    <EmbeddedResource Include="Resources\Events\c99_XPREG_def.csv" />
     <None Include="Resources\preg_icon.xcf" />
   </ItemGroup>
   <ItemGroup>
@@ -180,9 +243,21 @@
     <Folder Include="Properties\" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Constants.cs" />
+    <Compile Include="Features\CsvHelper.cs" />
+    <Compile Include="Features\FamilyCondomsFeature.cs" />
+    <None Include="Features\FamilySuppositoryFeature.cs" />
+    <Compile Include="Features\CustomEventsFeature.cs" />
     <Compile Include="GUI\PregnancyGui.cs" />
     <Compile Include="GUI\PregnancyGui.HSceneMenstrIconOverride.cs" />
     <Compile Include="GUI\PregnancyGui.StatusIcons.cs" />
+    <Compile Include="PregnancyGameController.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\item_rubber.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Resources\icon_insertable.png" />
   </ItemGroup>
   <Import Project="..\Core_Pregnancy_KK\Core_Pregnancy_KK.projitems" Label="Shared" />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -208,8 +283,8 @@
     <Error Condition="!Exists('..\packages\IllusionLibs.KoikatsuSunshine.UnityEngine.TextRenderingModule.2019.4.9\build\IllusionLibs.KoikatsuSunshine.UnityEngine.TextRenderingModule.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\IllusionLibs.KoikatsuSunshine.UnityEngine.TextRenderingModule.2019.4.9\build\IllusionLibs.KoikatsuSunshine.UnityEngine.TextRenderingModule.targets'))" />
     <Error Condition="!Exists('..\packages\IllusionLibs.KoikatsuSunshine.UnityEngine.UI.2019.4.9\build\IllusionLibs.KoikatsuSunshine.UnityEngine.UI.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\IllusionLibs.KoikatsuSunshine.UnityEngine.UI.2019.4.9\build\IllusionLibs.KoikatsuSunshine.UnityEngine.UI.targets'))" />
     <Error Condition="!Exists('..\packages\IllusionLibs.KoikatsuSunshine.UnityEngine.UIModule.2019.4.9\build\IllusionLibs.KoikatsuSunshine.UnityEngine.UIModule.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\IllusionLibs.KoikatsuSunshine.UnityEngine.UIModule.2019.4.9\build\IllusionLibs.KoikatsuSunshine.UnityEngine.UIModule.targets'))" />
-    <Error Condition="!Exists('..\packages\IllusionLibs.XUnity.AutoTranslator.Plugin.Core.4.16.0\build\IllusionLibs.XUnity.AutoTranslator.Plugin.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\IllusionLibs.XUnity.AutoTranslator.Plugin.Core.4.16.0\build\IllusionLibs.XUnity.AutoTranslator.Plugin.Core.targets'))" />
     <Error Condition="!Exists('..\packages\IllusionLibs.KoikatsuSunshine.UnityEngine.ParticleSystemModule.2019.4.9\build\IllusionLibs.KoikatsuSunshine.UnityEngine.ParticleSystemModule.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\IllusionLibs.KoikatsuSunshine.UnityEngine.ParticleSystemModule.2019.4.9\build\IllusionLibs.KoikatsuSunshine.UnityEngine.ParticleSystemModule.targets'))" />
+    <Error Condition="!Exists('..\packages\IllusionLibs.XUnity.AutoTranslator.Plugin.Core.4.18.0\build\IllusionLibs.XUnity.AutoTranslator.Plugin.Core.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\IllusionLibs.XUnity.AutoTranslator.Plugin.Core.4.18.0\build\IllusionLibs.XUnity.AutoTranslator.Plugin.Core.targets'))" />
   </Target>
   <Import Project="..\packages\IllusionLibs.BepInEx.MonoMod.21.8.5.1\build\IllusionLibs.BepInEx.MonoMod.targets" Condition="Exists('..\packages\IllusionLibs.BepInEx.MonoMod.21.8.5.1\build\IllusionLibs.BepInEx.MonoMod.targets')" />
   <Import Project="..\packages\IllusionLibs.KoikatsuSunshine.Assembly-CSharp-firstpass.2021.9.17\build\IllusionLibs.KoikatsuSunshine.Assembly-CSharp-firstpass.targets" Condition="Exists('..\packages\IllusionLibs.KoikatsuSunshine.Assembly-CSharp-firstpass.2021.9.17\build\IllusionLibs.KoikatsuSunshine.Assembly-CSharp-firstpass.targets')" />
@@ -227,6 +302,6 @@
   <Import Project="..\packages\IllusionLibs.KoikatsuSunshine.UnityEngine.TextRenderingModule.2019.4.9\build\IllusionLibs.KoikatsuSunshine.UnityEngine.TextRenderingModule.targets" Condition="Exists('..\packages\IllusionLibs.KoikatsuSunshine.UnityEngine.TextRenderingModule.2019.4.9\build\IllusionLibs.KoikatsuSunshine.UnityEngine.TextRenderingModule.targets')" />
   <Import Project="..\packages\IllusionLibs.KoikatsuSunshine.UnityEngine.UI.2019.4.9\build\IllusionLibs.KoikatsuSunshine.UnityEngine.UI.targets" Condition="Exists('..\packages\IllusionLibs.KoikatsuSunshine.UnityEngine.UI.2019.4.9\build\IllusionLibs.KoikatsuSunshine.UnityEngine.UI.targets')" />
   <Import Project="..\packages\IllusionLibs.KoikatsuSunshine.UnityEngine.UIModule.2019.4.9\build\IllusionLibs.KoikatsuSunshine.UnityEngine.UIModule.targets" Condition="Exists('..\packages\IllusionLibs.KoikatsuSunshine.UnityEngine.UIModule.2019.4.9\build\IllusionLibs.KoikatsuSunshine.UnityEngine.UIModule.targets')" />
-  <Import Project="..\packages\IllusionLibs.XUnity.AutoTranslator.Plugin.Core.4.16.0\build\IllusionLibs.XUnity.AutoTranslator.Plugin.Core.targets" Condition="Exists('..\packages\IllusionLibs.XUnity.AutoTranslator.Plugin.Core.4.16.0\build\IllusionLibs.XUnity.AutoTranslator.Plugin.Core.targets')" />
   <Import Project="..\packages\IllusionLibs.KoikatsuSunshine.UnityEngine.ParticleSystemModule.2019.4.9\build\IllusionLibs.KoikatsuSunshine.UnityEngine.ParticleSystemModule.targets" Condition="Exists('..\packages\IllusionLibs.KoikatsuSunshine.UnityEngine.ParticleSystemModule.2019.4.9\build\IllusionLibs.KoikatsuSunshine.UnityEngine.ParticleSystemModule.targets')" />
+  <Import Project="..\packages\IllusionLibs.XUnity.AutoTranslator.Plugin.Core.4.18.0\build\IllusionLibs.XUnity.AutoTranslator.Plugin.Core.targets" Condition="Exists('..\packages\IllusionLibs.XUnity.AutoTranslator.Plugin.Core.4.18.0\build\IllusionLibs.XUnity.AutoTranslator.Plugin.Core.targets')" />
 </Project>

@@ -34,15 +34,17 @@ namespace KK_Pregnancy
 
         public void ReadData()
         {
-            var data = GetExtendedData();
-            Data = PregnancyData.Load(data) ?? new PregnancyData();
+            var heroine = KoikatuAPI.GetCurrentGameMode() == GameMode.MainGame ? ChaControl.GetHeroine() : null;
+            if (heroine?.charFile != null)
+                Data = heroine.charFile.GetPregnancyData() ?? new PregnancyData();
+            else
+                Data = PregnancyData.Load(GetExtendedData()) ?? new PregnancyData();
 
             // PregnancyPlugin.Logger.LogDebug($"Preg - ReadData week {Data.Week} {ChaControl.name}");
 
             if (!CanGetDangerousDays())
             {
                 // Force the girl to always be on the safe day, happens every day after day of conception
-                var heroine = ChaControl.GetHeroine();
                 if (heroine != null)
                     HFlag.SetMenstruation(heroine, HFlag.MenstruationType.安全日);
             }
