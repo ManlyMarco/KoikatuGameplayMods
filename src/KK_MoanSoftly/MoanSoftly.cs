@@ -31,7 +31,7 @@ namespace KK_MoanSoftly
             if (_hFlag == null)
                 _hFlag = FindObjectOfType<HFlag>();
 
-            var startValue = 30;
+            var startValue = 50;
 
             var attribute = _female.chaFile.parameter.attribute;
             if (attribute.bitch || attribute.choroi) startValue += 20;
