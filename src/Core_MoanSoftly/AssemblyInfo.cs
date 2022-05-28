@@ -4,10 +4,10 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("KK_MoanSoftly")]
-[assembly: AssemblyDescription("Change how loud breathing sounds are")]
+[assembly: AssemblyTitle("MoanSoftly")]
+[assembly: AssemblyDescription("Make breathing sounds quieter in H at start")]
 [assembly: AssemblyCompany("https://github.com/ManlyMarco/KoikatuGameplayMods")]
-[assembly: AssemblyProduct("KK_MoanSoftly")]
+[assembly: AssemblyProduct("MoanSoftly")]
 [assembly: AssemblyCopyright("Copyright ©  2019")]
 
 // Setting ComVisible to false makes the types in this assembly not visible

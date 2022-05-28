@@ -5,7 +5,6 @@ using BepInEx;
 using HarmonyLib;
 using KKAPI;
 using KKAPI.MainGame;
-using KKAPI.Studio;
 using KKAPI.Utilities;
 using UnityEngine;
 
@@ -13,15 +12,19 @@ namespace KK_MoanSoftly
 {
     [BepInPlugin(GUID, "Moan softly when I H you", Version)]
     [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
+    [BepInProcess(KoikatuAPI.GameProcessName)]
+    [BepInProcess(KoikatuAPI.VRProcessName)]
+#if KK
+    [BepInProcess(KoikatuAPI.GameProcessNameSteam)]
+    [BepInProcess(KoikatuAPI.VRProcessNameSteam)]
+#endif
     public class MoanSoftly : BaseUnityPlugin
     {
         public const string GUID = "KK_MoanSoftly";
-        public const string Version = "1.0";
+        public const string Version = "1.0.1";
 
         private void Awake()
         {
-            if (StudioAPI.InsideStudio) return;
-
             Harmony.CreateAndPatchAll(typeof(MoanSoftly));
         }
 
@@ -54,22 +57,15 @@ namespace KK_MoanSoftly
         }
 
         [HarmonyTranspiler]
-        [HarmonyPatch(typeof(HVoiceCtrl), "BreathProc")]
+        [HarmonyPatch(typeof(HVoiceCtrl), nameof(HVoiceCtrl.BreathProc))]
+        [HarmonyPatch(typeof(HVoiceCtrl), nameof(HVoiceCtrl.ShortBreathProc))]
         private static IEnumerable<CodeInstruction> BreathProcTpl(IEnumerable<CodeInstruction> instructions)
         {
-            return Apply(instructions);
-        }
-
-        [HarmonyTranspiler]
-        [HarmonyPatch(typeof(HVoiceCtrl), "ShortBreathProc")]
-        private static IEnumerable<CodeInstruction> ShortBreathTpl(IEnumerable<CodeInstruction> instructions)
-        {
-            return Apply(instructions);
-        }
-
-        private static IEnumerable<CodeInstruction> Apply(IEnumerable<CodeInstruction> instructions)
-        {
+#if KK
             var findMethod = AccessTools.Method(typeof(ChaControl), nameof(ChaControl.SetVoiceTransform));
+#elif KKS
+            var findMethod = AccessTools.Method(typeof(ChaControl), nameof(ChaControl.SetLipSync));
+#endif
             if (findMethod == null) throw new ArgumentNullException(nameof(findMethod));
             var addMethod = AccessTools.Method(typeof(MoanSoftly), nameof(ApplyBreathingTweaks));
             if (addMethod == null) throw new ArgumentNullException(nameof(addMethod));
