@@ -14,7 +14,8 @@ namespace MoreShopItems.Features
     {
         private static ConfigEntry<bool> _notifyMast;
         private static ConfigEntry<bool> _notifyLesb;
-        private static string _infoTextPrefix = "エロ活動：{0}";
+        private static string _infoTextPrefixMast = "{0} オナニー：{1}"; //I am sorry if this is incorrect as i used google translate
+        private static string _infoTextPrefixLesb = "{0} レズビアン：{1}"; //Same here
 
         public bool ApplyFeature(ref CompositeDisposable disp, MoreShopItemsPlugin inst)
         {
@@ -37,7 +38,8 @@ namespace MoreShopItems.Features
             _notifyMast = inst.Config.Bind(itemName, "Notification on masturbation", true, "If the item is purchased, show a notification whenever any NPC starts a masturbation action.");
             _notifyLesb = inst.Config.Bind(itemName, "Notification on lesbian", true, "If the item is purchased, show a notification whenever any NPC starts a lesbian action.");
 
-            TranslationHelper.TranslateAsync(_infoTextPrefix, s => _infoTextPrefix = s);
+            TranslationHelper.TranslateAsync(_infoTextPrefixMast, s => _infoTextPrefixMast = s);
+            TranslationHelper.TranslateAsync(_infoTextPrefixLesb, s => _infoTextPrefixLesb = s);
 
             return true;
         }
@@ -61,7 +63,15 @@ namespace MoreShopItems.Features
                             //if (ActionScene.initialized && ActionScene.instance.Player.mapNo != mapNo)
                             if (ActionScene.instance.Map.infoDic.TryGetValue(mapNo, out var param))
                             {
-                                InformationUI.SetAsync(string.Format(_infoTextPrefix, param.DisplayName), InformationUI.Mode.Normal).Forget();
+                                if (npc.isOnanism)
+                                {
+                                    InformationUI.SetAsync(string.Format(_infoTextPrefixMast, npc.charaData.Name, param.DisplayName), InformationUI.Mode.Normal).Forget();
+                                }
+                                else if (npc.isLesbian)
+                                {
+                                    InformationUI.SetAsync(string.Format(_infoTextPrefixLesb, npc.charaData.Name, param.DisplayName), InformationUI.Mode.Normal).Forget();
+                                }
+                                
                             }
                         }
                     }
