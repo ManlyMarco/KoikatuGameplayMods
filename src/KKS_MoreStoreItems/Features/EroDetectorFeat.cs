@@ -14,12 +14,14 @@ namespace MoreShopItems.Features
     {
         private static ConfigEntry<bool> _notifyMast;
         private static ConfigEntry<bool> _notifyLesb;
-        private static string _infoTextPrefixMast = "{0} オナニー：{1}"; //I am sorry if this is incorrect as i used google translate
-        private static string _infoTextPrefixLesb = "{0} レズビアン：{1}"; //Same here
+        private static string _infoTextPrefixMast = "{0}は{1}でオナニーしている";
+        private static string _infoTextPrefixLesb = "{0}は{1}でレズのセックスしている";
+        private static string _infoTextPrefix = "エロ活動：{0}";
 
         public bool ApplyFeature(ref CompositeDisposable disp, MoreShopItemsPlugin inst)
         {
             const string itemName = "Ero Detection App";
+            const string itemUpgradeName = "Upgraded Ero Detection App";
 
             disp.Add(StoreApi.RegisterShopItem(
                 itemId: MoreShopItemsPlugin.DetectorItemId,
@@ -33,11 +35,24 @@ namespace MoreShopItems.Features
                 cost: 200,
                 sort: 500));
 
+            disp.Add(StoreApi.RegisterShopItem(
+                itemId: MoreShopItemsPlugin.UpgDetectorItemId,
+                itemName: itemUpgradeName,
+                explaination: "An upgrade to the Ero Detection App, lets you know who and what type of activity they're doing. Requires the Ero Detection App",
+                shopType: StoreApi.ShopType.NightOnly,
+                itemBackground: StoreApi.ShopBackground.Yellow,
+                itemCategory: 3,
+                stock: 1,
+                resetsDaily: false,
+                cost: 200,
+                sort: 501));
+
             disp.Add(Harmony.CreateAndPatchAll(typeof(EroDetectorFeat)));
 
             _notifyMast = inst.Config.Bind(itemName, "Notification on masturbation", true, "If the item is purchased, show a notification whenever any NPC starts a masturbation action.");
             _notifyLesb = inst.Config.Bind(itemName, "Notification on lesbian", true, "If the item is purchased, show a notification whenever any NPC starts a lesbian action.");
 
+            TranslationHelper.TranslateAsync(_infoTextPrefix, s => _infoTextPrefix = s);
             TranslationHelper.TranslateAsync(_infoTextPrefixMast, s => _infoTextPrefixMast = s);
             TranslationHelper.TranslateAsync(_infoTextPrefixLesb, s => _infoTextPrefixLesb = s);
 
@@ -63,15 +78,28 @@ namespace MoreShopItems.Features
                             //if (ActionScene.initialized && ActionScene.instance.Player.mapNo != mapNo)
                             if (ActionScene.instance.Map.infoDic.TryGetValue(mapNo, out var param))
                             {
-                                if (npc.isOnanism)
+                                var location = "";
+                                TranslationHelper.TryTranslate(param.DisplayName,out location);
+
+                                if (StoreApi.GetItemAmountBought(MoreShopItemsPlugin.UpgDetectorItemId) > 0)
                                 {
-                                    InformationUI.SetAsync(string.Format(_infoTextPrefixMast, npc.charaData.Name, param.DisplayName), InformationUI.Mode.Normal).Forget();
+                                    TranslationHelper.TranslateAsync(npc.charaData.Name, s =>
+                                    {
+                                        if (npc.isOnanism)
+                                        {
+                                            InformationUI.SetAsync(string.Format(_infoTextPrefixMast, s, location), InformationUI.Mode.Normal).Forget();
+                                        }
+                                        else if (npc.isLesbian)
+                                        {
+                                            InformationUI.SetAsync(string.Format(_infoTextPrefixLesb, s, location), InformationUI.Mode.Normal).Forget();
+                                        }
+                                        return;
+                                    });
+                                    return;
                                 }
-                                else if (npc.isLesbian)
-                                {
-                                    InformationUI.SetAsync(string.Format(_infoTextPrefixLesb, npc.charaData.Name, param.DisplayName), InformationUI.Mode.Normal).Forget();
-                                }
-                                
+
+                                InformationUI.SetAsync(string.Format(_infoTextPrefix, location), InformationUI.Mode.Normal).Forget();
+
                             }
                         }
                     }
