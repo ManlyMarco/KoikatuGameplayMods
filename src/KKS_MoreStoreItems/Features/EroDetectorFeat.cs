@@ -26,26 +26,15 @@ namespace MoreShopItems.Features
             disp.Add(StoreApi.RegisterShopItem(
                 itemId: MoreShopItemsPlugin.DetectorItemId,
                 itemName: itemName,
-                explaination: "A phone app that notifies you about erotic activities happening around the island. It's fully automatic and gives estimated locations.",
+                explaination: "A phone app that notifies you about erotic activities happening around the island. It's fully automatic and gives estimated locations. Further upgrade lets you see who and what is being done",
                 shopType: StoreApi.ShopType.NightOnly,
                 itemBackground: StoreApi.ShopBackground.Yellow,
                 itemCategory: 3,
-                stock: 1,
+                stock: 2,
                 resetsDaily: false,
                 cost: 200,
-                sort: 500));
-
-            disp.Add(StoreApi.RegisterShopItem(
-                itemId: MoreShopItemsPlugin.UpgDetectorItemId,
-                itemName: itemUpgradeName,
-                explaination: "An upgrade to the Ero Detection App, lets you know who and what type of activity they're doing. Requires the Ero Detection App",
-                shopType: StoreApi.ShopType.NightOnly,
-                itemBackground: StoreApi.ShopBackground.Yellow,
-                itemCategory: 3,
-                stock: 1,
-                resetsDaily: false,
-                cost: 200,
-                sort: 501));
+                sort: 500,
+                numText: "{0} available upgrades"));
 
             disp.Add(Harmony.CreateAndPatchAll(typeof(EroDetectorFeat)));
 
@@ -81,7 +70,7 @@ namespace MoreShopItems.Features
                                 var location = "";
                                 TranslationHelper.TryTranslate(param.DisplayName,out location);
 
-                                if (StoreApi.GetItemAmountBought(MoreShopItemsPlugin.UpgDetectorItemId) > 0)
+                                if (StoreApi.GetItemAmountBought(MoreShopItemsPlugin.DetectorItemId) > 1)
                                 {
                                     TranslationHelper.TranslateAsync(npc.charaData.Name, s =>
                                     {

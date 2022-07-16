@@ -17,7 +17,6 @@ namespace MoreShopItems
         public const string GUID = "MoreShopItems";
         public const string Version = "2.0";
 
-        internal const int UpgDetectorItemId = 3456652;
         internal const int DetectorItemId = 3456651;
         internal const int TalismanItemId = 3456650;
 
