@@ -16,12 +16,11 @@ namespace MoreShopItems.Features
         private static ConfigEntry<bool> _notifyLesb;
         private static string _infoTextPrefixMast = "{0}は{1}でオナニーしている";
         private static string _infoTextPrefixLesb = "{0}は{1}でレズのセックスしている";
-        private static string _infoTextPrefix = "エロ活動：{0}";
+        private static string _infoTextPrefixGeneral = "エロ活動：{0}";
 
         public bool ApplyFeature(ref CompositeDisposable disp, MoreShopItemsPlugin inst)
         {
             const string itemName = "Ero Detection App";
-            const string itemUpgradeName = "Upgraded Ero Detection App";
 
             disp.Add(StoreApi.RegisterShopItem(
                 itemId: MoreShopItemsPlugin.DetectorItemId,
@@ -41,7 +40,7 @@ namespace MoreShopItems.Features
             _notifyMast = inst.Config.Bind(itemName, "Notification on masturbation", true, "If the item is purchased, show a notification whenever any NPC starts a masturbation action.");
             _notifyLesb = inst.Config.Bind(itemName, "Notification on lesbian", true, "If the item is purchased, show a notification whenever any NPC starts a lesbian action.");
 
-            TranslationHelper.TranslateAsync(_infoTextPrefix, s => _infoTextPrefix = s);
+            TranslationHelper.TranslateAsync(_infoTextPrefixGeneral, s => _infoTextPrefixGeneral = s);
             TranslationHelper.TranslateAsync(_infoTextPrefixMast, s => _infoTextPrefixMast = s);
             TranslationHelper.TranslateAsync(_infoTextPrefixLesb, s => _infoTextPrefixLesb = s);
 
@@ -55,47 +54,35 @@ namespace MoreShopItems.Features
             // wpData is null when the character is still walking to the current action location
             if (value == null) return;
 
-            if (__instance is NPC npc)
+            if (__instance is NPC npc && (npc.isOnanism && _notifyMast.Value || npc.isLesbian && _notifyLesb.Value))
             {
-                if (npc.isOnanism && _notifyMast.Value || npc.isLesbian && _notifyLesb.Value)
+                try
                 {
-                    try
+                    var featureLevel = StoreApi.GetItemAmountBought(MoreShopItemsPlugin.DetectorItemId);
+                    if (featureLevel > 0)
                     {
-                        if (StoreApi.GetItemAmountBought(MoreShopItemsPlugin.DetectorItemId) > 0)
+                        var mapNo = __instance.mapNo;
+                        //if (ActionScene.initialized && ActionScene.instance.Player.mapNo != mapNo)
+                        if (ActionScene.instance.Map.infoDic.TryGetValue(mapNo, out var param))
                         {
-                            var mapNo = __instance.mapNo;
-                            //if (ActionScene.initialized && ActionScene.instance.Player.mapNo != mapNo)
-                            if (ActionScene.instance.Map.infoDic.TryGetValue(mapNo, out var param))
+                            TranslationHelper.TryTranslate(param.DisplayName, out var locationName);
+
+                            if (featureLevel > 1)
                             {
-                                var location = "";
-                                TranslationHelper.TryTranslate(param.DisplayName,out location);
-
-                                if (StoreApi.GetItemAmountBought(MoreShopItemsPlugin.DetectorItemId) > 1)
-                                {
-                                    TranslationHelper.TranslateAsync(npc.charaData.Name, s =>
-                                    {
-                                        if (npc.isOnanism)
-                                        {
-                                            InformationUI.SetAsync(string.Format(_infoTextPrefixMast, s, location), InformationUI.Mode.Normal).Forget();
-                                        }
-                                        else if (npc.isLesbian)
-                                        {
-                                            InformationUI.SetAsync(string.Format(_infoTextPrefixLesb, s, location), InformationUI.Mode.Normal).Forget();
-                                        }
-                                        return;
-                                    });
-                                    return;
-                                }
-
-                                InformationUI.SetAsync(string.Format(_infoTextPrefix, location), InformationUI.Mode.Normal).Forget();
-
+                                TranslationHelper.TranslateAsync(
+                                    npc.charaData.Name,
+                                    s => InformationUI.SetAsync(string.Format(npc.isOnanism ? _infoTextPrefixMast : _infoTextPrefixLesb, s, locationName), InformationUI.Mode.Normal).Forget());
+                            }
+                            else
+                            {
+                                InformationUI.SetAsync(string.Format(_infoTextPrefixGeneral, locationName), InformationUI.Mode.Normal).Forget();
                             }
                         }
                     }
-                    catch (Exception e)
-                    {
-                        UnityEngine.Debug.LogException(e);
-                    }
+                }
+                catch (Exception e)
+                {
+                    UnityEngine.Debug.LogException(e);
                 }
             }
         }
