@@ -40,9 +40,21 @@ namespace MoreShopItems.Features
             _notifyMast = inst.Config.Bind(itemName, "Notification on masturbation", true, "If the item is purchased, show a notification whenever any NPC starts a masturbation action.");
             _notifyLesb = inst.Config.Bind(itemName, "Notification on lesbian", true, "If the item is purchased, show a notification whenever any NPC starts a lesbian action.");
 
-            TranslationHelper.TranslateAsync(_infoTextPrefixGeneral, s => _infoTextPrefixGeneral = s);
-            TranslationHelper.TranslateAsync(_infoTextPrefixMast, s => _infoTextPrefixMast = s);
-            TranslationHelper.TranslateAsync(_infoTextPrefixLesb, s => _infoTextPrefixLesb = s);
+            TranslationHelper.TranslateAsync(_infoTextPrefixGeneral, s =>
+            {
+                if (s.Contains("{0}")) _infoTextPrefixGeneral = s;
+                else MoreShopItemsPlugin.Logger.LogWarning($"Invalid format of translation of {_infoTextPrefixGeneral} -> {s}");
+            });
+            TranslationHelper.TranslateAsync(_infoTextPrefixMast, s =>
+            {
+                if (s.Contains("{0}") && s.Contains("{1}")) _infoTextPrefixMast = s;
+                else MoreShopItemsPlugin.Logger.LogWarning($"Invalid format of translation of {_infoTextPrefixMast} -> {s}");
+            });
+            TranslationHelper.TranslateAsync(_infoTextPrefixLesb, s =>
+            {
+                if (s.Contains("{0}") && s.Contains("{1}")) _infoTextPrefixLesb = s;
+                else MoreShopItemsPlugin.Logger.LogWarning($"Invalid format of translation of {_infoTextPrefixLesb} -> {s}");
+            });
 
             return true;
         }
