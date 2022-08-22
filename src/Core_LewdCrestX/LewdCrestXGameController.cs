@@ -70,9 +70,11 @@ namespace KK_LewdCrestX
                     var totalTime = (int)heroine.TotalRoughTime;
                     var h = heroine.Heroine;
                     h.lewdness = Mathf.Min(100, h.lewdness + totalTime / 10);
-                    h.favor = Mathf.Min(100, h.favor + totalTime / 20);
 #if KK
                     h.intimacy = Mathf.Min(100, h.intimacy + totalTime / 30);
+                    h.favor = Mathf.Min(100, h.favor + totalTime / 20);
+#else
+                    h.favor = Mathf.Min(h.isGirlfriend ? 150 : 100, h.favor + totalTime / 20);
 #endif
                 }
 
