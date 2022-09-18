@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using HarmonyLib;
 using Illusion.Game;
+using KKAPI.MainGame;
 using UnityEngine;
 using Random = UnityEngine.Random;
 #if AI
@@ -150,7 +151,7 @@ namespace KK_Pregnancy
                 // Gradually increase
                 if (data.IsPregnant) return Mathf.Clamp01(data.Week / 40f);
                 // Gradually decrease after pregnancy finishes
-                if (data.PregnancyCount > 0) return 1 - Mathf.Clamp01(data.WeeksSinceLastPregnancy / (40f / PregnancyPlugin.PregnancyProgressionSpeed.Value));
+                if (data.PregnancyCount > 0) return 1 - Mathf.Clamp01(data.WeeksSinceLastPregnancy / (40f / PregnancyDataUtils.GetPregnancyProgressionSpeed(controller.ChaControl.GetHeroine())));
                 return 0;
             }
 

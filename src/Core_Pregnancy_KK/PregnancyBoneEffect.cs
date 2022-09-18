@@ -1,6 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using KKABMX.Core;
+using KKAPI.MainGame;
 using KKAPI.Maker;
 using KKAPI.Studio;
 using UnityEngine;
@@ -120,7 +121,7 @@ namespace KK_Pregnancy
             if (_controller.Data.Week > PregnancyData.LeaveSchoolWeek) return 0;
             // Don't show any effect at week 1 since it begins right after winning a child lottery
             // also reduce belly size in the 2nd week based on the time step to avoid huge bellies causing a large belly to appear out of nowhere very early
-            var progressionSpeed = Mathf.Ceil(PregnancyPlugin.PregnancyProgressionSpeed.Value / 2f);
+            var progressionSpeed = Mathf.Ceil(PregnancyDataUtils.GetPregnancyProgressionSpeed(_controller.ChaControl.GetHeroine()) / 2f);
             return Mathf.Clamp01((_controller.Data.Week - progressionSpeed) / (PregnancyData.LeaveSchoolWeek - progressionSpeed));
         }
     }

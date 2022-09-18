@@ -7,6 +7,7 @@ using Manager;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using ActionGame;
+using static SaveData;
 
 namespace KK_Pregnancy
 {
@@ -33,7 +34,7 @@ namespace KK_Pregnancy
             if (day == Cycle.Week.Holiday)
             {
                 // At start of each week increase pregnancy week counters of all pregnant characters
-                ApplyToAllDatas((chara, data) => AddPregnancyWeek(data));
+                ApplyToAllDatas(AddPregnancyWeek);
             }
         }
 
@@ -66,7 +67,7 @@ namespace KK_Pregnancy
                 //Allow pregnancy if enabled, or overridden, and is not currently pregnant
                 if (!controller.Data.GameplayEnabled || controller.Data.IsPregnant) return;
 
-                var fertility = Mathf.Max(PregnancyPlugin.FertilityOverride.Value, controller.Data.Fertility);
+                var fertility = PregnancyDataUtils.GetFertility(heroine); //Mathf.Max(PregnancyPlugin.FertilityOverride.Value, controller.Data.Fertility);
 
                 var winThreshold = Mathf.RoundToInt(fertility * 100);
                 var childLottery = Random.Range(1, 100);
@@ -139,7 +140,7 @@ namespace KK_Pregnancy
                 controller.ReadData();
         }
 
-        private static bool AddPregnancyWeek(PregnancyData pd)
+        private static bool AddPregnancyWeek(SaveData.CharaData charaData, PregnancyData pd)
         {
             if (pd == null || !pd.GameplayEnabled) return false;
 
@@ -148,14 +149,14 @@ namespace KK_Pregnancy
                 if (pd.Week < PregnancyData.LeaveSchoolWeek)
                 {
                     // Advance through in-school at full configured speed
-                    var weekChange = PregnancyPlugin.PregnancyProgressionSpeed.Value;
+                    var weekChange = PregnancyDataUtils.GetPregnancyProgressionSpeed(charaData);
                     pd.Week = Mathf.Min(PregnancyData.LeaveSchoolWeek, pd.Week + weekChange);
                 }
                 else if (pd.Week < PregnancyData.ReturnToSchoolWeek)
                 {
                     // Make sure at least one week is spent out of school
-                    var weekChange = Mathf.Min(PregnancyData.ReturnToSchoolWeek - PregnancyData.LeaveSchoolWeek - 1, PregnancyPlugin.PregnancyProgressionSpeed.Value);
-                    pd.Week = pd.Week + weekChange;
+                    var weekChange = Mathf.Min(PregnancyData.ReturnToSchoolWeek - PregnancyData.LeaveSchoolWeek - 1, PregnancyDataUtils.GetPregnancyProgressionSpeed(charaData));
+                    pd.Week += weekChange;
                 }
 
                 if (pd.Week >= PregnancyData.ReturnToSchoolWeek)
