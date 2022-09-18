@@ -40,9 +40,11 @@ namespace KK_Pregnancy
                 if (_lastHeroine != null)
                 {
                     // Get a schedule directly this way since the controller is not spawned in class roster
-                    var schedule = _lastHeroine.GetRelatedChaFiles()
-                        .Select(c => PregnancyData.Load(ExtendedSave.GetExtendedDataById(c, GUID))?.MenstruationSchedule ?? MenstruationSchedule.Default)
-                        .FirstOrDefault(x => x != MenstruationSchedule.Default);
+                    var schedule = PregnancyDataUtils.GetMenstruation(_lastHeroine);
+                    // old version
+                    //_lastHeroine.GetRelatedChaFiles()
+                    //.Select(c => PregnancyData.Load(ExtendedSave.GetExtendedDataById(c, GUID))?.MenstruationSchedule ?? MenstruationSchedule.Default)
+                    //.FirstOrDefault(x => x != MenstruationSchedule.Default);
 
                     _menstruationsBackup = HFlag.menstruations;
                     HFlag.menstruations = PregnancyCharaController.GetMenstruationsArr(schedule);

@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using ExtensibleSaveFormat;
 using KKAPI.MainGame;
+using UnityEngine;
+using static ActionGame.Cycle;
 
 namespace KK_Pregnancy
 {
@@ -108,6 +110,37 @@ namespace KK_Pregnancy
                 character is SaveData.Player p ? KKAPI.MainGame.GameExtensions.GetRelatedChaFiles(p) :
                 null;
             return chafiles;
+        }
+
+        /// <summary>
+        /// Get character's current fertility. Can be affected by plugin config and other plugins.
+        /// </summary>
+        public static float GetFertility(SaveData.CharaData character)
+        {
+            var pd = character?.GetPregnancyData();
+            return Mathf.Max(PregnancyPlugin.FertilityOverride.Value, pd?.Fertility ?? 1);
+        }
+
+        /// <summary>
+        /// Get character's current MenstruationSchedule. Can be affected by plugin config and other plugins.
+        /// </summary>
+        public static MenstruationSchedule GetMenstruation(SaveData.CharaData character)
+        {
+            return character != null ? character.GetPregnancyData().MenstruationSchedule : MenstruationSchedule.Default;
+
+            // old version
+            //return heroine.GetRelatedChaFiles()
+            //            .Select(c => PregnancyData.Load(ExtendedSave.GetExtendedDataById(c, GUID))?.MenstruationSchedule ?? MenstruationSchedule.Default)
+            //            .FirstOrDefault(x => x != MenstruationSchedule.Default);
+        }
+        
+        /// <summary>
+        /// Get speed modifier of character's pergenency. Can be affected by plugin config and other plugins.
+        /// </summary>
+        public static int GetPregnancyProgressionSpeed(SaveData.CharaData character)
+        {
+            // todo add setting for individual chara speed (multiplier? slow normal fast for 1.5, 1, 0.5)
+            return PregnancyPlugin.PregnancyProgressionSpeed.Value;
         }
     }
 }
