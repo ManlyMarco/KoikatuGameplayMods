@@ -21,7 +21,7 @@ using UnityEngine;
 namespace KK_Pregnancy
 {
     /// <summary>
-    /// Play custom events at talk scene start like afterpill question or lettink know about conception
+    /// Play custom events at talk scene start like afterpill question or letting know about conception
     /// also add related items
     /// </summary>
     [UsedImplicitly]
@@ -29,10 +29,13 @@ namespace KK_Pregnancy
     {
         public const int AfterpillStoreId = Constants.AfterpillItemID;
 
+        private static ConfigEntry<bool> _disablePillEvents;
         private static int _installed;
         public bool Install(Harmony instance, ConfigFile config)
         {
             if (StudioAPI.InsideStudio || Interlocked.Increment(ref _installed) != 1) return false;
+
+            _disablePillEvents = config.Bind("General", "Disable afterpill events", false, "Disable events where heroine asks to use an after pill. Instead, automatically use a pill if player owns one, and do nothing otherwise.");
 
             StoreApi.RegisterShopItem(
                 itemId: AfterpillStoreId,
@@ -92,6 +95,16 @@ namespace KK_Pregnancy
 
         private static void RunIntroEvent(Heroine heroine, PregnancyData preg, bool isPillEvent)
         {
+            // If pill events are disabled, silently use a pill if it has been bought, or otherwise do absolutely nothing to prevent the impending doom
+            if (_disablePillEvents.Value && isPillEvent)
+            {
+                if (StoreApi.GetItemAmountBought(AfterpillStoreId) >= 1)
+                {
+                    ApplyStatChangesAfterEvent(heroine, preg, isPillEvent, new Dictionary<string, ValData> { { "PillUsed", new ValData(true) } });
+                }
+                return;
+            }
+
             var loadedEvt = GetEvent(heroine, preg, isPillEvent);
             if (loadedEvt == null)
             {
@@ -115,24 +128,30 @@ namespace KK_Pregnancy
                 .ContinueWith(() => Program.ADVProcessingCheck(scene.cancellation.Token))
                 .ContinueWith(() =>
                 {
-                    PregnancyGameController.ApplyToAllDatas((chara, data) =>
-                    {
-                        if (chara == heroine)
-                        {
-                            if (isPillEvent) data.CanAskForAfterpill = false;
-                            else data.CanTellAboutPregnancy = false;
-                            return true;
-                        }
-                        return false;
-                    });
-
                     var vars = ActionScene.instance.AdvScene.Scenario.Vars;
-                    ApplyStatChangeVars(heroine, preg, vars);
+                    ApplyStatChangesAfterEvent(heroine, preg, isPillEvent, vars);
 
                     // Fix mouth getting permanently locked by the events
                     heroine.chaCtrl.ChangeMouthFixed(false);
                 })
                 .Forget();
+        }
+
+        private static void ApplyStatChangesAfterEvent(Heroine heroine, PregnancyData preg, bool isPillEvent, Dictionary<string, ValData> vars)
+        {
+            PregnancyGameController.ApplyToAllDatas((chara, data) =>
+            {
+                if (chara == heroine)
+                {
+                    if (isPillEvent) data.CanAskForAfterpill = false;
+                    else data.CanTellAboutPregnancy = false;
+                    return true;
+                }
+
+                return false;
+            });
+
+            ApplyStatChangeVars(heroine, preg, vars);
         }
 
         private static void ApplyStatChangeVars(Heroine heroine, PregnancyData preg, Dictionary<string, ValData> vars)
@@ -167,7 +186,7 @@ namespace KK_Pregnancy
                 evtName += "PREG_";
             else
                 evtName += "XPREG_";
-            
+
             var pattern = evtName + @"[\w\d ]+.csv$";
 
             var containingAssembly = typeof(CustomEventsFeature).Assembly;
