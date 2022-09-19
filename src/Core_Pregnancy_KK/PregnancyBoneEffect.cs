@@ -1,7 +1,6 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 using KKABMX.Core;
-using KKAPI.MainGame;
 using KKAPI.Maker;
 using KKAPI.Studio;
 using UnityEngine;
@@ -10,8 +9,6 @@ namespace KK_Pregnancy
 {
     public class PregnancyBoneEffect : BoneEffect
     {
-        private readonly PregnancyCharaController _controller;
-
         private static readonly Dictionary<string, BoneModifierData> _bellyFullValues = new Dictionary<string, BoneModifierData>
         {
                 // Belly                                :scale                                :position                           :rotation
@@ -53,6 +50,10 @@ namespace KK_Pregnancy
         };
 
         private static readonly IEnumerable<string> _affectedBoneNames = _bellyFullValues.Keys.Concat(_pregnancyFullValues.Keys).ToArray();
+        
+        private readonly PregnancyCharaController _controller;
+
+        private float _pregnancyEffectPercent;
 
         public PregnancyBoneEffect(PregnancyCharaController controller)
         {
@@ -62,7 +63,10 @@ namespace KK_Pregnancy
         public override IEnumerable<string> GetAffectedBones(BoneController origin)
         {
             if (_controller.Data.IsPregnant || MakerAPI.InsideMaker || StudioAPI.InsideStudio || PregnancyGameController.InsideHScene)
+            {
+                _pregnancyEffectPercent = GetPregnancyEffectPercent();
                 return _affectedBoneNames;
+            }
 
             return Enumerable.Empty<string>();
         }
@@ -74,7 +78,7 @@ namespace KK_Pregnancy
             {
                 if (_pregnancyFullValues.TryGetValue(bone, out var mod))
                 {
-                    var prEffect = GetPregnancyEffectPercent();
+                    var prEffect = _pregnancyEffectPercent;
                     return LerpModifier(mod, prEffect);
                 }
             }
@@ -83,7 +87,7 @@ namespace KK_Pregnancy
             {
                 if (_bellyFullValues.TryGetValue(bone, out var mod))
                 {
-                    var prEffect = GetPregnancyEffectPercent();
+                    var prEffect = _pregnancyEffectPercent;
                     var infEffect = _controller.GetInflationEffectPercent() + prEffect / 2;
 
                     var bellySize = Mathf.Max(prEffect, infEffect);
@@ -120,9 +124,7 @@ namespace KK_Pregnancy
         {
             if (_controller.Data.Week > PregnancyData.LeaveSchoolWeek) return 0;
             // Don't show any effect at week 1 since it begins right after winning a child lottery
-            // also reduce belly size in the 2nd week based on the time step to avoid huge bellies causing a large belly to appear out of nowhere very early
-            var progressionSpeed = Mathf.Ceil(PregnancyDataUtils.GetPregnancyProgressionSpeed(_controller.ChaControl.GetHeroine()) / 2f);
-            return Mathf.Clamp01((_controller.Data.Week - progressionSpeed) / (PregnancyData.LeaveSchoolWeek - progressionSpeed));
+            return Mathf.Clamp01((_controller.Data.Week - 1f) / (PregnancyData.LeaveSchoolWeek - 1f));
         }
     }
 }
