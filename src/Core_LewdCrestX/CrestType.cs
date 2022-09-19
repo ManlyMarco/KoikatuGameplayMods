@@ -40,7 +40,7 @@ namespace KK_LewdCrestX
         triggered,
         vibrancy,
         violove,
-        wombgasm
+        broodmother
     }
 
     public partial class LewdCrestXPlugin
@@ -61,6 +61,7 @@ namespace KK_LewdCrestX
             CrestType.triggered,
             CrestType.vibrancy,
             CrestType.violove,
+            CrestType.broodmother
         };
     }
 }
