@@ -56,5 +56,10 @@ namespace KK_LewdCrestX
             if (!Equals(defaultValue, value))
                 data.data.Add(propName, value);
         }
+
+        public static string GetFullname(this SaveData.CharaData character)
+        {
+            return character.charFile?.parameter?.fullname ?? "???";
+        }
     }
 }

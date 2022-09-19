@@ -140,7 +140,7 @@ namespace KK_LewdCrestX
                             {
                                 if (Vector3.Distance(player.position, npc.position) > 3)
                                 {
-                                    LewdCrestXPlugin.Logger.LogInfo("Chasing player because of mantraction crest: " + controller.Heroine.charFile?.parameter?.fullname);
+                                    LewdCrestXPlugin.Logger.LogInfo("Chasing player because of mantraction crest: " + controller.Heroine.GetFullname());
                                     npc.ItemClear();
                                     npc.AI.ChaseAction();
                                     // Need to replace this from the default chase id because that disables the talk to bubble
@@ -209,7 +209,7 @@ namespace KK_LewdCrestX
                     case CrestType.restore:
                         if (!heroine.isVirgin)
                         {
-                            LewdCrestXPlugin.Logger.LogInfo("Resetting heroine to virgin because of restore crest: " + heroine.charFile?.parameter?.fullname);
+                            LewdCrestXPlugin.Logger.LogInfo("Resetting heroine to virgin because of restore crest: " + heroine.GetFullname());
                             heroine.isVirgin = true;
                             heroine.hCount = 0;
                         }
