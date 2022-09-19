@@ -7,7 +7,6 @@ using Manager;
 using UnityEngine;
 using Random = UnityEngine.Random;
 using ActionGame;
-using static SaveData;
 
 namespace KK_Pregnancy
 {

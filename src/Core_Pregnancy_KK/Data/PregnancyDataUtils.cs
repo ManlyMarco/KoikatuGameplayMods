@@ -114,11 +114,11 @@ namespace KK_Pregnancy
 
         /// <summary>
         /// Get character's current fertility. Can be affected by plugin config and other plugins.
+        /// 0-1 range
         /// </summary>
         public static float GetFertility(SaveData.CharaData character)
         {
-            var pd = character?.GetPregnancyData();
-            return Mathf.Max(PregnancyPlugin.FertilityOverride.Value, pd?.Fertility ?? 1);
+            return Mathf.Max(PregnancyPlugin.FertilityOverride.Value, character != null ? character.GetPregnancyData().Fertility : 0.3f);
         }
 
         /// <summary>
@@ -133,13 +133,13 @@ namespace KK_Pregnancy
             //            .Select(c => PregnancyData.Load(ExtendedSave.GetExtendedDataById(c, GUID))?.MenstruationSchedule ?? MenstruationSchedule.Default)
             //            .FirstOrDefault(x => x != MenstruationSchedule.Default);
         }
-        
+
         /// <summary>
         /// Get speed modifier of character's pergenency. Can be affected by plugin config and other plugins.
         /// </summary>
         public static int GetPregnancyProgressionSpeed(SaveData.CharaData character)
         {
-            // todo add setting for individual chara speed (multiplier? slow normal fast for 1.5, 1, 0.5)
+            // todo add setting for individual chara speed (multiplier? slow normal fast for 1.5, 1, 0.5? only toggle for faster? slower won't work if config is set to 1)
             return PregnancyPlugin.PregnancyProgressionSpeed.Value;
         }
     }

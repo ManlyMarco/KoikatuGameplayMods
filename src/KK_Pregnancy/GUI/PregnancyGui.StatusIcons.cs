@@ -197,7 +197,7 @@ namespace KK_Pregnancy
 
                                 GUILayout.Label("Forecast for this week:");
 
-                                switch (pregData.MenstruationSchedule)
+                                switch (PregnancyDataUtils.GetMenstruation(heroine))
                                 {
                                     case MenstruationSchedule.AlwaysSafe:
                                         GUILayout.Label("It's always safe!");

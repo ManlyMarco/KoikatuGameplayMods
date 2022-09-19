@@ -151,7 +151,7 @@ namespace KK_Pregnancy
                 // Gradually increase
                 if (data.IsPregnant) return Mathf.Clamp01(data.Week / 40f);
                 // Gradually decrease after pregnancy finishes
-                if (data.PregnancyCount > 0) return 1 - Mathf.Clamp01(data.WeeksSinceLastPregnancy / (40f / PregnancyDataUtils.GetPregnancyProgressionSpeed(controller.ChaControl.GetHeroine())));
+                if (data.PregnancyCount > 0) return 1 - Mathf.Clamp01(data.WeeksSinceLastPregnancy / 3f);
                 return 0;
             }
 
