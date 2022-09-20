@@ -68,7 +68,7 @@ namespace KK_LewdCrestX
                 {"cf_d_bust02_R" , new BoneModifierData(new Vector3(0.7f , 0.7f , 0.7f) , 1f)},
                 {"cf_s_siri_L" , new BoneModifierData(new Vector3(0.8f , 0.8f , 0.8f) , 1f)},
                 {"cf_s_siri_R" , new BoneModifierData(new Vector3(0.8f , 0.8f , 0.8f) , 1f)},
-                {"cf_n_height", new BoneModifierData(new Vector3(0.85f, 0.85f, 0.85f), 1f)},
+                {"cf_n_height", new BoneModifierData(new Vector3(0.91f, 0.91f, 0.91f), 1f)},
                 {"cf_s_waist01", new BoneModifierData( new Vector3(0.9f, 0.9f, 0.9f), 1f)},
                 {"cf_s_waist02", new BoneModifierData( new Vector3(0.9f, 0.9f, 0.9f), 1f)},
                 {"cf_s_thigh01_L",new BoneModifierData(new Vector3(0.9f, 0.9f, 0.9f), 1f)},
