@@ -53,8 +53,8 @@ namespace KK_LewdCrestX
             
             _lactationModifiers = new Dictionary<string, BoneModifierData>
             {
-                {"cf_d_bust01_L" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
-                {"cf_d_bust01_R" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
+                {"cf_d_bust01_L" , new BoneModifierData(new Vector3(1.25f , 1.25f , 1.25f) , 1f)},
+                {"cf_d_bust01_R" , new BoneModifierData(new Vector3(1.25f , 1.25f , 1.25f) , 1f)},
                 {"cf_d_bnip01_L" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
                 {"cf_d_bnip01_R" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
             };
