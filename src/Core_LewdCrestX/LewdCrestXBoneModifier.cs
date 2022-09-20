@@ -33,22 +33,23 @@ namespace KK_LewdCrestX
         {
             var vibDict = new Dictionary<string, Vector3>
             {
-                {"cf_d_bust01_L", new Vector3(1.2f, 1.2f, 1.2f)},
-                {"cf_d_bust01_R", new Vector3(1.2f, 1.2f, 1.2f)},
-                {"cf_d_bnip01_L", new Vector3(1.1f, 1.1f, 1.1f)},
-                {"cf_d_bnip01_R", new Vector3(1.1f, 1.1f, 1.1f)},
-                {"cf_s_bnip02_L", new Vector3(1.2f, 1.2f, 1.2f)},
-                {"cf_s_bnip02_R", new Vector3(1.2f, 1.2f, 1.2f)},
-                {"cf_s_siri_L", new Vector3(1.2f, 1.2f, 1.2f)},
-                {"cf_s_siri_R", new Vector3(1.2f, 1.2f, 1.2f)},
+                {"cf_d_bust01_L", new Vector3(1.25f, 1.25f, 1.25f)},
+                {"cf_d_bust01_R", new Vector3(1.25f, 1.25f, 1.25f)},
+                {"cf_d_bnip01_L", new Vector3(1.15f, 1.15f, 1.15f)},
+                {"cf_d_bnip01_R", new Vector3(1.15f, 1.15f, 1.15f)},
+                {"cf_s_bnip02_L", new Vector3(1.25f, 1.25f, 1.25f)},
+                {"cf_s_bnip02_R", new Vector3(1.25f, 1.25f, 1.25f)},
+                {"cf_s_siri_L", new Vector3(1.25f, 1.25f, 1.25f)},
+                {"cf_s_siri_R", new Vector3(1.25f, 1.25f, 1.25f)},
                 {"cf_s_waist01", new Vector3(0.9f, 0.9f, 0.9f)},
-                {"cf_s_waist02", new Vector3(1.1f, 1.1f, 1.1f)},
-                {"cf_s_thigh01_L", new Vector3(1.1f, 1.1f, 1.1f)},
-                {"cf_s_thigh01_R", new Vector3(1.1f, 1.1f, 1.1f)},
-                {"cf_s_thigh02_L", new Vector3(1.1f, 1.1f, 1.1f)},
-                {"cf_s_thigh02_R", new Vector3(1.1f, 1.1f, 1.1f)},
-                {"cf_s_thigh03_L", new Vector3(1.1f, 1.1f, 1.1f)},
-                {"cf_s_thigh03_R", new Vector3(1.1f, 1.1f, 1.1f)},
+                {"cf_s_waist02", new Vector3(1.15f, 1.15f, 1.15f)},
+                {"cf_s_thigh01_L", new Vector3(1.15f, 1.15f, 1.15f)},
+                {"cf_s_thigh01_R", new Vector3(1.15f, 1.15f, 1.15f)},
+                {"cf_s_thigh02_L", new Vector3(1.15f, 1.15f, 1.15f)},
+                {"cf_s_thigh02_R", new Vector3(1.15f, 1.15f, 1.15f)},
+                {"cf_s_thigh03_L", new Vector3(1.15f, 1.15f, 1.15f)},
+                {"cf_s_thigh03_R", new Vector3(1.15f, 1.15f, 1.15f)},
+                {"cf_n_height", new Vector3(1.08f, 1.08f, 1.08f)},
             };
             _vibrancyBones = vibDict.Keys.ToArray();
             _vibrancyBoneModifiers = vibDict.ToDictionary(
