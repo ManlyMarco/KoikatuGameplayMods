@@ -16,7 +16,7 @@ namespace KK_LewdCrestX
         deepfocus,
         destruction,
         forlorn,
-        gaze,
+        reduction,
         glow,
         gullible,
         lactation,
@@ -61,7 +61,8 @@ namespace KK_LewdCrestX
             CrestType.triggered,
             CrestType.vibrancy,
             CrestType.violove,
-            CrestType.broodmother
+            CrestType.broodmother,
+            CrestType.reduction
         };
     }
 }

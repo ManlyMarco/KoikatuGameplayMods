@@ -5,24 +5,19 @@ using UnityEngine;
 
 namespace KK_LewdCrestX
 {
-    sealed class LewdCrestXBoneModifier : BoneEffect
+    internal sealed class LewdCrestXBoneModifier : BoneEffect
     {
         private readonly LewdCrestXController _controller;
 
         // todo might cause issues if in future abmx holds on to the bone modifiers since we reuse them for all characters
         private static readonly Dictionary<string, KeyValuePair<Vector3, BoneModifierData>> _vibrancyBoneModifiers;
         private static readonly string[] _vibrancyBones;
-        private float _previousVibRatio;
-
-        private static readonly Dictionary<string, BoneModifierData> _lactationModifiers =
-            new Dictionary<string, BoneModifierData>
-            {
-                {"cf_d_bust01_L" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
-                {"cf_d_bust01_R" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
-                {"cf_d_bnip01_L" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
-                {"cf_d_bnip01_R" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
-            };
+        private static readonly Dictionary<string, BoneModifierData> _lactationModifiers;
         private static readonly string[] _lactationBones;
+        private static readonly Dictionary<string, BoneModifierData> _reductionModifiers;
+        private static readonly string[] _reductionBones;
+        
+        private float _previousVibRatio;
 
         public LewdCrestXBoneModifier(LewdCrestXController controller)
         {
@@ -55,8 +50,35 @@ namespace KK_LewdCrestX
             _vibrancyBoneModifiers = vibDict.ToDictionary(
                 x => x.Key,
                 x => new KeyValuePair<Vector3, BoneModifierData>(x.Value, new BoneModifierData(x.Value, 1)));
-
+            
+            _lactationModifiers = new Dictionary<string, BoneModifierData>
+            {
+                {"cf_d_bust01_L" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
+                {"cf_d_bust01_R" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
+                {"cf_d_bnip01_L" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
+                {"cf_d_bnip01_R" , new BoneModifierData(new Vector3(1.2f , 1.2f , 1.2f) , 1f)},
+            };
             _lactationBones = _lactationModifiers.Keys.ToArray();
+
+            _reductionModifiers = new Dictionary<string, BoneModifierData>
+            {
+                {"cf_d_bust01_L" , new BoneModifierData(new Vector3(0.8f , 0.8f , 0.8f) , 1f)},
+                {"cf_d_bust01_R" , new BoneModifierData(new Vector3(0.8f , 0.8f , 0.8f) , 1f)},
+                {"cf_d_bust02_L" , new BoneModifierData(new Vector3(0.7f , 0.7f , 0.7f) , 1f)},
+                {"cf_d_bust02_R" , new BoneModifierData(new Vector3(0.7f , 0.7f , 0.7f) , 1f)},
+                {"cf_s_siri_L" , new BoneModifierData(new Vector3(0.8f , 0.8f , 0.8f) , 1f)},
+                {"cf_s_siri_R" , new BoneModifierData(new Vector3(0.8f , 0.8f , 0.8f) , 1f)},
+                {"cf_n_height", new BoneModifierData(new Vector3(0.85f, 0.85f, 0.85f), 1f)},
+                {"cf_s_waist01", new BoneModifierData( new Vector3(0.9f, 0.9f, 0.9f), 1f)},
+                {"cf_s_waist02", new BoneModifierData( new Vector3(0.9f, 0.9f, 0.9f), 1f)},
+                {"cf_s_thigh01_L",new BoneModifierData(new Vector3(0.9f, 0.9f, 0.9f), 1f)},
+                {"cf_s_thigh01_R",new BoneModifierData(new Vector3(0.9f, 0.9f, 0.9f), 1f)},
+                {"cf_s_thigh02_L",new BoneModifierData(new Vector3(0.9f, 0.9f, 0.9f), 1f)},
+                {"cf_s_thigh02_R",new BoneModifierData(new Vector3(0.9f, 0.9f, 0.9f), 1f)},
+                {"cf_s_thigh03_L",new BoneModifierData(new Vector3(0.9f, 0.9f, 0.9f), 1f)},
+                {"cf_s_thigh03_R",new BoneModifierData(new Vector3(0.9f, 0.9f, 0.9f), 1f)},
+            };
+            _reductionBones = _reductionModifiers.Keys.ToArray();
         }
 
         public override IEnumerable<string> GetAffectedBones(BoneController origin)
@@ -67,6 +89,8 @@ namespace KK_LewdCrestX
                     return _vibrancyBones;
                 case CrestType.lactation:
                     return _lactationBones;
+                case CrestType.reduction:
+                    return _reductionBones;
                 default:
                     return Enumerable.Empty<string>();
             }
@@ -101,6 +125,8 @@ namespace KK_LewdCrestX
                     return null;
                 case CrestType.lactation:
                     return _lactationModifiers.TryGetValue(bone, out var lactMod) ? lactMod : null;
+                case CrestType.reduction:
+                    return _reductionModifiers.TryGetValue(bone, out var reductionMod) ? reductionMod : null;
                 default:
                     return null;
             }
