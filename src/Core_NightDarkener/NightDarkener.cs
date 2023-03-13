@@ -64,6 +64,7 @@ namespace KK_NightDarkener
         };
 
         public static ConfigEntry<bool> BeSmart { get; private set; }
+        public static ConfigEntry<bool> BeSmartAlwaysOnCustom { get; private set; }
         public static ConfigEntry<bool> UseFog { get; private set; }
         public static ConfigEntry<float> Exposure { get; private set; }
 
@@ -76,7 +77,12 @@ namespace KK_NightDarkener
             var time = (SunLightInfo.Info.Type)proc.dataH.timezoneFreeH;
             if (time != SunLightInfo.Info.Type.Night) return;
 
-            if (BeSmart.Value && !_allowedMaps.Contains(proc.dataH.mapNoFreeH)) return;
+            if (BeSmart.Value)
+            {
+                if (!_allowedMaps.Contains(proc.dataH.mapNoFreeH)) return;
+                // Assume all custom maps are above id 999. Some stock game maps can go up into 100s.
+                if (BeSmartAlwaysOnCustom.Value && proc.dataH.mapNoFreeH > 999) return;
+            }
 
             var amplifyColorEffect = Camera.main?.gameObject.GetComponent<AmplifyColorEffect>();
             if (amplifyColorEffect != null)
@@ -106,6 +112,7 @@ namespace KK_NightDarkener
             UseFog = Config.Bind("General", "Enable dark fog at night", false, "Horror game effect.\nChanges take effect next time you load a night map.");
             Exposure = Config.Bind("General", "Exposure at night", 0.3f, new ConfigDescription("The lower the exposure, the darker the game will be.\nChanges take effect next time you load a night map.", new AcceptableValueRange<float>(0, 1)));
             BeSmart = Config.Bind("General", "Only on specific maps", true, "Only darken maps that are unlikely to have lights turned on at night (likely to be vacant). Turn off to make all maps dark at night.");
+            BeSmartAlwaysOnCustom = Config.Bind("General", "Always enable on custom maps", true, "If the \"Only on specific maps\" setting is enabled, also darken all custom maps (otherwise all custom maps will not be darkened).");
 
             Harmony.CreateAndPatchAll(typeof(NightDarkener));
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
