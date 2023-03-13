@@ -1,8 +1,6 @@
-﻿using System;
-using System.Linq;
+﻿using System.Linq;
 using BepInEx;
 using BepInEx.Configuration;
-using HarmonyLib;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
@@ -68,12 +66,14 @@ namespace KK_NightDarkener
         public static ConfigEntry<bool> UseFog { get; private set; }
         public static ConfigEntry<float> Exposure { get; private set; }
 
-        private static void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
+        private void SceneManager_sceneLoaded(Scene arg0, LoadSceneMode arg1)
         {
             var proc = FindObjectOfType<HSceneProc>();
 
+            // Only run in free h, not in main game
             if (proc == null || !proc.dataH.isFreeH) return;
 
+            // Only run if night time of day was selected
             var time = (SunLightInfo.Info.Type)proc.dataH.timezoneFreeH;
             if (time != SunLightInfo.Info.Type.Night) return;
 
@@ -84,26 +84,35 @@ namespace KK_NightDarkener
                 if (BeSmartAlwaysOnCustom.Value && proc.dataH.mapNoFreeH > 999) return;
             }
 
-            var amplifyColorEffect = Camera.main?.gameObject.GetComponent<AmplifyColorEffect>();
-            if (amplifyColorEffect != null)
-                amplifyColorEffect.Exposure = Exposure.Value;
+            if (Camera.main != null)
+            {
+                var amplifyColorEffect = Camera.main.gameObject.GetComponent<AmplifyColorEffect>();
+                if (amplifyColorEffect != null)
+                    amplifyColorEffect.Exposure = Exposure.Value;
+            }
 
             var lightInfo = FindObjectOfType<SunLightInfo>();
-
-            foreach (var info in lightInfo.infos)
+            if (lightInfo != null)
             {
-                if (info.type != SunLightInfo.Info.Type.Night) continue;
-
-                if (UseFog.Value)
+                foreach (var info in lightInfo.infos)
                 {
-                    info.fogColor = SubtractColor(info.fogColor, 0.1f);
-                    info.fogStart = 1;
-                    info.fogEnd = 50;
-                }
+                    if (info.type != SunLightInfo.Info.Type.Night) continue;
 
-                //bug does this do anything?
-                info.color = SubtractColor(info.color, 0.2f);
-                info.intensity = info.intensity / 2f;
+                    if (UseFog.Value)
+                    {
+                        info.fogColor = SubtractColor(info.fogColor, 0.1f);
+                        info.fogStart = 1;
+                        info.fogEnd = 50;
+                    }
+
+                    //bug does this do anything?
+                    info.color = SubtractColor(info.color, 0.2f);
+                    info.intensity /= 2f;
+                }
+            }
+            else
+            {
+                Logger.LogError("SunLightInfo not found for map id " + proc.dataH.mapNoFreeH);
             }
         }
 
@@ -114,7 +123,6 @@ namespace KK_NightDarkener
             BeSmart = Config.Bind("General", "Only on specific maps", true, "Only darken maps that are unlikely to have lights turned on at night (likely to be vacant). Turn off to make all maps dark at night.");
             BeSmartAlwaysOnCustom = Config.Bind("General", "Always enable on custom maps", true, "If the \"Only on specific maps\" setting is enabled, also darken all custom maps (otherwise all custom maps will not be darkened).");
 
-            Harmony.CreateAndPatchAll(typeof(NightDarkener));
             SceneManager.sceneLoaded += SceneManager_sceneLoaded;
         }
 
