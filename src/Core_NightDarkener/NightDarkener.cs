@@ -123,7 +123,8 @@ namespace KK_NightDarkener
             BeSmart = Config.Bind("General", "Only on specific maps", true, "Only darken maps that are unlikely to have lights turned on at night (likely to be vacant). Turn off to make all maps dark at night.");
             BeSmartAlwaysOnCustom = Config.Bind("General", "Always enable on custom maps", true, "If the \"Only on specific maps\" setting is enabled, also darken all custom maps (otherwise all custom maps will not be darkened).");
 
-            SceneManager.sceneLoaded += SceneManager_sceneLoaded;
+            if (Config.Bind("General", "Enabled", true, "Set to false to completely disable this plugin. Changes take effect after game restart.").Value)
+                SceneManager.sceneLoaded += SceneManager_sceneLoaded;
         }
 
         private static Color SubtractColor(Color color, float amount)
