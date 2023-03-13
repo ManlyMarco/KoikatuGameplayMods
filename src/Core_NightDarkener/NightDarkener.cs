@@ -16,7 +16,7 @@ namespace KK_NightDarkener
     public class NightDarkener : BaseUnityPlugin
     {
         public const string GUID = "Marco.NightDarkener";
-        internal const string Version = "1.2";
+        public const string Version = "1.3";
 
         private static readonly int[] _allowedMaps =
         {
