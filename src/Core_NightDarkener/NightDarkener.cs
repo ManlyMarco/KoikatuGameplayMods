@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System;
+using System.Linq;
 using BepInEx;
 using BepInEx.Configuration;
 using HarmonyLib;
@@ -8,17 +9,59 @@ using UnityEngine.SceneManagement;
 namespace KK_NightDarkener
 {
     [BepInPlugin(GUID, "Night Darkener", Version)]
-    [BepInProcess(GameProcessName)]
-    [BepInProcess(GameProcessNameSteam)]
+    [BepInProcess(KKAPI.KoikatuAPI.GameProcessName)]
+#if KK
+    [BepInProcess(KKAPI.KoikatuAPI.GameProcessNameSteam)]
+#endif
     public class NightDarkener : BaseUnityPlugin
     {
         public const string GUID = "Marco.NightDarkener";
         internal const string Version = "1.2";
 
-        private const string GameProcessName = "Koikatu";
-        private const string GameProcessNameSteam = "Koikatsu Party";
-
-        private static readonly int[] _allowedMaps = { 0, 3, 4, 8, 9, 11, 15, 16, 17, 18, 20, 21, 22, 26, 28, 31, 32, 33, 34, 36, 37, 38, 45, 46, 47 };
+        private static readonly int[] _allowedMaps =
+        {
+#if KK
+            0,  // MyRoom
+            3,  // 2F
+            4,  // 3F
+            8,  // 2-1
+            9,  // 2-2
+            11, // 3-1
+            15, // 2F Toilet
+            16, // 3F Toilet
+            17, // Staff room
+            18, // Male Toilet
+            20, // Nurse room
+            21, // Library
+            22, // Club room
+            26, // Comic club room
+            28, // Tea club room
+            31, // Gym warehouse
+            32, // Gym
+            33, // Courtyard
+            34, // Sport ground
+            36, // Rooftom
+            37, // Pool
+            38, // Dining
+            45, // Showers
+            46, // Lockers
+            47  // Backyard
+#elif KKS
+            0,  // Hotel
+            1,  // Guest House
+            2,  // Training Center
+            3,  // Harbor
+            4,  // Beach
+            5,  // Nature Park
+            6,  // Lighthouse
+            7,  // Aquarium
+            8,  // Stone Wall Pathway
+            9,  // Secret Beach
+            28, // N. Park Public Bathroom
+            33, // Beach Changing Room
+            36, // Suite
+#endif
+        };
 
         public static ConfigEntry<bool> BeSmart { get; private set; }
         public static ConfigEntry<bool> UseFog { get; private set; }

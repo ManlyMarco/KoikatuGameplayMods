@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.29806.167
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.33424.131
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KK_GameplayMod", "KK_GameplayMod\KK_GameplayMod.csproj", "{9A51CFCB-A18A-428A-843A-FE7CF2EEF523}"
 EndProject
@@ -59,25 +59,13 @@ Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Core_MoanSoftly", "Core_Moa
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KKS_MoanSoftly", "KKS_MoanSoftly\KKS_MoanSoftly.csproj", "{D8938702-94AE-48A4-B5D7-F31750BCC99C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "NightDarkener", "NightDarkener", "{D8B4C45B-D1CB-4A9B-9D7E-6570CCADDA7E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KKS_NightDarkener", "KKS_NightDarkener\KKS_NightDarkener.csproj", "{90279D2E-9680-4488-881E-6135BE1295D0}"
+EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Core_NightDarkener", "Core_NightDarkener\Core_NightDarkener.shproj", "{9A37531D-CC0A-4891-8C2A-87BDE418138A}"
+EndProject
 Global
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Core_Bulge\Core_Bulge.projitems*{0f6b651e-d1f9-467f-a8f3-d1006c277e51}*SharedItemsImports = 4
-		Core_GameplayMod\Core_GameplayMod.projitems*{15a4df23-86ea-49b4-b120-e8f123f8dafe}*SharedItemsImports = 4
-		Core_Pregnancy_KK\Core_Pregnancy_KK.projitems*{3c122ef8-491b-447b-94e4-ada9d818403c}*SharedItemsImports = 13
-		Core_Bulge\Core_Bulge.projitems*{3e03b28f-bc65-459f-89e5-70d89905d636}*SharedItemsImports = 13
-		Core_LewdCrestX\Core_LewdCrestX.projitems*{45953d5d-fcb8-48f1-8dd4-9d4faa031b57}*SharedItemsImports = 4
-		Core_Bulge\Core_Bulge.projitems*{49cad984-906a-4b18-9982-e003d8668fe4}*SharedItemsImports = 4
-		Core_LewdCrestX\Core_LewdCrestX.projitems*{5b1134de-7840-4309-83f9-843606f01727}*SharedItemsImports = 4
-		Core_Pregnancy_KK\Core_Pregnancy_KK.projitems*{736eb022-a7b9-43aa-95c3-05a84b57f7e7}*SharedItemsImports = 4
-		Core_Bulge\Core_Bulge.projitems*{904b04c0-5095-40f9-915a-005f80bc2cb1}*SharedItemsImports = 4
-		Core_Pregnancy_KK\Core_Pregnancy_KK.projitems*{930a00a6-2935-4ea0-81f0-b16d3e71b74c}*SharedItemsImports = 4
-		Core_GameplayMod\Core_GameplayMod.projitems*{9a51cfcb-a18a-428a-843a-fe7cf2eef523}*SharedItemsImports = 4
-		Core_MoanSoftly\Core_MoanSoftly.projitems*{b5a960d4-aaf4-41d9-ae4d-5ccb29cee4eb}*SharedItemsImports = 13
-		Core_GameplayMod\Core_GameplayMod.projitems*{c9650f99-df26-4d54-9826-5f77275c9d31}*SharedItemsImports = 13
-		Core_LewdCrestX\Core_LewdCrestX.projitems*{d86dabea-94ce-4fbf-818b-adb7b0134cb0}*SharedItemsImports = 13
-		Core_MoanSoftly\Core_MoanSoftly.projitems*{d8938702-94ae-48a4-b5d7-f31750bcc99c}*SharedItemsImports = 4
-		Core_MoanSoftly\Core_MoanSoftly.projitems*{e3dc203a-c84c-4d46-bec0-8a3d612fc5d6}*SharedItemsImports = 4
-	EndGlobalSection
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
@@ -155,12 +143,17 @@ Global
 		{D8938702-94AE-48A4-B5D7-F31750BCC99C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D8938702-94AE-48A4-B5D7-F31750BCC99C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D8938702-94AE-48A4-B5D7-F31750BCC99C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{90279D2E-9680-4488-881E-6135BE1295D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{90279D2E-9680-4488-881E-6135BE1295D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{90279D2E-9680-4488-881E-6135BE1295D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{90279D2E-9680-4488-881E-6135BE1295D0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{9A51CFCB-A18A-428A-843A-FE7CF2EEF523} = {5DECD423-5B05-4F46-AB72-7CA9CCB27E0C}
+		{EA097539-121F-4DCB-ACAE-B4BE2076BABE} = {D8B4C45B-D1CB-4A9B-9D7E-6570CCADDA7E}
 		{930A00A6-2935-4EA0-81F0-B16D3E71B74C} = {1C61B7E0-3603-4193-9B05-A5FF0CAFBD11}
 		{930A00A6-2935-4EA0-81F0-C16D3E71B74C} = {1C61B7E0-3603-4193-9B05-A5FF0CAFBD11}
 		{E3DC203A-C84C-4D46-BEC0-8A3D612FC5D6} = {FC4A3B8A-ADBE-4DA1-9978-8157F89236DD}
@@ -177,8 +170,31 @@ Global
 		{45953D5D-FCB8-48F1-8DD4-9D4FAA031B57} = {52326CC0-4619-41C5-9D9A-8D44BADFBA2F}
 		{B5A960D4-AAF4-41D9-AE4D-5CCB29CEE4EB} = {FC4A3B8A-ADBE-4DA1-9978-8157F89236DD}
 		{D8938702-94AE-48A4-B5D7-F31750BCC99C} = {FC4A3B8A-ADBE-4DA1-9978-8157F89236DD}
+		{90279D2E-9680-4488-881E-6135BE1295D0} = {D8B4C45B-D1CB-4A9B-9D7E-6570CCADDA7E}
+		{9A37531D-CC0A-4891-8C2A-87BDE418138A} = {D8B4C45B-D1CB-4A9B-9D7E-6570CCADDA7E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {19B0272D-3305-4C60-8DD9-E15889B2FF54}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		Core_Bulge\Core_Bulge.projitems*{0f6b651e-d1f9-467f-a8f3-d1006c277e51}*SharedItemsImports = 4
+		Core_GameplayMod\Core_GameplayMod.projitems*{15a4df23-86ea-49b4-b120-e8f123f8dafe}*SharedItemsImports = 4
+		Core_Pregnancy_KK\Core_Pregnancy_KK.projitems*{3c122ef8-491b-447b-94e4-ada9d818403c}*SharedItemsImports = 13
+		Core_Bulge\Core_Bulge.projitems*{3e03b28f-bc65-459f-89e5-70d89905d636}*SharedItemsImports = 13
+		Core_LewdCrestX\Core_LewdCrestX.projitems*{45953d5d-fcb8-48f1-8dd4-9d4faa031b57}*SharedItemsImports = 4
+		Core_Bulge\Core_Bulge.projitems*{49cad984-906a-4b18-9982-e003d8668fe4}*SharedItemsImports = 4
+		Core_LewdCrestX\Core_LewdCrestX.projitems*{5b1134de-7840-4309-83f9-843606f01727}*SharedItemsImports = 4
+		Core_Pregnancy_KK\Core_Pregnancy_KK.projitems*{736eb022-a7b9-43aa-95c3-05a84b57f7e7}*SharedItemsImports = 4
+		Core_NightDarkener\Core_NightDarkener.projitems*{90279d2e-9680-4488-881e-6135be1295d0}*SharedItemsImports = 4
+		Core_Bulge\Core_Bulge.projitems*{904b04c0-5095-40f9-915a-005f80bc2cb1}*SharedItemsImports = 4
+		Core_Pregnancy_KK\Core_Pregnancy_KK.projitems*{930a00a6-2935-4ea0-81f0-b16d3e71b74c}*SharedItemsImports = 4
+		Core_NightDarkener\Core_NightDarkener.projitems*{9a37531d-cc0a-4891-8c2a-87bde418138a}*SharedItemsImports = 13
+		Core_GameplayMod\Core_GameplayMod.projitems*{9a51cfcb-a18a-428a-843a-fe7cf2eef523}*SharedItemsImports = 4
+		Core_MoanSoftly\Core_MoanSoftly.projitems*{b5a960d4-aaf4-41d9-ae4d-5ccb29cee4eb}*SharedItemsImports = 13
+		Core_GameplayMod\Core_GameplayMod.projitems*{c9650f99-df26-4d54-9826-5f77275c9d31}*SharedItemsImports = 13
+		Core_LewdCrestX\Core_LewdCrestX.projitems*{d86dabea-94ce-4fbf-818b-adb7b0134cb0}*SharedItemsImports = 13
+		Core_MoanSoftly\Core_MoanSoftly.projitems*{d8938702-94ae-48a4-b5d7-f31750bcc99c}*SharedItemsImports = 4
+		Core_MoanSoftly\Core_MoanSoftly.projitems*{e3dc203a-c84c-4d46-bec0-8a3d612fc5d6}*SharedItemsImports = 4
+		Core_NightDarkener\Core_NightDarkener.projitems*{ea097539-121f-4dcb-acae-b4be2076babe}*SharedItemsImports = 4
 	EndGlobalSection
 EndGlobal

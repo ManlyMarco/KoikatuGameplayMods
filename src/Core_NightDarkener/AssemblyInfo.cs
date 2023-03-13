@@ -4,10 +4,10 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("KK_NightDarkener")]
-[assembly: AssemblyDescription("Darkens the night scenes to something slightly more realistic")]
+[assembly: AssemblyTitle("NightDarkener")]
+[assembly: AssemblyDescription("Darkens the night scenes in FreeH to something slightly more realistic")]
 [assembly: AssemblyCompany("https://github.com/ManlyMarco/KoikatuGameplayMods")]
-[assembly: AssemblyProduct("KK_NightDarkener")]
+[assembly: AssemblyProduct("NightDarkener")]
 [assembly: AssemblyCopyright("Copyright ©  2019")]
 
 // Setting ComVisible to false makes the types in this assembly not visible
