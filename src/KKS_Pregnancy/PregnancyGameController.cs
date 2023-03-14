@@ -55,12 +55,7 @@ namespace KK_Pregnancy
 
         protected override void OnDayChange(Cycle.Week day)
         {
-            // Use Sunday for weekly stuff because it is always triggered (all other days can get skipped)
-            if (day == Cycle.Week.Holiday)
-            {
-                // At start of each week increase pregnancy week counters of all pregnant characters
-                ApplyToAllDatas(AddPregnancyWeek);
-            }
+            ApplyToAllDatas((data, pregnancyData) => AddPregnancyDay(data, pregnancyData, day));
         }
 
         protected override void OnStartH(MonoBehaviour proc, HFlag hFlag, bool vr)
@@ -178,7 +173,7 @@ namespace KK_Pregnancy
                 controller.ReadData();
         }
 
-        private static bool AddPregnancyWeek(CharaData charaData, PregnancyData pd)
+        private static bool AddPregnancyDay(CharaData charaData, PregnancyData pd, Cycle.Week week)
         {
             if (pd == null || !pd.GameplayEnabled) return false;
 
@@ -188,7 +183,26 @@ namespace KK_Pregnancy
                 {
                     // Advance through in-school at full configured speed
                     var weekChange = PregnancyDataUtils.GetPregnancyProgressionSpeed(charaData);
-                    pd.Week = Mathf.Min(PregnancyData.LeaveSchoolWeek, pd.Week + weekChange);
+
+                    // Unlike KK, in KKS it's not possible to skip more than 1 day at once, so it's possible to do daily updates
+                    // At least 0.8 weeks / day are required to use the daily update mode (chosen because LewdCrestX can override progression speed to 20 / 7 = 2.86 weeks/day)
+                    var dayChangeApprox = Mathf.FloorToInt(weekChange / 7f + 0.2f);
+
+                    if (dayChangeApprox < 1)
+                    {
+                        // If the progression speed is too slow to let 1+ week pass in 1 day, fall back to weekly updates
+                        if (week == Cycle.Week.Holiday)
+                        {
+                            pd.Week = Mathf.Min(PregnancyData.LeaveSchoolWeek, pd.Week + weekChange);
+                            //PregnancyPlugin.Logger.LogDebug("weekly " + weekChange);
+                        }
+                    }
+                    else
+                    {
+                        // If possible, update daily to have a more gradual 
+                        pd.Week = Mathf.Min(PregnancyData.LeaveSchoolWeek, pd.Week + dayChangeApprox);
+                        //PregnancyPlugin.Logger.LogDebug($"daily {dayChangeApprox} weekly {weekChange} {week}");
+                    }
                 }
                 else if (pd.Week < PregnancyData.ReturnToSchoolWeek)
                 {
