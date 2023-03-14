@@ -47,8 +47,12 @@ namespace KK_Pregnancy
             PregnancyProgressionSpeed = Config.Bind("General", "Pregnancy progression speed", 4,
                 new ConfigDescription("How much faster does the in-game pregnancy progresses than the standard 40 weeks. " +
                                     "It also reduces the time characters leave school for after birth.\n\n" +
-                                    "x1 is 40 weeks, x2 is 20 weeks, x4 is 10 weeks, x10 is 4 weeks.",
-                    new AcceptableValueList<int>(1, 2, 4, 10)));
+                                    "x1 is 40 weeks, x2 is 20 weeks, x4 is 10 weeks, etc.",
+#if KK
+                                    new AcceptableValueList<int>(1, 2, 4, 10)));
+#elif KKS
+                                    new AcceptableValueList<int>(1, 2, 4, 7, 14, 20))); // Multiples of 7 to match daily updates
+#endif
 
             ConceptionEnabled = Config.Bind("General", "Enable conception", true,
                 "Allows characters to get pregnant from vaginal sex. Doesn't affect already pregnant characters.");
@@ -102,8 +106,8 @@ namespace KK_Pregnancy
             if (TimelineCompatibility.IsTimelineAvailable())
             {
                 TimelineCompatibility.AddCharaFunctionInterpolable<int, PregnancyCharaController>(
-                    GUID, 
-                    "week", 
+                    GUID,
+                    "week",
                     "Pregnancy week",
                     (oci, parameter, leftValue, rightValue, factor) => parameter.Data.Week = Mathf.RoundToInt(Mathf.LerpUnclamped(leftValue, rightValue, factor)),
                     null,
