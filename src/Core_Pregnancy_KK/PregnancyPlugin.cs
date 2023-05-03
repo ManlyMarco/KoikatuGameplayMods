@@ -20,12 +20,13 @@ namespace KK_Pregnancy
     public partial class PregnancyPlugin : BaseUnityPlugin
     {
         public const string GUID = "KK_Pregnancy";
-        public const string Version = "2.7.1";
+        public const string Version = "2.8.0";
 
         public static ConfigEntry<bool> ConceptionEnabled { get; private set; }
         public static ConfigEntry<float> FertilityOverride { get; private set; }
         public static ConfigEntry<bool> AnalConceptionEnabled { get; private set; }
         public static ConfigEntry<bool> ShowPregnancyIconEarly { get; private set; }
+        public static ConfigEntry<StatusDisplayCondition> StatusDisplay { get; private set; }
         public static ConfigEntry<int> PregnancyProgressionSpeed { get; private set; }
         public static ConfigEntry<bool> HSceneMenstrIconOverride { get; private set; }
 
@@ -69,6 +70,12 @@ namespace KK_Pregnancy
             ShowPregnancyIconEarly = Config.Bind("General", "Show pregnancy icon early", false,
                 "By default pregnancy status icon in class roster is shown after a few days or weeks (the character had a chance to do the test or noticed something is wrong).\n" +
                 "Turning this on will always make the icon show up at the end of the current day.");
+
+            StatusDisplay = Config.Bind("General", "When to reveal Risky/Safe/Pregnant status", StatusDisplayCondition.Normal,
+                                                      "Always: You can immediately see the status of all characters.\n" +
+                                                      "Normal: You can only see status of characters you are reasonably close with.\n" +
+                                                      "Only Girlfriend: You can only see status of your girlfriends (other requirements might also apply).\n" +
+                                                      "Never: The status is always shown as Unknown.");
 
             HSceneMenstrIconOverride = Config.Bind("General", "Use custom safe/risky icons in H Scenes", true,
                 "Replaces the standard safe/risky indicators with custom indicators that can also show pregnancy and unknown status. " +
@@ -135,6 +142,14 @@ namespace KK_Pregnancy
         internal static PregnancyCharaController GetEffectController(SaveData.Heroine heroine)
         {
             return heroine?.chaCtrl != null ? heroine.chaCtrl.GetComponent<PregnancyCharaController>() : null;
+        }
+        
+        public enum StatusDisplayCondition
+        {
+            Always,
+            Normal,
+            OnlyGirlfriend,
+            Never
         }
     }
 }

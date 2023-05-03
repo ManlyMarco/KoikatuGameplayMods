@@ -161,9 +161,21 @@ namespace KK_Pregnancy
                         switch (status)
                         {
                             case HeroineStatus.Unknown:
-                                GUILayout.Label("This character didn't tell you their risky day schedule yet.");
+                                GUILayout.Label("This character didn't tell you their risky day schedule.");
                                 GUILayout.FlexibleSpace();
-                                GUILayout.Label("Become closer to learn it!");
+                                switch (PregnancyPlugin.StatusDisplay.Value)
+                                {
+                                    default:
+                                    case PregnancyPlugin.StatusDisplayCondition.Normal:
+                                        GUILayout.Label("Become closer to learn it!");
+                                        break;
+                                    case PregnancyPlugin.StatusDisplayCondition.OnlyGirlfriend:
+                                        GUILayout.Label("Become close lovers to learn it!");
+                                        break;
+                                    case PregnancyPlugin.StatusDisplayCondition.Never:
+                                        GUILayout.Label("All schedules are forced to be hidden by the \"When to reveal status\" setting.");
+                                        break;
+                                }
                                 break;
 
                             case HeroineStatus.OnLeave:

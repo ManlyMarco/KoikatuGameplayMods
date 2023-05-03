@@ -56,19 +56,7 @@ namespace KK_Pregnancy
             {
                 if (pregData == null) pregData = heroine.GetPregnancyData();
 
-                // Check if she wants to tell //todo need to ask in talk scene
-#if KK
-                if (heroine.intimacy >= 80 ||
-                    heroine.hCount >= 5 ||
-                    heroine.parameter.attribute.bitch && heroine.favor > 50 ||
-                    (heroine.isGirlfriend || heroine.favor >= 90) &&
-                    (!heroine.isVirgin || heroine.hCount >= 2 || heroine.intimacy >= 40))
-#else
-                if (heroine.relation >= 3 ||
-                    heroine.hCount >= 5 ||
-                    heroine.parameter.attribute.bitch && heroine.favor > 50 ||
-                    heroine.isGirlfriend && (heroine.favor >= 90 || heroine.hCount >= 2))
-#endif
+                if (CanShowStatus(heroine))
                 {
                     var pregnancyWeek = pregData.Week;
                     if (pregnancyWeek > 0)
@@ -101,6 +89,39 @@ namespace KK_Pregnancy
                 return pregData.IsPregnant ? HeroineStatus.Pregnant : HeroineStatus.Safe;
             }
             return HeroineStatus.Unknown;
+        }
+
+        private static bool CanShowStatus(SaveData.Heroine heroine)
+        {
+            // todo add option to ask in talk scene?
+            switch (PregnancyPlugin.StatusDisplay.Value)
+            {
+                case PregnancyPlugin.StatusDisplayCondition.Always:
+                    return true;
+                case PregnancyPlugin.StatusDisplayCondition.Normal:
+#if KK
+                    return heroine.intimacy >= 80 ||
+                           heroine.hCount >= 5 ||
+                           heroine.parameter.attribute.bitch && heroine.favor > 50 ||
+                           (heroine.isGirlfriend || heroine.favor >= 90) &&
+                           (!heroine.isVirgin || heroine.hCount >= 2 || heroine.intimacy >= 40);
+#else
+                    return heroine.relation >= 3 ||
+                           heroine.hCount >= 5 ||
+                           heroine.parameter.attribute.bitch && heroine.favor > 50 ||
+                           heroine.isGirlfriend && (!heroine.isVirgin || heroine.hCount >= 2 || heroine.favor >= 120);
+#endif
+                case PregnancyPlugin.StatusDisplayCondition.OnlyGirlfriend:
+#if KK
+                    return heroine.isGirlfriend && (!heroine.isVirgin || heroine.hCount >= 2 || heroine.intimacy >= 40);
+#else
+                    return heroine.isGirlfriend && (!heroine.isVirgin || heroine.hCount >= 2 || heroine.favor >= 120);
+#endif
+                case PregnancyPlugin.StatusDisplayCondition.Never:
+                    return false;
+                default:
+                    throw new ArgumentOutOfRangeException();
+            }
         }
 
         internal static IEnumerable<ChaFileControl> GetRelatedChaFiles(this SaveData.CharaData character)
