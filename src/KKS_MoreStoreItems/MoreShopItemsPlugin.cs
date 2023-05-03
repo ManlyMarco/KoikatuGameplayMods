@@ -15,7 +15,7 @@ namespace MoreShopItems
     public class MoreShopItemsPlugin : BaseUnityPlugin
     {
         public const string GUID = "MoreShopItems";
-        public const string Version = "2.1.1";
+        public const string Version = "2.1.2";
 
         internal const int DetectorItemId = 3456651;
         internal const int TalismanItemId = 3456650;

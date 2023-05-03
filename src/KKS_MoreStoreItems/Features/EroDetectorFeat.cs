@@ -40,21 +40,24 @@ namespace MoreShopItems.Features
             _notifyMast = inst.Config.Bind(itemName, "Notification on masturbation", true, "If the item is purchased, show a notification whenever any NPC starts a masturbation action.");
             _notifyLesb = inst.Config.Bind(itemName, "Notification on lesbian", true, "If the item is purchased, show a notification whenever any NPC starts a lesbian action.");
 
-            TranslationHelper.TranslateAsync(_infoTextPrefixGeneral, s =>
+            if (TranslationHelper.AutoTranslatorInstalled)
             {
-                if (s.Contains("{0}")) _infoTextPrefixGeneral = s;
-                else MoreShopItemsPlugin.Logger.LogWarning($"Invalid format of translation of {_infoTextPrefixGeneral} -> {s}");
-            });
-            TranslationHelper.TranslateAsync(_infoTextPrefixMast, s =>
-            {
-                if (s.Contains("{0}") && s.Contains("{1}")) _infoTextPrefixMast = s;
-                else MoreShopItemsPlugin.Logger.LogWarning($"Invalid format of translation of {_infoTextPrefixMast} -> {s}");
-            });
-            TranslationHelper.TranslateAsync(_infoTextPrefixLesb, s =>
-            {
-                if (s.Contains("{0}") && s.Contains("{1}")) _infoTextPrefixLesb = s;
-                else MoreShopItemsPlugin.Logger.LogWarning($"Invalid format of translation of {_infoTextPrefixLesb} -> {s}");
-            });
+                TranslationHelper.TranslateAsync(_infoTextPrefixGeneral, s =>
+                {
+                    if (s.Contains("{0}")) _infoTextPrefixGeneral = s;
+                    else MoreShopItemsPlugin.Logger.LogWarning($"Invalid format of translation of {_infoTextPrefixGeneral} -> {s}");
+                });
+                TranslationHelper.TranslateAsync(_infoTextPrefixMast, s =>
+                {
+                    if (s.Contains("{0}") && s.Contains("{1}")) _infoTextPrefixMast = s;
+                    else MoreShopItemsPlugin.Logger.LogWarning($"Invalid format of translation of {_infoTextPrefixMast} -> {s}");
+                });
+                TranslationHelper.TranslateAsync(_infoTextPrefixLesb, s =>
+                {
+                    if (s.Contains("{0}") && s.Contains("{1}")) _infoTextPrefixLesb = s;
+                    else MoreShopItemsPlugin.Logger.LogWarning($"Invalid format of translation of {_infoTextPrefixLesb} -> {s}");
+                });
+            }
 
             return true;
         }
@@ -77,13 +80,17 @@ namespace MoreShopItems.Features
                         //if (ActionScene.initialized && ActionScene.instance.Player.mapNo != mapNo)
                         if (ActionScene.instance.Map.infoDic.TryGetValue(mapNo, out var param))
                         {
-                            TranslationHelper.TryTranslate(param.DisplayName, out var locationName);
+                            var locationName = param.DisplayName;
+                            if (TranslationHelper.TryTranslate(locationName, out var tlLoc))
+                                locationName = tlLoc;
 
                             if (featureLevel > 1)
                             {
-                                TranslationHelper.TranslateAsync(
-                                    npc.charaData.Name,
-                                    s => InformationUI.SetAsync(string.Format(npc.isOnanism ? _infoTextPrefixMast : _infoTextPrefixLesb, s, locationName), InformationUI.Mode.Normal).Forget());
+                                var charaName = npc.charaData.Name?.Trim();
+                                if(TranslationHelper.TryTranslate(charaName, out var tlNam))
+                                    charaName = tlNam;
+
+                                InformationUI.SetAsync(string.Format(npc.isOnanism ? _infoTextPrefixMast : _infoTextPrefixLesb, charaName, locationName), InformationUI.Mode.Normal).Forget();
                             }
                             else
                             {
