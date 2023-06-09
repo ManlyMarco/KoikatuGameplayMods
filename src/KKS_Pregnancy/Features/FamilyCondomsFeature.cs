@@ -79,5 +79,53 @@ namespace KK_Pregnancy
         //        _nextAnimation = !__instance.flags.isAnalPlay ? "Drop" : "A_Drop";
         //    }
         //}
+
+        // Cum leaks out even when using a condom.
+        [HarmonyPrefix]
+        [HarmonyPatch(typeof(HSonyu), nameof(HSonyu.Proc))]
+        [HarmonyWrapSafe] // Ignore crashes (Consistency)
+        private static void HSonyuProcPrefix(HSonyu __instance, out bool __state)
+        {
+            __state = __instance.flags.isCondom;
+
+            if (!IsEffectActive()) return;
+
+            var animatorStateInfo = __instance.female.getAnimatorStateInfo(0);
+
+            if ((animatorStateInfo.IsName("Pull") || animatorStateInfo.IsName("A_Pull")))
+            {
+                if (__instance.flags.isCondom && (animatorStateInfo.normalizedTime > 1f))
+                {
+                    __instance.flags.isCondom = false;
+                }
+            }
+        }
+
+        [HarmonyPostfix]
+        [HarmonyPatch(typeof(HSonyu), nameof(HSonyu.Proc))]
+        [HarmonyWrapSafe]
+        private static void HSonyuProcPostfix(HSonyu __instance, bool __state)
+        {
+            if (!IsEffectActive()) return;
+
+            var animatorStateInfo = __instance.female.getAnimatorStateInfo(0);
+
+            if ((animatorStateInfo.IsName("Pull") || animatorStateInfo.IsName("A_Pull")))
+            {
+                // If __state is false there is nothing to do no condom was used.
+                if (__state && (animatorStateInfo.normalizedTime > 1f))
+                {
+                    __instance.flags.isCondom = true;
+                    // Code from game not run because of hook altering
+                    // the isCondom flag. Maybe not needed.
+                    __instance.sprite.SetSonyuStart();
+                    __instance.sprite.sonyu.imageCtrlPad.OnChangeValue(-1);
+                    __instance.flags.voice.SetSonyuIdleTime();
+                    __instance.flags.timeWaitSonyu.SetIdleTime();
+                    __instance.flags.isInsideFinish = false;
+                    __instance.rePlay = 0;
+                }
+            }
+        }
     }
 }
