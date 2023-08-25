@@ -79,7 +79,7 @@ namespace KK_Pregnancy
                 if (_pregnancyFullValues.TryGetValue(bone, out var mod))
                 {
                     var prEffect = _pregnancyEffectPercent;
-                    return LerpModifier(mod, prEffect);
+                    return LerpModifier(bone, mod, prEffect);
                 }
             }
 
@@ -92,29 +92,40 @@ namespace KK_Pregnancy
 
                     var bellySize = Mathf.Max(prEffect, infEffect);
 
-                    return LerpModifier(mod, bellySize);
+                    return LerpModifier(bone, mod, bellySize);
                 }
             }
 
             return null;
         }
 
-        private static BoneModifierData LerpModifier(BoneModifierData mod, float bellySize)
+        /// <summary>
+        /// A buffer that allows us to return BoneModifierData without allocating
+        /// new objects.
+        /// </summary>
+        private readonly Dictionary<string, BoneModifierData> _modifierDataBuffer =
+            new Dictionary<string, BoneModifierData>();
+        private BoneModifierData LerpModifier(string bone, BoneModifierData mod, float bellySize)
         {
-            return new BoneModifierData(
-                new Vector3(
-                    Mathf.Lerp(1f, mod.ScaleModifier.x, bellySize),
-                    Mathf.Lerp(1f, mod.ScaleModifier.y, bellySize),
-                    Mathf.Lerp(1f, mod.ScaleModifier.z, bellySize)),
-                Mathf.Lerp(1f, mod.LengthModifier, bellySize),
-                new Vector3(
-                    Mathf.Lerp(0f, mod.PositionModifier.x, bellySize),
-                    Mathf.Lerp(0f, mod.PositionModifier.y, bellySize),
-                    Mathf.Lerp(0f, mod.PositionModifier.z, bellySize)),
-                new Vector3(
-                    Mathf.Lerp(0f, mod.RotationModifier.x, bellySize),
-                    Mathf.Lerp(0f, mod.RotationModifier.y, bellySize),
-                    Mathf.Lerp(0f, mod.RotationModifier.z, bellySize)));
+            if (!_modifierDataBuffer.TryGetValue(bone, out var buf))
+            {
+                buf = new BoneModifierData();
+                _modifierDataBuffer.Add(bone, buf);
+            }
+            buf.ScaleModifier = new Vector3(
+                Mathf.Lerp(1f, mod.ScaleModifier.x, bellySize),
+                Mathf.Lerp(1f, mod.ScaleModifier.y, bellySize),
+                Mathf.Lerp(1f, mod.ScaleModifier.z, bellySize));
+            buf.LengthModifier = Mathf.Lerp(1f, mod.LengthModifier, bellySize);
+            buf.PositionModifier = new Vector3(
+                Mathf.Lerp(0f, mod.PositionModifier.x, bellySize),
+                Mathf.Lerp(0f, mod.PositionModifier.y, bellySize),
+                Mathf.Lerp(0f, mod.PositionModifier.z, bellySize));
+            buf.RotationModifier = new Vector3(
+                Mathf.Lerp(0f, mod.RotationModifier.x, bellySize),
+                Mathf.Lerp(0f, mod.RotationModifier.y, bellySize),
+                Mathf.Lerp(0f, mod.RotationModifier.z, bellySize));
+            return buf;
         }
 
         /// <summary>
