@@ -334,3 +334,8 @@ ASALocalRun/
 #Ignore VSCode config and tasks
 /.vscode
 TODO
+
+/src/Core_LewdCrestX/CrestsUnityProject/Library/metadata
+/src/Core_LewdCrestX/CrestsUnityProject/Library/ShaderCache
+/src/Core_LewdCrestX/CrestsUnityProject/Library/ScriptAssemblies
+/src/Core_LewdCrestX/CrestsUnityProject/Assets/AssetBundles
