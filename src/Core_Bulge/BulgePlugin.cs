@@ -17,8 +17,8 @@ using KKAPI.Utilities;
 using UniRx;
 using UnityEngine;
 
-// BUG this plugin is useless in AI because it doesn't work on male body and females can't be given male uncensors
-#if !AI
+// BUG this plugin is useless in AI/HS2 because it doesn't work on male body and females can't be given male uncensors
+#if !AI && !HS2
 using CoordinateType = ChaFileDefine.CoordinateType;
 using StrayTech;
 #endif
@@ -66,7 +66,7 @@ namespace KK_Bulge
                 {
 #if KK || KKS
                     var cat = KKABMX.GUI.InterfaceData.BodyGenitals;
-#elif AI
+#elif AI || HS2
                     var cat = MakerConstants.Body.Lower;
 #endif
 
@@ -133,7 +133,7 @@ namespace KK_Bulge
                 // BodyTop/p_cf_body_00/cf_o_root/n_body/n_dankon
                 // BodyTop/p_cf_body_00 can be disabled in kkp in some cases, somehow, so need a full scan
                 var sonGo = transform.FindChildDeep("n_dankon");
-#elif AI
+#elif AI || HS2
                 var sonGo = ChaControl.cmpBody.targetEtc.objDanTop;
 #endif
                 if (sonGo)
@@ -164,7 +164,7 @@ namespace KK_Bulge
     {
 #if KK || KKS
         private const string BulgeBoneName = "cf_j_kokan";
-#elif AI
+#elif AI || HS2
         private const string BulgeBoneName = "cf_J_Kokan"; // BUG this does not affect male body only female (no other bones seem to have a similar effect), so since females can't be set male uncensors in US this makes the plugin useless
 #endif
         private static readonly string[] _affectedBones = { BulgeBoneName };
@@ -187,7 +187,7 @@ namespace KK_Bulge
         {
 #if KK
             return !Manager.Config.EtcData.VisibleSon;
-#elif AI
+#elif AI || HS2
             return !Manager.Config.HData.Son;
 #elif KKS
             return !Manager.Config.HData.VisibleSon;
@@ -200,7 +200,11 @@ namespace KK_Bulge
             {
                 case BulgeEnableLevel.Auto:
                 default:
+#if HS2
+                    if (IsSonDisabledInConfig()) //todo proper detection
+#else
                     if (GameAPI.InsideHScene && IsSonDisabledInConfig())
+#endif
                         return false;
 
                     var status = _ctrl.ChaControl.fileStatus;
