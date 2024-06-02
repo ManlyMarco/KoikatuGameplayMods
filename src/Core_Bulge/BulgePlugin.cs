@@ -17,7 +17,6 @@ using KKAPI.Utilities;
 using UniRx;
 using UnityEngine;
 
-// BUG this plugin is useless in AI/HS2 because it doesn't work on male body and females can't be given male uncensors
 #if !AI && !HS2
 using CoordinateType = ChaFileDefine.CoordinateType;
 using StrayTech;
