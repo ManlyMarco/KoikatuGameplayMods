@@ -72,8 +72,11 @@ namespace KK_Bulge
                     e.AddControl(new MakerRadioButtons(cat, this, "Enable crotch bulge", (int)DefaultBulgeState.Value, "Auto", "Always", "Never"))
                         .BindToFunctionController<BulgeController, int>(controller => (int)controller.EnableBulge, (controller, value) => controller.EnableBulge = (BulgeEnableLevel)value);
                     e.AddControl(new MakerText("Auto will enable the bulge only if the character has a shlong (either male or added with UncensorSelector).\nThe effect is applied only when wearing clothes.", cat, this) { TextColor = MakerText.ExplanationGray });
+#if AI || HS2
+                    e.AddControl(new MakerText("In AI and HS2 this effect does not work on default male body. It only works on female bodies.", cat, this) { TextColor = Color.yellow });
+#endif
                     e.AddControl(new MakerSlider(cat, "Bulge size", 0, 1, DefaultBulgeSize.Value, this))
-                        .BindToFunctionController<BulgeController, float>(controller => controller.BulgeSize, (controller, value) => controller.BulgeSize = value);
+                     .BindToFunctionController<BulgeController, float>(controller => controller.BulgeSize, (controller, value) => controller.BulgeSize = value);
                 };
             }
             else
