@@ -164,7 +164,7 @@ namespace KK_Bulge
 #if KK || KKS
         private const string BulgeBoneName = "cf_j_kokan";
 #elif AI || HS2
-        private const string BulgeBoneName = "cf_J_Kokan"; // BUG this does not affect male body only female (no other bones seem to have a similar effect), so since females can't be set male uncensors in US this makes the plugin useless
+        private const string BulgeBoneName = "cf_J_Kokan"; // BUG this does not affect male body only female (no other bones seem to have a similar effect)
 #endif
         private static readonly string[] _affectedBones = { BulgeBoneName };
         private static readonly Vector3 _maxScale = new Vector3(2, 3, 3.3f);
