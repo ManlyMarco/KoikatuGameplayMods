@@ -65,6 +65,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "KKS_NightDarkener", "KKS_Ni
 EndProject
 Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "Core_NightDarkener", "Core_NightDarkener\Core_NightDarkener.shproj", "{9A37531D-CC0A-4891-8C2A-87BDE418138A}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HS2_Bulge", "HS2_Bulge\HS2_Bulge.csproj", "{CFD72D0E-4E3C-4D22-B932-B9C35825B045}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -147,6 +149,10 @@ Global
 		{90279D2E-9680-4488-881E-6135BE1295D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{90279D2E-9680-4488-881E-6135BE1295D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{90279D2E-9680-4488-881E-6135BE1295D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CFD72D0E-4E3C-4D22-B932-B9C35825B045}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CFD72D0E-4E3C-4D22-B932-B9C35825B045}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CFD72D0E-4E3C-4D22-B932-B9C35825B045}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CFD72D0E-4E3C-4D22-B932-B9C35825B045}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -172,6 +178,7 @@ Global
 		{D8938702-94AE-48A4-B5D7-F31750BCC99C} = {FC4A3B8A-ADBE-4DA1-9978-8157F89236DD}
 		{90279D2E-9680-4488-881E-6135BE1295D0} = {D8B4C45B-D1CB-4A9B-9D7E-6570CCADDA7E}
 		{9A37531D-CC0A-4891-8C2A-87BDE418138A} = {D8B4C45B-D1CB-4A9B-9D7E-6570CCADDA7E}
+		{CFD72D0E-4E3C-4D22-B932-B9C35825B045} = {C75FFBF1-9DCE-4BC4-9F20-F95B243ABEE3}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {19B0272D-3305-4C60-8DD9-E15889B2FF54}
@@ -192,6 +199,7 @@ Global
 		Core_GameplayMod\Core_GameplayMod.projitems*{9a51cfcb-a18a-428a-843a-fe7cf2eef523}*SharedItemsImports = 4
 		Core_MoanSoftly\Core_MoanSoftly.projitems*{b5a960d4-aaf4-41d9-ae4d-5ccb29cee4eb}*SharedItemsImports = 13
 		Core_GameplayMod\Core_GameplayMod.projitems*{c9650f99-df26-4d54-9826-5f77275c9d31}*SharedItemsImports = 13
+		Core_Bulge\Core_Bulge.projitems*{cfd72d0e-4e3c-4d22-b932-b9c35825b045}*SharedItemsImports = 4
 		Core_LewdCrestX\Core_LewdCrestX.projitems*{d86dabea-94ce-4fbf-818b-adb7b0134cb0}*SharedItemsImports = 13
 		Core_MoanSoftly\Core_MoanSoftly.projitems*{d8938702-94ae-48a4-b5d7-f31750bcc99c}*SharedItemsImports = 4
 		Core_MoanSoftly\Core_MoanSoftly.projitems*{e3dc203a-c84c-4d46-bec0-8a3d612fc5d6}*SharedItemsImports = 4

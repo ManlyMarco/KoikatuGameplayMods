@@ -17,8 +17,7 @@ using KKAPI.Utilities;
 using UniRx;
 using UnityEngine;
 
-// BUG this plugin is useless in AI because it doesn't work on male body and females can't be given male uncensors
-#if !AI
+#if !AI && !HS2
 using CoordinateType = ChaFileDefine.CoordinateType;
 using StrayTech;
 #endif
@@ -66,15 +65,18 @@ namespace KK_Bulge
                 {
 #if KK || KKS
                     var cat = KKABMX.GUI.InterfaceData.BodyGenitals;
-#elif AI
+#elif AI || HS2
                     var cat = MakerConstants.Body.Lower;
 #endif
 
                     e.AddControl(new MakerRadioButtons(cat, this, "Enable crotch bulge", (int)DefaultBulgeState.Value, "Auto", "Always", "Never"))
                         .BindToFunctionController<BulgeController, int>(controller => (int)controller.EnableBulge, (controller, value) => controller.EnableBulge = (BulgeEnableLevel)value);
                     e.AddControl(new MakerText("Auto will enable the bulge only if the character has a shlong (either male or added with UncensorSelector).\nThe effect is applied only when wearing clothes.", cat, this) { TextColor = MakerText.ExplanationGray });
+#if AI || HS2
+                    e.AddControl(new MakerText("In AI and HS2 this effect does not work on default male body. It only works on female bodies.", cat, this) { TextColor = Color.yellow });
+#endif
                     e.AddControl(new MakerSlider(cat, "Bulge size", 0, 1, DefaultBulgeSize.Value, this))
-                        .BindToFunctionController<BulgeController, float>(controller => controller.BulgeSize, (controller, value) => controller.BulgeSize = value);
+                     .BindToFunctionController<BulgeController, float>(controller => controller.BulgeSize, (controller, value) => controller.BulgeSize = value);
                 };
             }
             else
@@ -133,7 +135,7 @@ namespace KK_Bulge
                 // BodyTop/p_cf_body_00/cf_o_root/n_body/n_dankon
                 // BodyTop/p_cf_body_00 can be disabled in kkp in some cases, somehow, so need a full scan
                 var sonGo = transform.FindChildDeep("n_dankon");
-#elif AI
+#elif AI || HS2
                 var sonGo = ChaControl.cmpBody.targetEtc.objDanTop;
 #endif
                 if (sonGo)
@@ -164,8 +166,8 @@ namespace KK_Bulge
     {
 #if KK || KKS
         private const string BulgeBoneName = "cf_j_kokan";
-#elif AI
-        private const string BulgeBoneName = "cf_J_Kokan"; // BUG this does not affect male body only female (no other bones seem to have a similar effect), so since females can't be set male uncensors in US this makes the plugin useless
+#elif AI || HS2
+        private const string BulgeBoneName = "cf_J_Kokan"; // BUG this does not affect male body only female (no other bones seem to have a similar effect)
 #endif
         private static readonly string[] _affectedBones = { BulgeBoneName };
         private static readonly Vector3 _maxScale = new Vector3(2, 3, 3.3f);
@@ -187,7 +189,7 @@ namespace KK_Bulge
         {
 #if KK
             return !Manager.Config.EtcData.VisibleSon;
-#elif AI
+#elif AI || HS2
             return !Manager.Config.HData.Son;
 #elif KKS
             return !Manager.Config.HData.VisibleSon;
@@ -200,7 +202,11 @@ namespace KK_Bulge
             {
                 case BulgeEnableLevel.Auto:
                 default:
+#if HS2
+                    if (IsSonDisabledInConfig()) //todo proper detection
+#else
                     if (GameAPI.InsideHScene && IsSonDisabledInConfig())
+#endif
                         return false;
 
                     var status = _ctrl.ChaControl.fileStatus;
