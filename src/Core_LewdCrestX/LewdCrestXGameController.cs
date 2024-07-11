@@ -34,11 +34,7 @@ namespace KK_LewdCrestX
             return timeLeft;
         }
 
-#if KK
-        protected override void OnStartH(BaseLoader proc, HFlag hFlag, bool vr)
-#else
         protected override void OnStartH(MonoBehaviour proc, HFlag hFlag, bool vr)
-#endif
         {
             _hFlag = hFlag;
             _hSceneHeroines = hFlag.lstHeroine.Select(x => new HsceneHeroineInfo(x)).ToArray();
@@ -57,11 +53,7 @@ namespace KK_LewdCrestX
             }
         }
 
-#if KK
-        protected override void OnEndH(BaseLoader proc, HFlag hFlag, bool vr)
-#else
         protected override void OnEndH(MonoBehaviour proc, HFlag hFlag, bool vr)
-#endif
         {
             foreach (var heroine in _hSceneHeroines)
             {

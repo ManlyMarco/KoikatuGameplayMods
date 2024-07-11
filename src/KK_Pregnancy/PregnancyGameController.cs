@@ -37,13 +37,13 @@ namespace KK_Pregnancy
             }
         }
 
-        protected override void OnStartH(BaseLoader proc, HFlag hFlag, bool vr)
+        protected override void OnStartH(MonoBehaviour proc, HFlag hFlag, bool vr)
         {
             InsideHScene = true;
             proc.gameObject.AddComponent<LactationController>();
         }
 
-        protected override void OnEndH(BaseLoader proc, HFlag hFlag, bool vr)
+        protected override void OnEndH(MonoBehaviour proc, HFlag hFlag, bool vr)
         {
             InsideHScene = false;
             Destroy(proc.GetComponent<LactationController>());

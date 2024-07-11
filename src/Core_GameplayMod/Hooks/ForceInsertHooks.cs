@@ -10,11 +10,13 @@ namespace KoikatuGameplayMod
     internal class ForceInsertHooks : IFeature
     {
         private static ConfigEntry<bool> _forceInsert;
+#if KK
         private static ConfigEntry<bool> _forceInsertAnger;
+#endif
 
         public bool Install(Harmony instance, ConfigFile config)
         {
-            _forceInsert = config.Bind(KoikatuGameplayMod.ConfCatHScene, "Allow force insert", true, 
+            _forceInsert = config.Bind(KoikatuGameplayMod.ConfCatHScene, "Allow force insert", true,
                 "Can insert raw even if it's denied.\nTo force insert - click on the blue insert button right after being denied, after coming outside, or after making her come multiple times. Other contitions might apply.");
 
 #if KK
