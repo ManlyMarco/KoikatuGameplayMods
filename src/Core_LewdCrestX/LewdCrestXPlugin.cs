@@ -25,8 +25,8 @@ namespace KK_LewdCrestX
 {
     [BepInPlugin(GUID, "LewdCrestX", Version)]
     [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
-    [BepInDependency(KKABMX_Core.GUID, "4.0")]
-    [BepInDependency(KoiSkinOverlayMgr.GUID, "5.2")]
+    [BepInDependency(KKABMX_Core.GUID, KKABMX_Core.Version)]
+    [BepInDependency(KoiSkinOverlayMgr.GUID, KoiSkinOverlayMgr.Version)]
     [BepInDependency("KK_Pregnancy", BepInDependency.DependencyFlags.SoftDependency)]
     [BepInDependency("Marco.SkinEffects", BepInDependency.DependencyFlags.SoftDependency)]
     public partial class LewdCrestXPlugin : BaseUnityPlugin
