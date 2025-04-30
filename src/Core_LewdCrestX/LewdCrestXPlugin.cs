@@ -32,7 +32,7 @@ namespace KK_LewdCrestX
     public partial class LewdCrestXPlugin : BaseUnityPlugin
     {
         public const string GUID = "LewdCrestX";
-        public const string Version = "1.4";
+        public const string Version = "1.4.1";
 
         public static Dictionary<CrestType, CrestInfo> CrestInfos { get; } = new Dictionary<CrestType, CrestInfo>();
 
