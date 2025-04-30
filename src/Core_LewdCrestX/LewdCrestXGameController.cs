@@ -138,7 +138,12 @@ namespace KK_LewdCrestX
                                     // Need to replace this from the default chase id because that disables the talk to bubble
                                     // This action is triggered when character approaches player
                                     // 28 - wanting to talk to player. If too annoying might want to replace with actions in range 10 - 16, maybe randomized
-                                    npc.AI.actResult.value.actionNo = 28;
+                                    // If player never talked with the character, action 28 softlocks the game after talking to the character
+                                    var isFirstTalk = !heroine.talkEvent.Contains(0) && !heroine.talkEvent.Contains(1);
+                                    if (isFirstTalk)
+                                        npc.AI.actResult.value.actionNo = Random.RandomRangeInt(10, 16);
+                                    else
+                                        npc.AI.actResult.value.actionNo = 28;
 
                                     SetActionCooldown(heroine, 10);
                                 }
