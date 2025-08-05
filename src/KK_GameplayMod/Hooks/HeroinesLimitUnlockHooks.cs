@@ -86,22 +86,6 @@ namespace KoikatuGameplayMod
             vpRT.offsetMax = Vector2.zero;
             vpRT.sizeDelta = Vector2.zero;
 
-            // Add vertical scrollbar
-            var originalScrollbar = GameObject.Find("Scroll View/Scrollbar Vertical");
-            if (originalScrollbar != null)
-            {
-                var scrollbarObj = UnityEngine.Object.Instantiate(originalScrollbar, scrollGO.transform);
-                var scrollbarRT = scrollbarObj.GetComponent<RectTransform>();
-                // Set anchors and offsets as in pseudocode
-                scrollbarRT.anchorMin = new Vector2(1.0f, 0.0f);
-                scrollbarRT.anchorMax = new Vector2(1.0f, 1.0f);
-                scrollbarRT.offsetMin = new Vector2(-565.0f, 90.0f);
-                scrollbarRT.offsetMax = new Vector2(-550.0f, -100.0f);
-                var verticalScrollbar = scrollbarObj.GetComponent<Scrollbar>();
-                scrollRect.verticalScrollbar = verticalScrollbar;
-                scrollRect.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.Permanent;
-                scrollRect.verticalScrollbarSpacing = 0;
-            }
 
             var bgImage = vpGO.GetComponent<Image>();
             bgImage.color = new Color(1f, 1f, 1f, 2f / 255f);
