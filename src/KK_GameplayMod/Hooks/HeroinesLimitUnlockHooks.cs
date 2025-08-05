@@ -45,13 +45,11 @@ namespace KoikatuGameplayMod
 
             if (parent.childCount <= BaseSeats)
             {
-                //System.Console.WriteLine($"@@@@ {__instance.PreviewRoot.transform.GetFullPath()}");
-
                 for (int i = 0; i < _addHeroins.Value; ++i)
                 {
                     var seat = GameObject.Instantiate(_seat24, parent);
 
-                    int index = i + (BaseSeats + 1);
+                    int index = i + BaseSeats;
                     seat.name = "Seat_" + index;
 
                     var transform = (RectTransform)seat.transform;
@@ -68,21 +66,11 @@ namespace KoikatuGameplayMod
             RectTransform scrollRT = scrollGO.GetComponent<RectTransform>();
 
             // 全画面サイズにフィットさせる例 / Example of fitting to full screen size
-            scrollRT.anchorMin = Vector2.zero;
-            scrollRT.anchorMax = Vector2.one;
-            scrollRT.offsetMin = new Vector2(200, 0);
-            scrollRT.offsetMax = new Vector2(200, -20);
-            scrollRT.sizeDelta = Vector2.zero;
-
-            // 背景 Image（透けさせたい場合は alpha を下げる）
-            // Background Image (lower alpha if you want it to be transparent)
-            //var bgImage = scrollGO.GetComponent<Image>();
-            //bgImage.color = new Color(1, 1, 0, 0.5f);
-
-            // Mask で子を切り抜き
-            // Mask to clip children
-            //var mask = scrollGO.GetComponent<Mask>();
-            //mask.showMaskGraphic = false;
+            scrollRT.anchorMin = new Vector2(0.095f, 0.08f);
+            scrollRT.anchorMax = new Vector2(0.82f, 0.89f);
+            scrollRT.sizeDelta = new Vector2(25, 0);
+            scrollRT.offsetMin = Vector2.zero;
+            scrollRT.offsetMax = Vector2.zero;
 
             var scrollRect = scrollGO.GetComponent<ScrollRect>();
             scrollRect.horizontal = false;   // 横スクロール不要なら false / No horizontal scroll if not needed
@@ -94,9 +82,9 @@ namespace KoikatuGameplayMod
             RectTransform vpRT = vpGO.GetComponent<RectTransform>();
             vpRT.anchorMin = Vector2.zero;
             vpRT.anchorMax = Vector2.one;
-            vpRT.offsetMin = new Vector2(0, 100);
-            vpRT.offsetMax = new Vector2(-550, -120);
-            vpRT.sizeDelta = new Vector2(-550, -200);
+            vpRT.offsetMin = Vector2.zero;
+            vpRT.offsetMax = Vector2.zero;
+            vpRT.sizeDelta = Vector2.zero;
 
             // Add vertical scrollbar
             var originalScrollbar = GameObject.Find("Scroll View/Scrollbar Vertical");
@@ -140,12 +128,40 @@ namespace KoikatuGameplayMod
             grid.spacing = new Vector2(10, 10);
             grid.constraint = GridLayoutGroup.Constraint.FixedColumnCount;
             grid.constraintCount = 5;
+            grid.padding = new RectOffset(10, 10, 0, 0);
 
             var fitter = contentGO.AddComponent<ContentSizeFitter>();
             fitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
             fitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+            
+            var originalScrollBarGObj = GameObject.Find("ClassRoomSelectScene/previewcharacanvas/charaFileControl/charaFileWindow/WinRect/ListArea/Scroll View/Scrollbar Vertical");
 
-            //System.Console.WriteLine("@@@ ddd");
+            if(originalScrollBarGObj != null)
+            {
+                var scrollbar = originalScrollBarGObj.GetComponent<Scrollbar>();
+
+                // コピー元のScrollbarを複製 / Duplicate the original Scrollbar
+                Scrollbar newScrollbar = GameObject.Instantiate(scrollbar, scrollRect.transform);
+
+                // ScrollRectと連携 / Link the ScrollRect with the new scrollbar
+                scrollRect.verticalScrollbar = newScrollbar;
+                scrollRect.verticalScrollbarVisibility = ScrollRect.ScrollbarVisibility.AutoHideAndExpandViewport;
+
+                RectTransform scrollbarRT = newScrollbar.GetComponent<RectTransform>();
+
+                // Viewportのサイズ調整（必要に応じて）/ Adjust the size of the Viewport (if necessary)
+                if (scrollRect.viewport != null)
+                {
+                    // Scrollbarの位置を右に配置（仮に幅20）/ Position the scrollbar to the right (assuming width 20)
+                    scrollbarRT.anchorMin = new Vector2(1, 0);
+                    scrollbarRT.anchorMax = new Vector2(1, 1);
+                    scrollbarRT.pivot = new Vector2(1, 1);
+                    scrollbarRT.sizeDelta = new Vector2(20, 0);
+                    scrollbarRT.anchoredPosition = new Vector2(+2, 0);
+                }
+
+                scrollbarRT.SetParent(scrollbarRT.parent.parent, true);
+            }
         }
     }
 }
