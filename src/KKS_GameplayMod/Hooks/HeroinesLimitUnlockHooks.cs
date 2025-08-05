@@ -20,7 +20,10 @@ namespace KoikatuGameplayMod
             if (KoikatuAPI.IsVR())
                 return false;
 
-            _addHeroins = config.Bind(KoikatuGameplayMod.ConfCatMainGame, "Increase max number of character slots", 0, new ConfigDescription("Maximum number of heroines in each location will be increased by this amount. You have to reopen the roster window after changing this setting.", new AcceptableValueRange<int>(0, 1500)));
+            _addHeroins = config.Bind(KoikatuGameplayMod.ConfCatMainGame, "Increase max number of character slots", 0, new ConfigDescription(
+                                          "Maximum number of heroines in each location will be increased by this amount. You have to reopen the roster window after changing this setting.\n" +
+                                          "WARNING: Before lowering this setting make sure to remove any characters in slots that will no longer exist! If you don't do this you may encounter random bugs.", 
+                                          new AcceptableValueRange<int>(0, 1500)));
 
             instance.PatchAll(typeof(HeroinesLimitUnlockHooks));
             return true;
