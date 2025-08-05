@@ -85,6 +85,7 @@
   <ItemGroup>
     <Compile Include="Hooks\BustSizeQuestionHooks.cs" />
     <Compile Include="Hooks\ClassCharaLimitUnlockHooks.cs" />
+    <Compile Include="Hooks\HeroinesLimitUnlockHooks.cs" />
     <Compile Include="Hooks\StatDecayHooks.cs" />
     <Compile Include="Hooks\UpdateLewdAfterHHooks.cs" />
   </ItemGroup>

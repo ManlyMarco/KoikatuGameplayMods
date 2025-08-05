@@ -14,7 +14,8 @@ namespace KoikatuGameplayMod
 #if KK
     [BepInProcess(KoikatuAPI.GameProcessNameSteam)]
     [BepInProcess(KoikatuAPI.VRProcessNameSteam)]
-    [BepInIncompatibility("fulmene.experiencelogic")]
+    [BepInIncompatibility("fulmene.experiencelogic")] // Included
+    [BepInIncompatibility("KoikatsuCharacterExpander")] // Included
 #endif
     [BepInDependency(KoikatuAPI.GUID, KoikatuAPI.VersionConst)]
     public class KoikatuGameplayMod : BaseUnityPlugin
